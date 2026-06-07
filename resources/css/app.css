@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .jewel-input {
+        @apply w-full rounded-lg border border-jewel-gold/30 bg-white px-4 py-2.5 text-jewel-charcoal shadow-sm transition duration-200 placeholder:text-gray-400 focus:border-jewel-gold focus:ring-2 focus:ring-jewel-gold/20;
+    }
+
+    .jewel-label {
+        @apply block text-sm font-medium tracking-wide text-jewel-charcoal;
+    }
+
+    .jewel-btn {
+        @apply inline-flex items-center justify-center rounded-lg bg-jewel-gold px-6 py-2.5 text-sm font-semibold uppercase tracking-widest text-jewel-dark shadow-md transition duration-200 hover:bg-jewel-gold-dark hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-jewel-gold focus:ring-offset-2 active:bg-jewel-gold-dark;
+    }
+
+    .jewel-link {
+        @apply text-sm text-jewel-gold-dark underline decoration-jewel-gold/40 underline-offset-2 transition hover:text-jewel-gold hover:decoration-jewel-gold;
+    }
+
+    .jewel-divider {
+        @apply flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-jewel-gold/60;
+    }
+
+    .jewel-divider::before,
+    .jewel-divider::after {
+        content: '';
+        @apply h-px flex-1 bg-jewel-gold/25;
+    }
+}
