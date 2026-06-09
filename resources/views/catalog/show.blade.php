@@ -2,9 +2,17 @@
     <x-slot name="title">{{ $design->name }} — {{ config('app.name') }}</x-slot>
 
     <div class="px-6 py-10 sm:px-10 lg:px-16 max-w-5xl mx-auto">
-        <a href="{{ route('catalog.index') }}" class="inline-flex items-center text-sm font-medium text-jewel-gold hover:text-white transition mb-6">
-            &larr; Back to catalog
-        </a>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-6">
+            <a href="{{ route('catalog.index') }}" class="inline-flex items-center text-sm font-medium text-jewel-gold hover:text-white transition">
+                &larr; Back to catalog
+            </a>
+            @guest
+                <span class="text-slate-600 hidden sm:inline">|</span>
+                <a href="{{ url('/') }}" class="inline-flex items-center text-sm font-medium text-slate-300 hover:text-jewel-gold transition">
+                    &larr; Back to Home
+                </a>
+            @endguest
+        </div>
 
         <div class="grid lg:grid-cols-2 gap-8">
             {{-- Images --}}
@@ -74,6 +82,9 @@
                         </a>
                         <a href="{{ route('purchase.login', $design) }}" class="jewel-btn-outline flex-1 text-center px-6 py-3 border-white/25 text-white hover:bg-white/10">
                             Already have an account? Sign In
+                        </a>
+                        <a href="{{ url('/') }}" class="jewel-btn-outline flex-1 text-center px-6 py-3 border-white/25 text-slate-300 hover:text-white hover:bg-white/10">
+                            Back to Home
                         </a>
                     @endauth
                 </div>

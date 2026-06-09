@@ -2,6 +2,12 @@
     <x-slot name="title">Our Catalog — {{ config('app.name') }}</x-slot>
 
     <div class="px-6 py-10 sm:px-10 lg:px-16 max-w-7xl mx-auto">
+        @guest
+            <a href="{{ url('/') }}" class="inline-flex items-center text-sm font-medium text-jewel-gold hover:text-white transition mb-6">
+                &larr; Back to Home
+            </a>
+        @endguest
+
         <div class="text-center mb-10 animate-slide-up">
             <span class="inline-block px-4 py-1.5 rounded-full bg-jewel-rose/20 text-jewel-rose-light text-xs font-semibold uppercase tracking-widest mb-4 border border-jewel-rose/30">Browse Collection</span>
             <h1 class="font-display text-3xl sm:text-4xl font-semibold text-white">Our Jewellery Catalog</h1>
@@ -76,8 +82,8 @@
                 <h2 class="font-display text-xl font-semibold text-white">Ready to order?</h2>
                 <p class="text-slate-400 mt-2 text-sm">Create a free account to place an order from our catalog or submit a custom design.</p>
                 <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="{{ route('register') }}" class="jewel-btn px-8">Create Account</a>
-                    <a href="{{ route('login') }}" class="jewel-btn px-8">Sign In</a>
+                    <a href="{{ route('register') }}" class="jewel-btn px-8">Start Ordering</a>
+                    <a href="{{ url('/') }}" class="jewel-btn-outline border-white/25 text-white hover:bg-white/10 px-8">Back to Home</a>
                 </div>
             </div>
         @endguest

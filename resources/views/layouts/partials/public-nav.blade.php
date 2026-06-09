@@ -19,10 +19,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="jewel-btn text-xs px-5 py-2">Admin Panel</a>
             @endif
         @else
-            <a href="{{ route('login') }}" class="jewel-btn text-xs px-5 py-2">Sign In</a>
-            @if(Route::has('register'))
-                <a href="{{ route('register') }}" class="hidden sm:inline jewel-btn-outline border-white/20 text-white hover:text-jewel-rose-dark text-xs px-5 py-2">Register</a>
-            @endif
+            <a href="{{ route('register') }}" class="jewel-btn text-xs px-5 py-2">Start Ordering</a>
         @endauth
     </div>
 </nav>
