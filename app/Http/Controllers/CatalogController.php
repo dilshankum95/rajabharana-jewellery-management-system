@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\CatalogDesign;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class CatalogController extends Controller
@@ -44,5 +46,29 @@ class CatalogController extends Controller
         $catalog->load('images');
 
         return view('catalog.show', ['design' => $catalog]);
+    }
+
+    public function purchase(CatalogDesign $catalog): RedirectResponse
+    {
+        abort_unless($catalog->isAvailable(), 404);
+
+        $orderUrl = route('orders.create', ['catalog' => $catalog->id]);
+
+        if (Auth::user()?->isCustomer()) {
+            return redirect($orderUrl);
+        }
+
+        session()->put('url.intended', $orderUrl);
+
+        return redirect()
+            ->route('register')
+            ->with('status', 'Create your account to order '.$catalog->name.'.');
+    }
+
+    public function purchaseLogin(CatalogDesign $catalog): RedirectResponse
+    {
+        abort_unless($catalog->isAvailable(), 404);
+
+        return redirect()->guest(route('orders.create', ['catalog' => $catalog->id]));
     }
 }

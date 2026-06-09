@@ -35,25 +35,34 @@
         @else
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($designs as $design)
-                    <a href="{{ route('catalog.show', $design) }}" class="jewel-card overflow-hidden group hover:shadow-jewel-lg transition">
-                        <div class="h-48 bg-slate-50 flex items-center justify-center relative overflow-hidden">
-                            @if($design->image_url)
-                                <img src="{{ $design->image_url }}" alt="{{ $design->name }}"
-                                    class="h-full w-full object-cover group-hover:scale-105 transition duration-300">
-                            @else
-                                <x-jewellery-logo class="w-12 h-12 text-jewel-gold/30" />
-                            @endif
-                            <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-semibold uppercase tracking-wide text-jewel-rose-dark">
-                                {{ $design->category_label }}
-                            </span>
-                        </div>
-                        <div class="p-4">
-                            <p class="font-semibold text-slate-800 group-hover:text-jewel-rose-dark transition">{{ $design->name }}</p>
-                            <p class="text-xs text-slate-400 mt-0.5">{{ $design->code }}</p>
-                            <p class="text-xs text-slate-500 mt-2">{{ $design->gold_quality_label }} · {{ number_format($design->weight_grams, 1) }}g</p>
-                            <p class="text-sm font-semibold text-jewel-gold-dark mt-2">LKR {{ number_format($design->selling_price, 0) }}</p>
-                        </div>
-                    </a>
+                    <div class="jewel-card overflow-hidden group hover:shadow-jewel-lg transition flex flex-col">
+                        <a href="{{ route('catalog.show', $design) }}" class="block flex-1">
+                            <div class="h-48 bg-slate-50 flex items-center justify-center relative overflow-hidden">
+                                @if($design->image_url)
+                                    <img src="{{ $design->image_url }}" alt="{{ $design->name }}"
+                                        class="h-full w-full object-cover group-hover:scale-105 transition duration-300">
+                                @else
+                                    <x-jewellery-logo class="w-12 h-12 text-jewel-gold/30" />
+                                @endif
+                                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-semibold uppercase tracking-wide text-jewel-rose-dark">
+                                    {{ $design->category_label }}
+                                </span>
+                            </div>
+                            <div class="p-4">
+                                <p class="font-semibold text-slate-800 group-hover:text-jewel-rose-dark transition">{{ $design->name }}</p>
+                                <p class="text-xs text-slate-400 mt-0.5">{{ $design->code }}</p>
+                                <p class="text-xs text-slate-500 mt-2">{{ $design->gold_quality_label }} · {{ number_format($design->weight_grams, 1) }}g</p>
+                                <p class="text-sm font-semibold text-jewel-gold-dark mt-2">LKR {{ number_format($design->selling_price, 0) }}</p>
+                            </div>
+                        </a>
+                        @guest
+                            <div class="px-4 pb-4">
+                                <a href="{{ route('purchase', $design) }}" class="jewel-btn w-full text-center text-sm py-2.5 block">
+                                    Register to Order
+                                </a>
+                            </div>
+                        @endguest
+                    </div>
                 @endforeach
             </div>
 

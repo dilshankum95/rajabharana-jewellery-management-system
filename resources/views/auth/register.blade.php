@@ -4,6 +4,8 @@
         <p class="jewel-page-subtitle mt-2">Register to order custom jewellery from Rajabharana</p>
     </div>
 
+    <x-auth-session-status class="mb-4" :status="session('status')" />
+
     <form method="POST" action="{{ route('register') }}" class="space-y-5">
         @csrf
 

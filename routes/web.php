@@ -15,6 +15,8 @@ Route::get('/', function () {
 });
 
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/catalog/{catalog}/purchase', [CatalogController::class, 'purchase'])->name('purchase');
+Route::get('/catalog/{catalog}/purchase/login', [CatalogController::class, 'purchaseLogin'])->name('purchase.login');
 Route::get('/catalog/{catalog}', [CatalogController::class, 'show'])->name('catalog.show');
 
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {

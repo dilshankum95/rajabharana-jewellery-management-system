@@ -42,7 +42,7 @@
                     <div x-show="designType === 'catalog'" x-cloak class="space-y-4">
                         <label class="jewel-label">Browse by Category</label>
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" @click="selectedCategory = 'all'"
+                            <button type="button" @@click="selectedCategory = 'all'"
                                 :class="selectedCategory === 'all'
                                     ? 'bg-btn-gradient text-white shadow-jewel border-transparent'
                                     : 'bg-white text-slate-600 border-slate-200 hover:border-jewel-rose/40 hover:bg-jewel-rose-light'"
@@ -51,7 +51,7 @@
                                 <span class="ml-1 opacity-75">({{ $catalogDesigns->count() }})</span>
                             </button>
                             @foreach($categories as $value => $label)
-                                <button type="button" @click="selectedCategory = '{{ $value }}'"
+                                <button type="button" @@click="selectedCategory = '{{ $value }}'"
                                     :class="selectedCategory === '{{ $value }}'
                                         ? 'bg-btn-gradient text-white shadow-jewel border-transparent'
                                         : 'bg-white text-slate-600 border-slate-200 hover:border-jewel-rose/40 hover:bg-jewel-rose-light'"
@@ -73,7 +73,7 @@
                                         x-transition>
                                         <input type="radio" name="catalog_design_id" value="{{ $design->id }}"
                                             class="peer sr-only"
-                                            @change="selectCatalogDesign('{{ $design->category }}', '{{ $design->gold_quality }}', {{ $design->weight_grams }})"
+                                            @@change="selectCatalogDesign('{{ $design->category }}', '{{ $design->gold_quality }}', {{ $design->weight_grams }})"
                                             {{ old('catalog_design_id', $preselectedCatalogId ?? '') == $design->id ? 'checked' : '' }}>
                                         <div class="rounded-xl border-2 border-slate-200 overflow-hidden peer-checked:border-jewel-rose peer-checked:ring-2 peer-checked:ring-jewel-rose/20 transition hover:border-jewel-gold/30 hover:shadow-jewel">
                                             <div class="h-32 bg-slate-50 flex items-center justify-center relative">
@@ -282,12 +282,8 @@
 
             return {
                 designType: @json(old('design_type', 'catalog')),
-                selectedCategory: @json(
-                    old('catalog_design_id', $preselectedCatalogId ?? null)
-                        ? ($catalogDesigns->firstWhere('id', (int) old('catalog_design_id', $preselectedCatalogId ?? 0))?->category ?? 'all')
-                        : 'all'
-                ),
-                designCategories: @json($catalogDesigns->pluck('category', 'id')),
+                selectedCategory: @json($selectedCategory),
+                designCategories: @json($designCategories),
                 hasVisibleDesigns() {
                     if (this.selectedCategory === 'all') {
                         return true;

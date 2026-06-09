@@ -50,7 +50,6 @@
                     <a href="{{ route('catalog.index') }}" class="jewel-btn px-8 py-3">Browse Catalog</a>
                     @guest
                         <a href="{{ route('register') }}" class="jewel-btn px-8 py-3">Start Ordering</a>
-                        <a href="{{ route('login') }}" class="jewel-btn px-8 py-3">Sign In</a>
                     @else
                         <a href="{{ route('orders.create') }}" class="jewel-btn px-8 py-3">Place an Order</a>
                         <a href="{{ route('dashboard') }}" class="jewel-btn-outline border-white/20 text-white hover:text-jewel-rose-dark px-8 py-3">My Dashboard</a>

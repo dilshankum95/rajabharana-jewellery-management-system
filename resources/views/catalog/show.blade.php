@@ -69,8 +69,12 @@
                             </a>
                         @endif
                     @else
-                        <a href="{{ route('register') }}" class="jewel-btn flex-1 text-center px-6 py-3">Create Account to Order</a>
-                        <a href="{{ route('login') }}" class="jewel-btn flex-1 text-center px-6 py-3">Sign In</a>
+                        <a href="{{ route('purchase', $design) }}" class="jewel-btn flex-1 text-center px-6 py-3">
+                            Register to Order
+                        </a>
+                        <a href="{{ route('purchase.login', $design) }}" class="jewel-btn-outline flex-1 text-center px-6 py-3 border-white/25 text-white hover:bg-white/10">
+                            Already have an account? Sign In
+                        </a>
                     @endauth
                 </div>
             </div>

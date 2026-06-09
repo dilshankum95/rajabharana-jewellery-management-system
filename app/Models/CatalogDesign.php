@@ -96,4 +96,13 @@ class CatalogDesign extends Model
     {
         return $this->availability_status === AvailabilityStatus::Available;
     }
+
+    public function orderUrl(): string
+    {
+        if (auth()->user()?->isCustomer()) {
+            return route('orders.create', ['catalog' => $this->id]);
+        }
+
+        return route('purchase', $this);
+    }
 }

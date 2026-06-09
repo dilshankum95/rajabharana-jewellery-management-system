@@ -36,10 +36,16 @@ class OrderController extends Controller
 
         $preselectedCatalogId = old('catalog_design_id', $request->query('catalog'));
 
+        $selectedCategory = $preselectedCatalogId
+            ? ($catalogDesigns->firstWhere('id', (int) $preselectedCatalogId)?->category ?? 'all')
+            : 'all';
+
         return view('customer.orders.create', [
             'catalogDesigns' => $catalogDesigns,
             'categories' => $categories,
             'preselectedCatalogId' => $preselectedCatalogId,
+            'selectedCategory' => $selectedCategory,
+            'designCategories' => $catalogDesigns->pluck('category', 'id'),
             'goldQualities' => config('jewellery.gold_qualities'),
             'itemTypes' => config('jewellery.item_types'),
             'designTypes' => config('jewellery.design_types'),
