@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-8 text-center">
-        <h2 class="font-display text-2xl font-semibold text-jewel-dark">Welcome Back</h2>
-        <p class="mt-2 text-sm text-gray-500">Sign in to Rajabharana Jewellery Management System</p>
+        <h2 class="jewel-page-title text-2xl">Welcome Back</h2>
+        <p class="jewel-page-subtitle mt-2">Sign in to Rajabharana Jewellery Management System</p>
     </div>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -69,7 +69,7 @@
             <div class="jewel-divider">or</div>
             <p class="mt-6 text-center text-sm text-gray-500">
                 New to the platform?
-                <a href="{{ route('register') }}" class="font-medium text-jewel-gold-dark hover:text-jewel-gold transition">
+                <a href="{{ route('register') }}" class="jewel-link no-underline hover:underline">
                     {{ __('Create an account') }}
                 </a>
             </p>

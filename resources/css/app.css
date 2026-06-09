@@ -2,30 +2,145 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    body {
+        @apply antialiased text-slate-600;
+    }
+}
+
 @layer components {
+    .jewel-bg-pattern {
+        background-color: #F8FAFC;
+        background-image:
+            radial-gradient(ellipse at 0% 0%, rgba(224, 122, 95, 0.06) 0%, transparent 50%),
+            radial-gradient(ellipse at 100% 100%, rgba(233, 180, 76, 0.06) 0%, transparent 50%);
+    }
+
     .jewel-input {
-        @apply w-full rounded-lg border border-jewel-gold/30 bg-white px-4 py-2.5 text-jewel-charcoal shadow-sm transition duration-200 placeholder:text-gray-400 focus:border-jewel-gold focus:ring-2 focus:ring-jewel-gold/20;
+        @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-700 shadow-sm transition duration-200 placeholder:text-slate-400 hover:border-slate-300 focus:border-jewel-rose/50 focus:ring-4 focus:ring-jewel-rose/10 focus:outline-none;
     }
 
     .jewel-label {
-        @apply block text-sm font-medium tracking-wide text-jewel-charcoal;
+        @apply block text-sm font-semibold text-slate-700;
     }
 
     .jewel-btn {
-        @apply inline-flex items-center justify-center rounded-lg bg-jewel-gold px-6 py-2.5 text-sm font-semibold uppercase tracking-widest text-jewel-dark shadow-md transition duration-200 hover:bg-jewel-gold-dark hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-jewel-gold focus:ring-offset-2 active:bg-jewel-gold-dark;
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-btn-gradient px-6 py-2.5 text-sm font-semibold text-white shadow-jewel transition duration-300 hover:bg-btn-gradient-hover hover:shadow-glow hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-jewel-rose/25 focus:ring-offset-2 active:translate-y-0;
+    }
+
+    .jewel-btn-outline {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:border-jewel-rose/40 hover:bg-jewel-rose-light hover:text-jewel-rose-dark focus:outline-none focus:ring-4 focus:ring-jewel-rose/10;
+    }
+
+    .jewel-btn-danger {
+        @apply inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100 focus:outline-none focus:ring-4 focus:ring-red-100;
     }
 
     .jewel-link {
-        @apply text-sm text-jewel-gold-dark underline decoration-jewel-gold/40 underline-offset-2 transition hover:text-jewel-gold hover:decoration-jewel-gold;
+        @apply text-sm font-semibold text-jewel-rose underline decoration-jewel-rose/30 underline-offset-4 transition hover:text-jewel-rose-dark hover:decoration-jewel-rose;
     }
 
     .jewel-divider {
-        @apply flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-jewel-gold/60;
+        @apply flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400;
     }
 
     .jewel-divider::before,
     .jewel-divider::after {
         content: '';
-        @apply h-px flex-1 bg-jewel-gold/25;
+        @apply h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent;
     }
+
+    .jewel-card {
+        @apply rounded-2xl border border-slate-200/60 bg-white shadow-sm transition duration-300 hover:shadow-jewel-lg hover:border-jewel-gold/20;
+    }
+
+    .jewel-card-header {
+        @apply border-b border-slate-100 px-6 py-4 bg-slate-50/50 rounded-t-2xl;
+    }
+
+    .jewel-card-body {
+        @apply p-6;
+    }
+
+    .jewel-stat {
+        @apply jewel-card relative overflow-hidden p-5;
+    }
+
+    .jewel-stat::before {
+        content: '';
+        @apply absolute top-0 left-0 h-1 w-full bg-btn-gradient;
+    }
+
+    .jewel-section-title {
+        @apply font-display text-lg font-semibold text-slate-800;
+    }
+
+    .jewel-page-title {
+        @apply font-display text-2xl font-semibold text-slate-800 sm:text-3xl;
+    }
+
+    .jewel-page-subtitle {
+        @apply mt-1 text-sm text-slate-500;
+    }
+
+    .jewel-auth-card {
+        @apply relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white px-8 py-10 shadow-jewel-lg sm:px-10;
+    }
+
+    .jewel-auth-card::before {
+        content: '';
+        @apply absolute inset-x-0 top-0 h-1 bg-btn-gradient;
+    }
+
+    .jewel-table thead {
+        @apply bg-slate-50;
+    }
+
+    .jewel-table th {
+        @apply px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500;
+    }
+
+    .jewel-table td {
+        @apply px-6 py-4 text-sm text-slate-600;
+    }
+
+    .jewel-table tbody tr {
+        @apply border-t border-slate-100 transition hover:bg-jewel-rose-light/30;
+    }
+
+    .jewel-file-input {
+        @apply block w-full cursor-pointer text-sm text-slate-500 file:mr-4 file:cursor-pointer file:rounded-xl file:border-0 file:bg-jewel-rose-light file:px-4 file:py-2 file:text-sm file:font-semibold file:text-jewel-rose-dark hover:file:bg-jewel-gold-light;
+    }
+
+    .jewel-empty {
+        @apply flex flex-col items-center justify-center py-16 text-center;
+    }
+
+    .jewel-badge-active {
+        @apply inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700;
+    }
+
+    .jewel-badge-inactive {
+        @apply inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500;
+    }
+
+    .jewel-sidebar-link {
+        @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition duration-200;
+    }
+
+    .jewel-sidebar-link-active {
+        @apply bg-gradient-to-r from-jewel-rose/20 to-jewel-gold/10 text-jewel-gold-light shadow-sm border border-white/10;
+    }
+
+    .jewel-sidebar-link-inactive {
+        @apply text-slate-400 hover:bg-white/5 hover:text-white;
+    }
+
+    .jewel-nav-glass {
+        @apply bg-jewel-dark/90 backdrop-blur-xl border-b border-white/10 shadow-jewel-lg;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
 }
