@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CatalogIndexRequest;
 use App\Models\CatalogDesign;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class CatalogController extends Controller
 {
-    public function index(Request $request): View
+    public function index(CatalogIndexRequest $request): View
     {
+        $validated = $request->validated();
         $query = CatalogDesign::available()->with('images')->orderBy('category')->orderBy('name');
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
+        if (! empty($validated['category'])) {
+            $query->where('category', $validated['category']);
         }
 
-        if ($request->filled('search')) {
-            $search = trim($request->search);
+        if (! empty($validated['search'])) {
+            $search = $validated['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('code', 'like', "%{$search}%");

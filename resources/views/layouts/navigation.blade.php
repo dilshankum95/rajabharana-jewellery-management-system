@@ -17,21 +17,26 @@
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center">
+            <div class="hidden sm:flex sm:items-center sm:gap-4">
+                <x-live-datetime variant="dark" class="hidden lg:block" />
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition">
-                            <span class="w-8 h-8 rounded-full bg-btn-gradient flex items-center justify-center text-xs font-bold text-white shadow-sm">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                            </span>
+                            <x-user-avatar :user="Auth::user()" size="sm" class="shadow-sm" />
                             <span class="hidden md:block">{{ Auth::user()->name }}</span>
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                         </button>
                     </x-slot>
                     <x-slot name="content">
                         <div class="px-4 py-3 border-b border-slate-100">
-                            <p class="text-sm font-semibold text-slate-800">{{ Auth::user()->name }}</p>
-                            <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                            <div class="flex items-center gap-3">
+                                <x-user-avatar :user="Auth::user()" size="sm" />
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-slate-800">{{ Auth::user()->name }}</p>
+                                    <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
+                                </div>
+                            </div>
+                            <x-live-datetime class="mt-2" />
                         </div>
                         <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
@@ -59,8 +64,14 @@
             <x-responsive-nav-link :href="route('orders.create')" :active="request()->routeIs('orders.create')">{{ __('Place Order') }}</x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-3 border-t border-white/10 px-4">
-            <p class="font-semibold text-white">{{ Auth::user()->name }}</p>
-            <p class="text-sm text-slate-400">{{ Auth::user()->email }}</p>
+            <x-live-datetime variant="dark" class="mb-3" />
+            <div class="flex items-center gap-3 mb-2">
+                <x-user-avatar :user="Auth::user()" size="sm" />
+                <div>
+                    <p class="font-semibold text-white">{{ Auth::user()->name }}</p>
+                    <p class="text-sm text-slate-400">{{ Auth::user()->email }}</p>
+                </div>
+            </div>
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
                 <form method="POST" action="{{ route('logout') }}">

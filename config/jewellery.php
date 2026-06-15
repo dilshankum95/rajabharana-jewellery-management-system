@@ -61,4 +61,6 @@ return [
         'cancelled' => 'Cancelled',
     ],
 
+    'delivery_reminder_days' => 3,
+
 ];

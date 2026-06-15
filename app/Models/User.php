@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use App\Support\Rbac;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'phone',
         'address',
         'city',
+        'profile_photo_path',
     ];
 
     protected $hidden = [
@@ -58,8 +60,78 @@ class User extends Authenticatable
         return $this->role === UserRole::Staff;
     }
 
+    public function isStaffMember(): bool
+    {
+        return $this->role instanceof UserRole && $this->role->isPanelRole();
+    }
+
     public function isAdminOrStaff(): bool
     {
-        return in_array($this->role, [UserRole::Admin, UserRole::Staff]);
+        return $this->isStaffMember();
+    }
+
+    public function isManager(): bool
+    {
+        return $this->role === UserRole::Manager;
+    }
+
+    public function isTechnician(): bool
+    {
+        return $this->role === UserRole::Technician;
+    }
+
+    public function isManagedStaffAccount(): bool
+    {
+        return $this->role instanceof UserRole && $this->role->isManagedStaffAccount();
+    }
+
+    public function assignedOrders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'assigned_technician_id');
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return Rbac::userHasPermission($this, $permission);
+    }
+
+    /** @param  list<string>  $permissions */
+    public function hasAnyPermission(array $permissions): bool
+    {
+        return Rbac::userHasAnyPermission($this, $permissions);
+    }
+
+    public function scopeStaffAccounts($query)
+    {
+        $roles = array_map(
+            fn (UserRole $role) => $role->value,
+            UserRole::panelRoles()
+        );
+        $roles[] = UserRole::Technician->value;
+
+        return $query->whereIn('role', $roles);
+    }
+
+    public function scopeTechnicians($query)
+    {
+        return $query->where('role', UserRole::Technician);
+    }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        return $this->profile_photo_path
+            ? asset('storage/'.$this->profile_photo_path)
+            : null;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $parts = preg_split('/\s+/', trim($this->name), 2);
+
+        if (count($parts) >= 2) {
+            return strtoupper(substr($parts[0], 0, 1).substr($parts[1], 0, 1));
+        }
+
+        return strtoupper(substr($this->name, 0, 1));
     }
 }

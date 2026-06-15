@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +12,7 @@ class EnsureAdmin
     {
         $user = $request->user();
 
-        if (! $user || ! in_array($user->role, [UserRole::Admin, UserRole::Staff])) {
+        if (! $user || ! $user->isStaffMember()) {
             abort(403, 'Unauthorized access to admin panel.');
         }
 

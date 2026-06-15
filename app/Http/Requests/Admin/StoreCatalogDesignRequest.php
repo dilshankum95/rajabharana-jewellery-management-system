@@ -14,7 +14,7 @@ class StoreCatalogDesignRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return $this->user()?->isAdminOrStaff() ?? false;
+        return $this->user()?->hasPermission('catalog.manage') ?? false;
     }
 
     protected function prepareForValidation(): void
@@ -28,25 +28,20 @@ class StoreCatalogDesignRequest extends FormRequest
             'name' => ValidationRules::productName(),
             'category' => ['required', Rule::in(array_keys(config('jewellery.catalog_categories')))],
             'gold_quality' => ['required', Rule::in(array_keys(config('jewellery.catalog_gold_qualities')))],
-            'weight_grams' => ['required', 'numeric', 'min:0.01', 'max:99999'],
-            'description' => ValidationRules::longText(max: 2000),
-            'selling_price' => ['required', 'numeric', 'min:0.01', 'max:99999999.99'],
+            'weight_grams' => ValidationRules::weight(required: true),
+            'description' => ValidationRules::orderNotes(max: 2000),
+            'selling_price' => ValidationRules::money(),
             'availability_status' => ['required', Rule::enum(AvailabilityStatus::class)],
             'images' => ['required', 'array', 'min:1', 'max:10'],
-            'images.*' => ['image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
+            'images.*' => ValidationRules::imageFile(required: true),
         ];
     }
 
     public function messages(): array
     {
-        return array_merge(ValidationRules::messages(), [
-            'name.regex' => 'The product name contains invalid characters.',
-            'name.min' => 'The product name must be at least 2 characters.',
+        return array_merge(ValidationRules::catalogItemMessages(), [
             'images.required' => 'Please upload at least one product image.',
             'images.min' => 'Please upload at least one product image.',
-            'images.max' => 'You can upload a maximum of 10 images.',
-            'weight_grams.min' => 'Weight must be at least 0.01 grams.',
-            'selling_price.min' => 'Selling price must be greater than zero.',
         ]);
     }
 

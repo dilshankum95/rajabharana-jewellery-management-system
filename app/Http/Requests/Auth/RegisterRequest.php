@@ -17,7 +17,7 @@ class RegisterRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->trimStrings(['name', 'email', 'phone']);
+        $this->trimStrings(['name', 'email', 'phone', 'address', 'city'], ['address', 'city']);
     }
 
     public function rules(): array
@@ -25,14 +25,20 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ValidationRules::personName(),
             'email' => ValidationRules::uniqueEmail(),
-            'phone' => ValidationRules::phone(),
+            'phone' => ValidationRules::phone(required: true),
+            'address' => ValidationRules::address(required: true),
+            'city' => ValidationRules::city(required: true),
             'password' => ValidationRules::password(),
         ];
     }
 
     public function messages(): array
     {
-        return ValidationRules::messages();
+        return array_merge(ValidationRules::messages(), [
+            'phone.required' => 'Phone number is required.',
+            'address.required' => 'Address is required.',
+            'city.required' => 'City is required.',
+        ]);
     }
 
     public function attributes(): array

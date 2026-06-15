@@ -19,6 +19,7 @@
                 required
                 autofocus
                 autocomplete="username"
+                maxlength="255"
                 placeholder="you@example.com"
                 class="jewel-input mt-1.5"
             />
@@ -32,6 +33,7 @@
                 type="password"
                 name="password"
                 required
+                maxlength="255"
                 autocomplete="current-password"
                 placeholder="••••••••"
                 class="jewel-input mt-1.5"

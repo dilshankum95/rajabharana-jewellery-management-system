@@ -30,8 +30,18 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-        if ($user->isAdminOrStaff()) {
-            return redirect()->intended(route('admin.dashboard', absolute: false));
+        if ($user->role === \App\Enums\UserRole::Technician) {
+            return redirect()->intended(route('technician.dashboard', absolute: false));
+        }
+
+        if ($user->isStaffMember()) {
+            $default = $user->hasPermission('dashboard.view')
+                ? route('admin.dashboard', absolute: false)
+                : ($user->hasPermission('catalog.view')
+                    ? route('admin.catalog.index', absolute: false)
+                    : route('admin.dashboard', absolute: false));
+
+            return redirect()->intended($default);
         }
 
         return redirect()->intended(route('dashboard', absolute: false));

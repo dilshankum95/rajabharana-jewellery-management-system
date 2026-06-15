@@ -10,9 +10,11 @@
         <div class="flex gap-3">
             <input type="text" name="search" value="{{ $filters['search'] ?? '' }}"
                 placeholder="Search name, email or phone..."
+                maxlength="100"
                 class="jewel-input flex-1 max-w-md">
             <button type="submit" class="jewel-btn px-6">Search</button>
         </div>
+        <x-input-error :messages="$errors->get('search')" class="mt-2" />
     </form>
 
     <div class="bg-white rounded-xl border border-jewel-gold/10 shadow-sm overflow-hidden">

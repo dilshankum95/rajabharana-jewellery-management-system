@@ -8,7 +8,7 @@
         @csrf
         <div>
             <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" type="password" name="password" required autocomplete="current-password" class="mt-1.5" />
+            <x-text-input id="password" type="password" name="password" required autocomplete="current-password" maxlength="255" class="mt-1.5" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
         <button type="submit" class="jewel-btn w-full">{{ __('Confirm') }}</button>

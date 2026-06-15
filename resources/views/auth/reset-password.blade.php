@@ -10,17 +10,18 @@
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" class="mt-1.5" />
+            <x-text-input id="email" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" maxlength="255" class="mt-1.5" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="password" :value="__('New Password')" />
-            <x-text-input id="password" type="password" name="password" required autocomplete="new-password" class="mt-1.5" />
+            <x-text-input id="password" type="password" name="password" required autocomplete="new-password" minlength="8" maxlength="255" class="mt-1.5" />
+            <x-password-requirements />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
         <div>
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" class="mt-1.5" />
+            <x-text-input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" minlength="8" maxlength="255" class="mt-1.5" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 

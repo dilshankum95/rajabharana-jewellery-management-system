@@ -10,6 +10,8 @@
         </div>
     </x-slot>
 
+    <x-delivery-alert :order="$order" class="mb-6" />
+
     <div class="grid lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             {{-- Customer --}}
@@ -122,6 +124,7 @@
                 @endif
             </section>
 
+            @can('permission', 'orders.manage')
             <section class="jewel-card jewel-card-body sticky top-24">
                 <h2 class="jewel-section-title mb-4">Manage Order</h2>
 
@@ -143,6 +146,8 @@
                         <label for="expected_delivery_date" class="jewel-label">Expected Delivery Date *</label>
                         <input id="expected_delivery_date" name="expected_delivery_date" type="date" required
                             value="{{ old('expected_delivery_date', $order->expected_delivery_date->format('Y-m-d')) }}"
+                            min="{{ $order->created_at->format('Y-m-d') }}"
+                            max="{{ now()->addYear()->format('Y-m-d') }}"
                             class="jewel-input mt-1.5">
                         <p class="mt-1 text-xs text-gray-400">Adjust if the production schedule requires a different date. Customer will see the updated date.</p>
                         <x-input-error :messages="$errors->get('expected_delivery_date')" class="mt-1" />
@@ -169,6 +174,78 @@
                     <button type="submit" class="jewel-btn w-full">Save Changes</button>
                 </form>
             </section>
+            @else
+            <section class="jewel-card jewel-card-body sticky top-24">
+                <h2 class="jewel-section-title mb-4">Order Status</h2>
+                <p class="text-sm text-slate-500">You have view-only access to this order. Contact a manager or administrator to update status or pricing.</p>
+                <div class="mt-4">
+                    <x-order-status-badge :status="$order->status" />
+                </div>
+            </section>
+            @endcan
+
+            @can('permission', 'production.assign')
+            <section class="jewel-card jewel-card-body">
+                <h2 class="jewel-section-title mb-4">Workshop Assignment</h2>
+
+                @if($order->assignedTechnician)
+                    <p class="text-sm text-slate-600 mb-4">
+                        Currently assigned to
+                        <span class="font-medium">{{ $order->assignedTechnician->name }}</span>
+                        @if($order->assigned_at)
+                            <span class="text-slate-400">since {{ $order->assigned_at->format('M d, Y') }}</span>
+                        @endif
+                    </p>
+                @elseif(! $order->isAssignableToTechnician())
+                    <p class="text-sm text-slate-500 mb-4">Assign a technician once the order is confirmed and in active production.</p>
+                @else
+                    <p class="text-sm text-slate-500 mb-4">No technician assigned yet.</p>
+                @endif
+
+                @if($technicians->isEmpty())
+                    <x-alert type="warning">No technician accounts exist. Create one under Staff Accounts first.</x-alert>
+                @elseif($order->isAssignableToTechnician() || $order->assignedTechnician)
+                    <form method="POST" action="{{ route('admin.orders.assign-technician', $order) }}" class="space-y-3">
+                        @csrf
+                        @method('PATCH')
+                        <div>
+                            <label for="assigned_technician_id" class="jewel-label">Technician</label>
+                            <select id="assigned_technician_id" name="assigned_technician_id" class="jewel-input mt-1.5">
+                                <option value="">— Unassigned —</option>
+                                @foreach($technicians as $technician)
+                                    <option value="{{ $technician->id }}" @selected(old('assigned_technician_id', $order->assigned_technician_id) == $technician->id)>
+                                        {{ $technician->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('assigned_technician_id')" class="mt-1" />
+                        </div>
+                        <button type="submit" class="jewel-btn-outline w-full">Update Assignment</button>
+                    </form>
+                @endif
+            </section>
+            @endcan
+
+            @if($order->productionLogs->isNotEmpty())
+            <section class="jewel-card jewel-card-body">
+                <h2 class="jewel-section-title mb-4">Production Log</h2>
+                <ol class="space-y-3 text-sm max-h-64 overflow-y-auto">
+                    @foreach($order->productionLogs as $log)
+                        <li class="border-l-2 border-jewel-gold/30 pl-3">
+                            <p class="font-medium text-slate-700">
+                                {{ $log->created_at->format('M d, h:i A') }}
+                                @if($log->from_status && $log->to_status && $log->from_status !== $log->to_status)
+                                    · {{ $log->from_status->label() }} → {{ $log->to_status->label() }}
+                                @endif
+                            </p>
+                            @if($log->note)
+                                <p class="mt-0.5 text-slate-500">{{ $log->note }}</p>
+                            @endif
+                        </li>
+                    @endforeach
+                </ol>
+            </section>
+            @endif
         </div>
     </div>
 </x-admin-layout>

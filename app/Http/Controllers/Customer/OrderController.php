@@ -25,8 +25,16 @@ class OrderController extends Controller
         return view('customer.orders.index', compact('orders'));
     }
 
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
+        $user = $request->user();
+
+        if (! $user->phone || ! $user->address || ! $user->city) {
+            return redirect()
+                ->route('profile.edit')
+                ->with('warning', 'Please complete your customer details (phone, address, and city) before placing an order.');
+        }
+
         $catalogDesigns = CatalogDesign::available()->with('images')->orderBy('category')->orderBy('name')->get();
         $allCategories = config('jewellery.catalog_categories');
 
@@ -81,6 +89,11 @@ class OrderController extends Controller
         }
 
         $order = Order::create($data);
+
+        $request->user()->update([
+            'phone' => $data['contact_phone'],
+            'address' => $data['delivery_address'],
+        ]);
 
         $message = 'Your order has been submitted successfully. Our team will review it shortly.';
         if ($order->estimated_price) {

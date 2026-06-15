@@ -9,13 +9,17 @@ trait SanitizesInput
         $merged = [];
 
         foreach ($fields as $field) {
-            if (! $this->has($field) || ! is_string($this->input($field))) {
+            if (! $this->has($field)) {
                 continue;
             }
 
-            $value = trim($this->input($field));
+            $value = $this->input($field);
 
-            if (in_array($field, $nullableFields, true) && $value === '') {
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+
+            if (in_array($field, $nullableFields, true) && ($value === '' || $value === null)) {
                 $value = null;
             }
 

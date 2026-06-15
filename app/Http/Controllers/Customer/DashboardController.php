@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Customer;
 
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Models\MetalPrice;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -30,6 +31,11 @@ class DashboardController extends Controller
             'ready' => $user->orders()->where('status', OrderStatus::Ready)->count(),
         ];
 
-        return view('customer.dashboard', compact('orders', 'stats'));
+        return view('customer.dashboard', [
+            'orders' => $orders,
+            'stats' => $stats,
+            'metalPrice' => MetalPrice::current(),
+            'overdueDeliveryCount' => $user->orders()->deliveryOverdue()->count(),
+        ]);
     }
 }

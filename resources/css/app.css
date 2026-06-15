@@ -139,6 +139,26 @@
     .jewel-nav-glass {
         @apply bg-jewel-dark/90 backdrop-blur-xl border-b border-white/10 shadow-jewel-lg;
     }
+
+    .jewel-kpi-card {
+        @apply jewel-card flex items-start gap-4 p-5 hover:shadow-md;
+    }
+
+    .jewel-kpi-icon {
+        @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1;
+    }
+
+    .jewel-dashboard-panel {
+        @apply jewel-card overflow-hidden flex flex-col;
+    }
+
+    .jewel-dashboard-panel-header {
+        @apply flex items-center justify-between gap-3 border-b border-slate-100 bg-white px-6 py-4;
+    }
+
+    .jewel-dashboard-list-item {
+        @apply flex items-center gap-4 px-6 py-4 transition hover:bg-slate-50/80;
+    }
 }
 
 [x-cloak] {

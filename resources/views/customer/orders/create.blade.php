@@ -22,6 +22,7 @@
                                 <input type="radio" name="design_type" value="{{ $value }}"
                                     x-model="designType"
                                     class="peer sr-only"
+                                    @if($loop->first) required @endif
                                     {{ old('design_type', 'catalog') === $value ? 'checked' : '' }}>
                                 <div class="rounded-xl border-2 border-jewel-gold/20 p-4 peer-checked:border-jewel-gold peer-checked:bg-jewel-cream/50 transition">
                                     <p class="font-medium text-jewel-dark">{{ $label }}</p>
@@ -139,24 +140,28 @@
                             <label for="item_name" class="jewel-label">Piece Name (optional)</label>
                             <input id="item_name" name="item_name" type="text" value="{{ old('item_name') }}"
                                 maxlength="255"
+                                pattern="[A-Za-z0-9\s'\-&.,()]+"
                                 placeholder="e.g. Wedding Ring, Mother's Day Gift"
                                 class="jewel-input mt-1.5">
+                            <x-form-hint>Letters, numbers, and basic punctuation only.</x-form-hint>
                             <x-input-error :messages="$errors->get('item_name')" />
                         </div>
 
                         <div>
-                            <label for="size" class="jewel-label">Size</label>
+                            <label for="size" class="jewel-label">Size *</label>
                             <input id="size" name="size" type="text" value="{{ old('size') }}"
-                                maxlength="100"
+                                required maxlength="100" minlength="1"
+                                pattern="[A-Za-z0-9\s'.,/#\-]+"
                                 placeholder="Ring size, chain length (inches/cm), etc."
                                 class="jewel-input mt-1.5">
+                            <x-form-hint>Letters and numbers only (e.g. 7, 18 inch, 45 cm).</x-form-hint>
                             <x-input-error :messages="$errors->get('size')" />
                         </div>
 
                         <div>
-                            <label for="weight_grams" class="jewel-label">Estimated Weight (grams)</label>
+                            <label for="weight_grams" class="jewel-label">Estimated Weight (grams) *</label>
                             <input id="weight_grams" name="weight_grams" type="number" step="0.01" min="0.01" max="99999"
-                                value="{{ old('weight_grams') }}" placeholder="e.g. 8.5"
+                                value="{{ old('weight_grams') }}" required placeholder="e.g. 8.5"
                                 class="jewel-input mt-1.5">
                             <x-input-error :messages="$errors->get('weight_grams')" />
                         </div>
@@ -181,10 +186,11 @@
                     </div>
 
                     <div class="mt-5">
-                        <label for="specifications" class="jewel-label">Specifications & Details</label>
-                        <textarea id="specifications" name="specifications" rows="3" maxlength="2000" minlength="3"
+                        <label for="specifications" class="jewel-label">Specifications & Details (optional)</label>
+                        <textarea id="specifications" name="specifications" rows="3" maxlength="2000"
                             placeholder="Describe engravings, finish (matte/polish), width, thickness, or any specific requirements..."
                             class="jewel-input mt-1.5">{{ old('specifications') }}</textarea>
+                        <x-form-hint>Letters, numbers, and basic punctuation only. Min 3 characters if provided.</x-form-hint>
                         <x-input-error :messages="$errors->get('specifications')" />
                     </div>
                 </section>
@@ -196,18 +202,21 @@
 
                     <div class="grid sm:grid-cols-2 gap-5">
                         <div>
-                            <label for="gemstone_type" class="jewel-label">Gemstone Type</label>
+                            <label for="gemstone_type" class="jewel-label">Gemstone Type (optional)</label>
                             <input id="gemstone_type" name="gemstone_type" type="text" value="{{ old('gemstone_type') }}"
                                 maxlength="100"
+                                pattern="[A-Za-z\s\-]+"
                                 placeholder="e.g. Ruby, Sapphire, Diamond, Pearl"
                                 class="jewel-input mt-1.5">
+                            <x-form-hint>Letters, spaces, and hyphens only.</x-form-hint>
                             <x-input-error :messages="$errors->get('gemstone_type')" />
                         </div>
                         <div class="sm:col-span-1">
-                            <label for="gemstone_details" class="jewel-label">Gemstone Details</label>
-                            <textarea id="gemstone_details" name="gemstone_details" rows="2" maxlength="1000" minlength="3"
+                            <label for="gemstone_details" class="jewel-label">Gemstone Details (optional)</label>
+                            <textarea id="gemstone_details" name="gemstone_details" rows="2" maxlength="1000"
                                 placeholder="Carat weight, cut, color, setting style..."
                                 class="jewel-input mt-1.5">{{ old('gemstone_details') }}</textarea>
+                            <x-form-hint>Letters, numbers, and basic punctuation only.</x-form-hint>
                             <x-input-error :messages="$errors->get('gemstone_details')" />
                         </div>
                     </div>
@@ -216,7 +225,7 @@
                 {{-- Delivery & Contact --}}
                 <section class="jewel-card jewel-card-body">
                     <h3 class="jewel-section-title mb-1">4. Delivery & Contact</h3>
-                    <p class="text-sm text-gray-500 mb-6">When do you need it and how can we reach you?</p>
+                    <p class="text-sm text-gray-500 mb-6">All customer contact details are required to process your order.</p>
 
                     <div class="grid sm:grid-cols-2 gap-5">
                         <div>
@@ -235,22 +244,26 @@
                                 value="{{ old('contact_phone', Auth::user()->phone) }}"
                                 required minlength="7" maxlength="25" pattern="[\+]?[0-9\s\-().]{7,25}"
                                 class="jewel-input mt-1.5">
+                            <x-form-hint>7–15 digits. Spaces, +, and hyphens allowed.</x-form-hint>
                             <x-input-error :messages="$errors->get('contact_phone')" />
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="delivery_address" class="jewel-label">Delivery Address</label>
+                            <label for="delivery_address" class="jewel-label">Delivery Address *</label>
                             <textarea id="delivery_address" name="delivery_address" rows="2" maxlength="500" minlength="5"
-                                placeholder="Full delivery address (optional if picking up in store)"
+                                required
+                                placeholder="Full delivery address including street, area, and postal code"
                                 class="jewel-input mt-1.5">{{ old('delivery_address', Auth::user()->address) }}</textarea>
+                            <x-form-hint>Letters, numbers, and common address punctuation only.</x-form-hint>
                             <x-input-error :messages="$errors->get('delivery_address')" />
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="special_instructions" class="jewel-label">Special Instructions</label>
-                            <textarea id="special_instructions" name="special_instructions" rows="2" maxlength="2000" minlength="3"
+                            <label for="special_instructions" class="jewel-label">Special Instructions (optional)</label>
+                            <textarea id="special_instructions" name="special_instructions" rows="2" maxlength="2000"
                                 placeholder="Gift wrapping, urgency notes, preferred contact time..."
                                 class="jewel-input mt-1.5">{{ old('special_instructions') }}</textarea>
+                            <x-form-hint>Letters, numbers, and basic punctuation only.</x-form-hint>
                             <x-input-error :messages="$errors->get('special_instructions')" />
                         </div>
                     </div>

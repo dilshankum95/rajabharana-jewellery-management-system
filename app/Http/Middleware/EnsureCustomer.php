@@ -14,7 +14,15 @@ class EnsureCustomer
         $user = $request->user();
 
         if (! $user || $user->role !== UserRole::Customer) {
-            return redirect()->route('admin.dashboard');
+            if ($user?->role === UserRole::Technician) {
+                return redirect()->route('technician.dashboard');
+            }
+
+            if ($user?->isStaffMember()) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return redirect('/');
         }
 
         return $next($request);

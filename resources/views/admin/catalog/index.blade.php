@@ -2,16 +2,19 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="jewel-page-title text-xl">Jewellery Catalog</h1>
-                <p class="jewel-page-subtitle">Manage catalog items for customer orders</p>
+                <h1 class="jewel-page-title text-xl">Inventory</h1>
+                <p class="jewel-page-subtitle">Manage catalog items, stock status, and product images</p>
             </div>
-            <a href="{{ route('admin.catalog.create') }}" class="jewel-btn">+ Add Item</a>
+            @can('permission', 'catalog.manage')
+                <a href="{{ route('admin.catalog.create') }}" class="jewel-btn">+ Add Item</a>
+            @endcan
         </div>
     </x-slot>
 
     <form method="GET" class="mb-6 flex flex-col lg:flex-row gap-3">
         <input type="text" name="search" value="{{ $filters['search'] ?? '' }}"
             placeholder="Search by name, code, or category..."
+            maxlength="100"
             class="jewel-input lg:flex-1">
         <select name="category" class="jewel-input lg:w-44">
             <option value="">All categories</option>
@@ -30,6 +33,9 @@
             <a href="{{ route('admin.catalog.index') }}" class="inline-flex items-center justify-center px-4 text-sm text-stone-500 hover:text-stone-700">Clear</a>
         @endif
     </form>
+    <x-input-error :messages="$errors->get('search')" class="mb-4" />
+    <x-input-error :messages="$errors->get('category')" class="mb-4" />
+    <x-input-error :messages="$errors->get('availability_status')" class="mb-4" />
 
     <div class="jewel-card overflow-hidden">
         <div class="overflow-x-auto">
@@ -76,14 +82,18 @@
                                 </span>
                             </td>
                             <td class="text-right whitespace-nowrap">
-                                <a href="{{ route('admin.catalog.edit', $design) }}" class="text-sm font-medium text-jewel-gold-dark hover:text-jewel-gold">Edit</a>
-                                @if($design->orders_count === 0)
-                                    <form method="POST" action="{{ route('admin.catalog.destroy', $design) }}" class="inline ml-2"
-                                        onsubmit="return confirm('Delete this catalog item?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="text-sm text-rose-600 hover:text-rose-800">Delete</button>
-                                    </form>
-                                @endif
+                                @can('permission', 'catalog.manage')
+                                    <a href="{{ route('admin.catalog.edit', $design) }}" class="text-sm font-medium text-jewel-gold-dark hover:text-jewel-gold">Edit</a>
+                                    @if($design->orders_count === 0)
+                                        <form method="POST" action="{{ route('admin.catalog.destroy', $design) }}" class="inline ml-2"
+                                            onsubmit="return confirm('Delete this catalog item?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="text-sm text-rose-600 hover:text-rose-800">Delete</button>
+                                        </form>
+                                    @endif
+                                @else
+                                    <span class="text-xs text-stone-400">View only</span>
+                                @endcan
                             </td>
                         </tr>
                     @empty

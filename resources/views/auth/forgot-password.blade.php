@@ -10,7 +10,7 @@
         @csrf
         <div>
             <label for="email" class="jewel-label">{{ __('Email Address') }}</label>
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="you@example.com" class="jewel-input mt-1.5" />
+            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus maxlength="255" placeholder="you@example.com" class="jewel-input mt-1.5" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
         <button type="submit" class="jewel-btn w-full">{{ __('Send Reset Link') }}</button>

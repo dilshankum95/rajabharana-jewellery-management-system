@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\OrderStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Models\MetalPrice;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -27,6 +28,8 @@ class DashboardController extends Controller
             'quoted_value' => Order::whereNotNull('estimated_price')
                 ->whereNot('status', OrderStatus::Cancelled)
                 ->sum('estimated_price'),
+            'overdue_deliveries' => Order::deliveryOverdue()->count(),
+            'due_soon_deliveries' => Order::deliveryDueSoon()->count(),
         ];
 
         $recentOrders = Order::with('user')
@@ -40,6 +43,34 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentOrders', 'pendingOrders'));
+        $overdueOrders = Order::with('user')
+            ->deliveryOverdue()
+            ->orderBy('expected_delivery_date')
+            ->limit(20)
+            ->get();
+
+        $dueSoonOrders = Order::with('user')
+            ->deliveryDueSoon()
+            ->orderBy('expected_delivery_date')
+            ->limit(20)
+            ->get();
+
+        $dueOrders = Order::with('user')
+            ->needsDeliveryAttention()
+            ->orderBy('expected_delivery_date')
+            ->limit(20)
+            ->get();
+
+        $metalPrice = MetalPrice::current();
+
+        return view('admin.dashboard', compact(
+            'stats',
+            'recentOrders',
+            'pendingOrders',
+            'overdueOrders',
+            'dueSoonOrders',
+            'dueOrders',
+            'metalPrice',
+        ));
     }
 }

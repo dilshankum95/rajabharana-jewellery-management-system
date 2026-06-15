@@ -8,18 +8,19 @@ use App\Http\Requests\Admin\UpdateCatalogDesignRequest;
 use App\Models\CatalogDesign;
 use App\Models\CatalogImage;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use App\Http\Requests\Admin\FilterCatalogDesignRequest;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class CatalogDesignController extends Controller
 {
-    public function index(Request $request): View
+    public function index(FilterCatalogDesignRequest $request): View
     {
+        $validated = $request->validated();
         $query = CatalogDesign::withCount('orders')->with('images')->latest();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
+        if (! empty($validated['search'])) {
+            $search = $validated['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('code', 'like', "%{$search}%")
@@ -27,12 +28,12 @@ class CatalogDesignController extends Controller
             });
         }
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
+        if (! empty($validated['category'])) {
+            $query->where('category', $validated['category']);
         }
 
-        if ($request->filled('availability_status')) {
-            $query->where('availability_status', $request->availability_status);
+        if (! empty($validated['availability_status'])) {
+            $query->where('availability_status', $validated['availability_status']);
         }
 
         $designs = $query->paginate(15)->withQueryString();

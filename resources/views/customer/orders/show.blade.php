@@ -11,6 +11,8 @@
 
     <div class="py-8">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <x-delivery-alert :order="$order" variant="customer" />
+
             <div class="grid lg:grid-cols-3 gap-6">
                 {{-- Main details --}}
                 <div class="lg:col-span-2 space-y-6">

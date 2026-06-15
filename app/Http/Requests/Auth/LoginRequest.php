@@ -30,6 +30,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ValidationRules::email(),
             'password' => ['required', 'string', 'max:255'],
+            'remember' => ValidationRules::rememberMe(),
         ];
     }
 

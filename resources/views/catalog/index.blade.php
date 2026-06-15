@@ -18,7 +18,7 @@
         <form method="GET" action="{{ route('catalog.index') }}" class="jewel-card p-4 sm:p-5 mb-8 flex flex-col lg:flex-row gap-3">
             <input type="search" name="search" value="{{ $filters['search'] ?? '' }}"
                 placeholder="Search by name or item code..."
-                maxlength="255"
+                maxlength="100"
                 class="jewel-input flex-1">
             <select name="category" class="jewel-input lg:w-48">
                 <option value="">All Categories</option>
@@ -33,6 +33,8 @@
                 @endif
             </div>
         </form>
+        <x-input-error :messages="$errors->get('search')" class="mb-4" />
+        <x-input-error :messages="$errors->get('category')" class="mb-4" />
 
         @if($designs->isEmpty())
             <x-empty-state title="No items found" description="Try a different category or check back soon for new designs." class="jewel-card py-16">

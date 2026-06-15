@@ -25,15 +25,21 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ValidationRules::personName(),
             'email' => ValidationRules::email(uniqueIgnoreUserId: $this->user()->id),
-            'phone' => ValidationRules::phone(),
-            'address' => ValidationRules::address(),
-            'city' => ValidationRules::city(),
+            'phone' => ValidationRules::phone(required: true),
+            'address' => ValidationRules::address(required: true),
+            'city' => ValidationRules::city(required: true),
+            'profile_photo' => ValidationRules::profilePhoto(),
+            'remove_profile_photo' => ['nullable', 'boolean'],
         ];
     }
 
     public function messages(): array
     {
-        return ValidationRules::messages();
+        return array_merge(ValidationRules::messages(), [
+            'phone.required' => 'Phone number is required.',
+            'address.required' => 'Address is required.',
+            'city.required' => 'City is required.',
+        ]);
     }
 
     public function attributes(): array

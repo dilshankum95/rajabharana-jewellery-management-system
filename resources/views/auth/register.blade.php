@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-8 text-center">
         <h2 class="jewel-page-title text-2xl">Create Account</h2>
-        <p class="jewel-page-subtitle mt-2">Register to order custom jewellery from Rajabharana</p>
+        <p class="jewel-page-subtitle mt-2">Register to order custom jewellery — all customer details are required</p>
     </div>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -26,24 +26,45 @@
         </div>
 
         <div>
-            <label for="phone" class="jewel-label">{{ __('Phone Number') }}</label>
+            <label for="phone" class="jewel-label">{{ __('Phone Number') }} *</label>
             <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required autocomplete="tel"
                 minlength="7" maxlength="25" pattern="[\+]?[0-9\s\-().]{7,25}"
                 placeholder="0771234567" class="jewel-input mt-1.5" />
-            <p class="mt-1 text-xs text-slate-400">7–15 digits. Spaces, +, and hyphens allowed.</p>
+            <x-form-hint>7–15 digits. Spaces, +, and hyphens allowed.</x-form-hint>
             <x-input-error :messages="$errors->get('phone')" class="mt-2" />
         </div>
 
         <div>
-            <label for="password" class="jewel-label">{{ __('Password') }}</label>
+            <label for="address" class="jewel-label">{{ __('Address') }} *</label>
+            <textarea id="address" name="address" rows="2" required minlength="5" maxlength="500"
+                placeholder="Street, area, postal code"
+                class="jewel-input mt-1.5">{{ old('address') }}</textarea>
+            <x-form-hint>Letters, numbers, and common address punctuation only.</x-form-hint>
+            <x-input-error :messages="$errors->get('address')" class="mt-2" />
+        </div>
+
+        <div>
+            <label for="city" class="jewel-label">{{ __('City') }} *</label>
+            <input id="city" type="text" name="city" value="{{ old('city') }}" required autocomplete="address-level2"
+                minlength="2" maxlength="100" pattern="[A-Za-z\s'\-.]+"
+                placeholder="e.g. Colombo" class="jewel-input mt-1.5" />
+            <x-form-hint>Letters, spaces, hyphens, and periods only.</x-form-hint>
+            <x-input-error :messages="$errors->get('city')" class="mt-2" />
+        </div>
+
+        <div>
+            <label for="password" class="jewel-label">{{ __('Password') }} *</label>
             <input id="password" type="password" name="password" required autocomplete="new-password"
+                minlength="8" maxlength="255"
                 placeholder="••••••••" class="jewel-input mt-1.5" />
+            <x-password-requirements />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <div>
             <label for="password_confirmation" class="jewel-label">{{ __('Confirm Password') }}</label>
             <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
+                minlength="8" maxlength="255"
                 placeholder="••••••••" class="jewel-input mt-1.5" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>

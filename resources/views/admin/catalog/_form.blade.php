@@ -1,5 +1,9 @@
 @props(['design' => null, 'categories', 'goldQualities', 'availabilityStatuses'])
 
+@php
+    $requiresImages = ! $design || $design->images->isEmpty();
+@endphp
+
 <div class="grid sm:grid-cols-2 gap-5">
     @if($design)
         <div>
@@ -19,9 +23,11 @@
     <div class="{{ $design ? '' : 'sm:col-span-1' }}">
         <label for="name" class="jewel-label">Item Name *</label>
         <input id="name" name="name" type="text" required minlength="2" maxlength="255"
+            pattern="[A-Za-z0-9\s'\-&.,()]+"
             value="{{ old('name', $design?->name) }}"
             placeholder="e.g. Classic Temple Ring"
             class="jewel-input mt-1.5">
+        <x-form-hint>Letters, numbers, spaces, and basic punctuation only. Min 2 characters.</x-form-hint>
         <x-input-error :messages="$errors->get('name')" />
     </div>
 
@@ -53,6 +59,7 @@
             value="{{ old('weight_grams', $design?->weight_grams) }}"
             placeholder="e.g. 8.50"
             class="jewel-input mt-1.5">
+        <x-form-hint>Numeric only. 0.01 to 99,999 grams.</x-form-hint>
         <x-input-error :messages="$errors->get('weight_grams')" />
     </div>
 
@@ -62,6 +69,7 @@
             value="{{ old('selling_price', $design?->selling_price) }}"
             placeholder="e.g. 125000.00"
             class="jewel-input mt-1.5">
+        <x-form-hint>Numeric only. Must be greater than zero.</x-form-hint>
         <x-input-error :messages="$errors->get('selling_price')" />
     </div>
 
@@ -76,24 +84,29 @@
     </div>
 
     <div class="sm:col-span-2">
-        <label for="description" class="jewel-label">Description</label>
-        <textarea id="description" name="description" rows="3" maxlength="2000" minlength="3"
+        <label for="description" class="jewel-label">Description (optional)</label>
+        <textarea id="description" name="description" rows="3" maxlength="2000"
             placeholder="Describe the item, materials, and craftsmanship..."
             class="jewel-input mt-1.5">{{ old('description', $design?->description) }}</textarea>
+        <x-form-hint>Letters, numbers, and basic punctuation. Min 3 characters if provided.</x-form-hint>
         <x-input-error :messages="$errors->get('description')" />
     </div>
 
     <div class="sm:col-span-2">
         <label for="images" class="jewel-label">
-            Product Images {{ $design ? '(add more)' : '*' }}
+            Product Images {{ $requiresImages ? '*' : '(add more)' }}
         </label>
         <input id="images" name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple
-            {{ $design ? '' : 'required' }}
+            {{ $requiresImages ? 'required' : '' }}
             class="mt-1.5 jewel-file-input">
-        <p class="mt-1 text-xs text-stone-400">
-            Upload up to 10 images (JPEG, PNG, WebP — max 5MB each).
-            @if($design) Leave empty to keep existing images. @endif
-        </p>
+        <x-form-hint>
+            @if($design && $design->images->isNotEmpty())
+                This item has {{ $design->images->count() }} image(s). Upload up to {{ 10 - $design->images->count() }} more (10 total max).
+                Leave empty to keep existing images.
+            @else
+                Upload 1 to 10 images (JPEG, PNG, WebP — max 5MB each).
+            @endif
+        </x-form-hint>
         <x-input-error :messages="$errors->get('images')" />
         <x-input-error :messages="$errors->get('images.*')" />
     </div>

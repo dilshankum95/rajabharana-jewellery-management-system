@@ -13,7 +13,7 @@
             <p class="mt-2 text-sm text-gray-500">{{ __('Please enter your password to confirm permanent deletion.') }}</p>
             <div class="mt-5">
                 <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-                <x-text-input id="password" name="password" type="password" placeholder="{{ __('Password') }}" />
+                <x-text-input id="password" name="password" type="password" placeholder="{{ __('Password') }}" required autocomplete="current-password" maxlength="255" />
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
             </div>
             <div class="mt-6 flex justify-end gap-3">
