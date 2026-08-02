@@ -2,7 +2,9 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\Admin\BillingSettingsController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\MetalPriceController;
 use App\Http\Controllers\Admin\CatalogDesignController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\Admin\StaffUserController;
 use App\Http\Controllers\Admin\WorkshopController;
 use App\Http\Controllers\Customer\DashboardController;
 use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
+use App\Http\Controllers\Customer\NotificationController;
 use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Technician\DashboardController as TechnicianDashboardController;
@@ -39,6 +42,12 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
         Route::get('/{order}', [OrderController::class, 'show'])->name('show');
         Route::patch('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
         Route::get('/{order}/invoice', [CustomerInvoiceController::class, 'show'])->name('invoice.show');
+    });
+
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+        Route::post('/{id}/read', [NotificationController::class, 'markRead'])->name('read');
     });
 });
 
@@ -124,6 +133,12 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::patch('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
         Route::post('/invoices/{invoice}/issue', [InvoiceController::class, 'issue'])->name('invoices.issue');
         Route::post('/invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');
+        Route::post('/invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('invoices.payments.store');
+    });
+
+    Route::middleware('permission:'.Permission::BillingSettings->value)->group(function () {
+        Route::get('/billing/settings', [BillingSettingsController::class, 'edit'])->name('billing.settings');
+        Route::patch('/billing/settings', [BillingSettingsController::class, 'update'])->name('billing.settings.update');
     });
 });
 

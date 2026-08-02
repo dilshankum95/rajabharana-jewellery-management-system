@@ -41,5 +41,15 @@ class AppServiceProvider extends ServiceProvider
                 'deliveryDueSoonCount' => Order::deliveryDueSoon()->count(),
             ]);
         });
+
+        View::composer(['layouts.navigation', 'layouts.app'], function ($view) {
+            if (! auth()->check() || ! auth()->user()->isCustomer()) {
+                return;
+            }
+
+            $view->with([
+                'unreadNotificationCount' => auth()->user()->unreadNotifications()->count(),
+            ]);
+        });
     }
 }

@@ -13,7 +13,7 @@ class InvoiceController extends Controller
         abort_unless($order->user_id === auth()->id(), 403);
 
         $invoice = $order->invoice()
-            ->with(['items', 'order.catalogDesign'])
+            ->with(['items', 'order.catalogDesign', 'payments' => fn ($q) => $q->completed()])
             ->firstOrFail();
 
         abort_unless($invoice->isIssued(), 404);

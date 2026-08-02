@@ -60,7 +60,12 @@ class InvoiceController extends Controller
 
         $order->load(['user', 'catalogDesign']);
 
-        return view('admin.invoices.create', compact('order'));
+        $categoryCode = \App\Models\CategoryDiscount::categoryCodeForOrder($order);
+        $categoryLabel = config('jewellery.catalog_categories.'.$categoryCode, ucfirst($categoryCode));
+        $discountPercent = \App\Models\CategoryDiscount::discountPercentForOrder($order);
+        $taxRate = \App\Models\BillingSetting::currentTaxRate();
+
+        return view('admin.invoices.create', compact('order', 'categoryCode', 'categoryLabel', 'discountPercent', 'taxRate'));
     }
 
     public function store(StoreInvoiceRequest $request): RedirectResponse
@@ -80,9 +85,12 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice): View
     {
-        $invoice->load(['items', 'order.catalogDesign', 'customer', 'creator']);
+        $invoice->load(['items', 'order.catalogDesign', 'customer', 'creator', 'payments.recorder', 'payments.paymentMethod']);
 
-        return view('admin.invoices.show', compact('invoice'));
+        $paymentMethods = \App\Models\PaymentMethod::active()->get();
+        $canRecordPayment = app(\App\Services\PaymentService::class)->canAcceptPayment($invoice);
+
+        return view('admin.invoices.show', compact('invoice', 'paymentMethods', 'canRecordPayment'));
     }
 
     public function edit(Invoice $invoice): View|RedirectResponse
@@ -93,9 +101,13 @@ class InvoiceController extends Controller
                 ->with('warning', 'Issued invoices cannot be edited.');
         }
 
-        $invoice->load(['items', 'order', 'customer']);
+        $invoice->load(['items', 'order.catalogDesign', 'customer']);
 
-        return view('admin.invoices.edit', compact('invoice'));
+        $categoryCode = \App\Models\CategoryDiscount::categoryCodeForOrder($invoice->order);
+        $categoryLabel = config('jewellery.catalog_categories.'.$categoryCode, ucfirst($categoryCode));
+        $taxRate = \App\Models\BillingSetting::currentTaxRate();
+
+        return view('admin.invoices.edit', compact('invoice', 'categoryCode', 'categoryLabel', 'taxRate'));
     }
 
     public function update(UpdateInvoiceRequest $request, Invoice $invoice): RedirectResponse

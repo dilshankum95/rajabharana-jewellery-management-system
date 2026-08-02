@@ -42,8 +42,11 @@
                         </tfoot>
                     </table>
                 </div>
-                <p class="mt-3 text-xs text-gray-400">Line items are generated from the order and cannot be edited here.</p>
             </section>
+
+            <x-alert type="info">
+                Category: <strong>{{ $categoryLabel }}</strong> · Tax rate: <strong>{{ number_format($taxRate, 2) }}%</strong> · Category discount: <strong>{{ number_format($invoice->discount_percent, 2) }}%</strong>
+            </x-alert>
         </div>
 
         <div>
@@ -62,18 +65,23 @@
                         <x-input-error :messages="$errors->get('making_charge')" class="mt-1" />
                     </div>
 
-                    <div>
-                        <label for="tax" class="jewel-label">Tax (LKR)</label>
-                        <input id="tax" name="tax" type="number" step="0.01" min="0" max="99999999.99" required
-                            value="{{ old('tax', $invoice->tax) }}"
-                            class="jewel-input mt-1.5">
-                        <x-input-error :messages="$errors->get('tax')" class="mt-1" />
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 text-sm space-y-2">
+                        <div class="flex justify-between gap-4">
+                            <span class="text-gray-500">Tax ({{ number_format($taxRate, 2) }}%)</span>
+                            <span class="font-medium">LKR {{ number_format($invoice->tax, 2) }}</span>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <span class="text-gray-500">Discount ({{ number_format($invoice->discount_percent, 2) }}% on subtotal)</span>
+                            <span class="font-medium text-emerald-700">− LKR {{ number_format($invoice->discount, 2) }}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 pt-1">Tax and discount recalculate automatically when you save.</p>
                     </div>
 
                     <div>
-                        <label for="discount" class="jewel-label">Discount (LKR)</label>
-                        <input id="discount" name="discount" type="number" step="0.01" min="0" max="99999999.99" required
-                            value="{{ old('discount', $invoice->discount) }}"
+                        <label for="discount" class="jewel-label">Discount Override (LKR, optional)</label>
+                        <input id="discount" name="discount" type="number" step="0.01" min="0" max="99999999.99"
+                            value="{{ old('discount') }}"
+                            placeholder="Leave blank to use category {{ number_format($invoice->discount_percent, 2) }}%"
                             class="jewel-input mt-1.5">
                         <x-input-error :messages="$errors->get('discount')" class="mt-1" />
                     </div>
@@ -102,7 +110,6 @@
                                 LKR {{ number_format($invoice->grand_total, 2) }}
                             </span>
                         </div>
-                        <p class="text-xs text-gray-400 mb-4">Total updates after you save changes.</p>
                         <button type="submit" class="jewel-btn w-full">Save Draft</button>
                     </div>
                 </form>

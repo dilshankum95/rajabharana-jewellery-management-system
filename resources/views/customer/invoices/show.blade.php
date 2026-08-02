@@ -74,13 +74,13 @@
                         @endif
                         @if($invoice->tax > 0)
                             <div class="flex justify-between gap-4">
-                                <dt class="text-gray-500">Tax</dt>
+                                <dt class="text-gray-500">Tax ({{ number_format($invoice->tax_rate_percent, 2) }}%)</dt>
                                 <dd>LKR {{ number_format($invoice->tax, 2) }}</dd>
                             </div>
                         @endif
                         @if($invoice->discount > 0)
                             <div class="flex justify-between gap-4 text-emerald-700">
-                                <dt>Discount</dt>
+                                <dt>Discount ({{ number_format($invoice->discount_percent, 2) }}%)</dt>
                                 <dd>− LKR {{ number_format($invoice->discount, 2) }}</dd>
                             </div>
                         @endif
@@ -106,6 +106,23 @@
                     </div>
                 @endif
             </section>
+
+            @if($invoice->payments->isNotEmpty())
+            <section class="jewel-card jewel-card-body mt-6">
+                <h3 class="jewel-section-title mb-4">Payment History</h3>
+                <div class="space-y-3">
+                    @foreach($invoice->payments as $payment)
+                        <div class="flex justify-between items-center text-sm border-b border-jewel-gold/10 pb-3 last:border-0 last:pb-0">
+                            <div>
+                                <p class="font-medium text-jewel-dark">{{ $payment->payment_date->format('M d, Y') }}</p>
+                                <p class="text-xs text-gray-400">{{ $payment->paymentMethod?->label ?? $payment->payment_method }}</p>
+                            </div>
+                            <p class="font-semibold text-emerald-700">LKR {{ number_format($payment->payment_amount, 2) }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+            @endif
 
             <div class="mt-6">
                 <a href="{{ route('orders.show', $order) }}" class="text-sm text-gray-500 hover:text-jewel-dark transition">

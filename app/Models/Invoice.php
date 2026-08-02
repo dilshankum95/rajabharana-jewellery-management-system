@@ -17,7 +17,9 @@ class Invoice extends Model
         'subtotal',
         'making_charge',
         'discount',
+        'discount_percent',
         'tax',
+        'tax_rate_percent',
         'grand_total',
         'invoice_status',
         'issue_date',
@@ -35,7 +37,9 @@ class Invoice extends Model
             'subtotal' => 'decimal:2',
             'making_charge' => 'decimal:2',
             'discount' => 'decimal:2',
+            'discount_percent' => 'decimal:2',
             'tax' => 'decimal:2',
+            'tax_rate_percent' => 'decimal:2',
             'grand_total' => 'decimal:2',
         ];
     }
@@ -80,6 +84,11 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function isEditable(): bool
     {
         return $this->invoice_status->isEditable();
@@ -104,10 +113,19 @@ class Invoice extends Model
         );
     }
 
-    /** Amount paid — placeholder until Payment module (M9). */
+    /** Sum of completed payments. */
     public function getAmountPaidAttribute(): float
     {
-        return 0.0;
+        if ($this->relationLoaded('payments')) {
+            return round(
+                (float) $this->payments
+                    ->where('payment_status', \App\Enums\PaymentStatus::Completed)
+                    ->sum('payment_amount'),
+                2
+            );
+        }
+
+        return round((float) $this->payments()->completed()->sum('payment_amount'), 2);
     }
 
     public function getBalanceDueAttribute(): float

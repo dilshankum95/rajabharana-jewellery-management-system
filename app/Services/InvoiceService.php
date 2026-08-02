@@ -8,11 +8,16 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Order;
 use App\Models\User;
+use App\Notifications\InvoiceIssuedNotification;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class InvoiceService
 {
+    public function __construct(
+        private InvoiceCalculator $calculator
+    ) {}
+
     /** @return array<int, OrderStatus> */
     public static function billableOrderStatuses(): array
     {
@@ -61,13 +66,12 @@ class InvoiceService
                 'customer_id' => $order->user_id,
                 'subtotal' => $lineTotal,
                 'making_charge' => 0,
-                'discount' => 0,
-                'tax' => 0,
                 'invoice_status' => InvoiceStatus::Draft,
                 'due_date' => today()->addDays((int) config('jewellery.invoice_due_days', 14)),
                 'created_by' => $creator->id,
             ]);
-            $invoice->recalculateGrandTotal();
+
+            $this->calculator->applyToInvoice($invoice, $order);
             $invoice->save();
 
             InvoiceItem::create([
@@ -89,14 +93,21 @@ class InvoiceService
             throw new InvalidArgumentException('Only draft invoices can be edited.');
         }
 
-        $invoice->fill([
-            'making_charge' => $data['making_charge'] ?? $invoice->making_charge,
-            'discount' => $data['discount'] ?? $invoice->discount,
-            'tax' => $data['tax'] ?? $invoice->tax,
-            'due_date' => $data['due_date'] ?? $invoice->due_date,
-            'notes' => $data['notes'] ?? $invoice->notes,
-        ]);
-        $invoice->recalculateGrandTotal();
+        $invoice->loadMissing('order.catalogDesign');
+
+        $discountOverride = array_key_exists('discount', $data)
+            ? (float) $data['discount']
+            : null;
+
+        $this->calculator->applyToInvoice(
+            $invoice,
+            $invoice->order,
+            (float) ($data['making_charge'] ?? $invoice->making_charge),
+            $discountOverride
+        );
+
+        $invoice->due_date = $data['due_date'] ?? $invoice->due_date;
+        $invoice->notes = $data['notes'] ?? $invoice->notes;
         $invoice->save();
 
         return $invoice->fresh(['items', 'order', 'customer', 'creator']);
@@ -112,12 +123,19 @@ class InvoiceService
             throw new InvalidArgumentException('Cannot issue an invoice without line items.');
         }
 
+        $invoice->loadMissing('order.catalogDesign', 'customer');
+
+        $this->calculator->applyToInvoice($invoice, $invoice->order);
         $invoice->update([
             'invoice_status' => InvoiceStatus::Issued,
             'issue_date' => today(),
         ]);
 
-        return $invoice->fresh(['items', 'order', 'customer', 'creator']);
+        $invoice = $invoice->fresh(['items', 'order', 'customer', 'creator']);
+
+        $invoice->customer?->notify(new InvoiceIssuedNotification($invoice));
+
+        return $invoice;
     }
 
     public function cancel(Invoice $invoice): Invoice

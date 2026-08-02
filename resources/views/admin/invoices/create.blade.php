@@ -10,7 +10,7 @@
     <div class="max-w-2xl">
         <section class="jewel-card jewel-card-body space-y-6">
             <x-alert type="info">
-                A draft invoice will be created from the order price. You can adjust making charges, tax, and discounts before issuing.
+                A draft invoice will be created from the order price. Tax ({{ number_format($taxRate, 2) }}%) and category discount ({{ $categoryLabel }}: {{ number_format($discountPercent, 2) }}%) will be applied automatically.
             </x-alert>
 
             <dl class="grid sm:grid-cols-2 gap-4 text-sm">

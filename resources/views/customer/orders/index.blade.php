@@ -26,6 +26,7 @@
                                     <th>Design</th>
                                     <th>Delivery</th>
                                     <th>Price</th>
+                                    <th>Invoice</th>
                                     <th>Status</th>
                                     <th></th>
                                 </tr>
@@ -54,6 +55,16 @@
                                                 <span class="font-semibold text-jewel-gold-dark">LKR {{ number_format($order->estimated_price, 0) }}</span>
                                             @else
                                                 <span class="text-slate-400 italic">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($order->invoice && $order->invoice->isIssued())
+                                                <a href="{{ route('orders.invoice.show', $order) }}" class="text-sm font-medium text-jewel-gold-dark hover:text-jewel-gold">
+                                                    {{ $order->invoice->invoice_number }}
+                                                </a>
+                                                <div class="mt-1"><x-invoice-status-badge :status="$order->invoice->invoice_status" /></div>
+                                            @else
+                                                <span class="text-xs text-gray-400">—</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">

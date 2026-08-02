@@ -18,8 +18,7 @@ class UpdateInvoiceRequest extends FormRequest
     {
         return [
             'making_charge' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
-            'discount' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
-            'tax' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'discount' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
             'due_date' => ['required', 'date', 'after_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:2000', ValidationRules::NO_HTML],
         ];
@@ -29,16 +28,14 @@ class UpdateInvoiceRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $invoice = $this->route('invoice');
-            if (! $invoice) {
+            if (! $invoice || ! $this->filled('discount')) {
                 return;
             }
 
-            $maxDiscount = (float) $invoice->subtotal
-                + (float) $this->input('making_charge', 0)
-                + (float) $this->input('tax', 0);
+            $maxDiscount = (float) $invoice->subtotal + (float) $this->input('making_charge', 0);
 
-            if ((float) $this->input('discount', 0) > $maxDiscount) {
-                $validator->errors()->add('discount', 'Discount cannot exceed subtotal plus charges and tax.');
+            if ((float) $this->input('discount') > $maxDiscount) {
+                $validator->errors()->add('discount', 'Discount cannot exceed subtotal plus making charge.');
             }
         });
     }

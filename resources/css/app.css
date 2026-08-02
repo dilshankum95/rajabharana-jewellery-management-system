@@ -136,6 +136,18 @@
         @apply text-slate-400 hover:bg-white/5 hover:text-white;
     }
 
+    .jewel-sidebar-sublink {
+        @apply block w-full rounded-lg px-3 py-2 text-xs font-medium transition duration-200;
+    }
+
+    .jewel-sidebar-sublink-active {
+        @apply text-jewel-gold-light bg-white/5;
+    }
+
+    .jewel-sidebar-sublink-inactive {
+        @apply text-slate-500 hover:bg-white/5 hover:text-slate-300;
+    }
+
     .jewel-nav-glass {
         @apply bg-jewel-dark/90 backdrop-blur-xl border-b border-white/10 shadow-jewel-lg;
     }

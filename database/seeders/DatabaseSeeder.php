@@ -81,5 +81,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CatalogDesignSeeder::class);
         $this->call(MetalPriceSeeder::class);
         $this->call(PaymentMethodSeeder::class);
+        $this->call(BillingSettingSeeder::class);
+        $this->call(CategoryDiscountSeeder::class);
     }
 }

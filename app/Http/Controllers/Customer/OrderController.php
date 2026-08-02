@@ -18,7 +18,7 @@ class OrderController extends Controller
     {
         $orders = $request->user()
             ->orders()
-            ->with('catalogDesign')
+            ->with(['catalogDesign', 'invoice'])
             ->latest()
             ->paginate(10);
 
