@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Use Case Diagram (Whole System + Generalization)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 4px 6px; text-align: center; }
+        th { background: #f8fafc; }
+        th:first-child, td:first-child { text-align: left; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Use Case Diagram</h1>
+    <p class="sub">Whole system · Generalization · Include · Extend · ✅ Implemented · 🔜 Planned</p>
+    <div class="legend">
+        <span>(( Actor ))</span>
+        <span>([ Use Case ])</span>
+        <span>--|> «generalize» (inheritance)</span>
+        <span>-.-> «include» / «extend»</span>
+        <span style="color:#db2777">🔜 Planned</span>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 1 — Whole System Use Case Diagram (with Generalization)</h2>
+        <div class="mermaid">
+flowchart TB
+    G((Guest))
+    RU((Registered User))
+    IU((Internal User))
+    C((Customer))
+    S((Sales Staff))
+    M((Inventory Manager))
+    T((Workshop Technician))
+    A((Administrator))
+
+    C --|>|«generalize»| RU
+    IU --|>|«generalize»| RU
+    S --|>|«generalize»| IU
+    M --|>|«generalize»| IU
+    T --|>|«generalize»| IU
+    A --|>|«generalize»| S
+    A --|>|«generalize»| M
+
+    subgraph SYS[" «system» Rajabharana Jewellery System "]
+        direction TB
+
+        subgraph AUTH["Authentication"]
+            UCA([Authenticate])
+            UC1([Login / Logout])
+            UC2([Register Account])
+            UC3([Reset Password])
+            UC1 --|>|«generalize»| UCA
+            UC2 --|>|«generalize»| UCA
+            UC3 --|>|«generalize»| UCA
+        end
+
+        subgraph PUB["Public Catalogue"]
+            UCB([Browse Catalogue])
+            UC4([View Design Details])
+            UC4 --|>|«generalize»| UCB
+        end
+
+        subgraph PROF["Profile"]
+            UCP([Manage Profile])
+        end
+
+        subgraph CUST["Customer Portal"]
+            UC5([View Dashboard])
+            UCO([Manage Own Orders])
+            UC6([Place Order])
+            UC7([Track Orders])
+            UC8([Cancel Order])
+            UC6 --|>|«generalize»| UCO
+            UC7 --|>|«generalize»| UCO
+            UC8 --|>|«generalize»| UCO
+            UC9([View Invoice 🔜])
+            UC9 -.->|«extend»| UC7
+        end
+
+        subgraph ORD["Order Management"]
+            UCM([Manage Orders])
+            UC10([Update Order Status])
+            UC11([View Customers])
+            UC10 --|>|«generalize»| UCM
+            UC11 --|>|«generalize»| UCM
+            UC12([View Admin Dashboard])
+        end
+
+        subgraph INV["Inventory"]
+            UCI([Manage Catalogue])
+            UC13([Create / Edit Design])
+            UC14([Upload Images])
+            UC15([Set Availability])
+            UC13 --|>|«generalize»| UCI
+            UC14 --|>|«generalize»| UCI
+            UC15 --|>|«generalize»| UCI
+        end
+
+        subgraph WS["Workshop"]
+            UCW([Manage Production])
+            UC16([Assign Technician])
+            UC17([View Workshop Queue])
+            UC18([Update Production Status])
+            UC19([Add Production Log])
+            UC16 --|>|«generalize»| UCW
+            UC17 --|>|«generalize»| UCW
+            UC18 --|>|«generalize»| UCW
+            UC19 --|>|«generalize»| UCW
+        end
+
+        subgraph ADM["System Administration"]
+            UCS([Manage System])
+            UC20([Manage Metal Prices])
+            UC21([Manage Staff Accounts])
+            UC20 --|>|«generalize»| UCS
+            UC21 --|>|«generalize»| UCS
+        end
+
+        subgraph BILL["Billing 🔜"]
+            UCBill([Manage Billing])
+            UC22([Generate Invoice])
+            UC23([Record Payment])
+            UC24([Print Invoice])
+            UC22 --|>|«generalize»| UCBill
+            UC23 --|>|«generalize»| UCBill
+            UC24 --|>|«generalize»| UCBill
+        end
+
+        subgraph REP["Reports 🔜"]
+            UCR([Generate Reports])
+            UC25([Order Summary Report])
+            UC26([Sales Report])
+            UC27([Production Report])
+            UC28([Inventory Report])
+            UC29([Export PDF])
+            UC25 --|>|«generalize»| UCR
+            UC26 --|>|«generalize»| UCR
+            UC27 --|>|«generalize»| UCR
+            UC28 --|>|«generalize»| UCR
+            UC29 --|>|«generalize»| UCR
+        end
+    end
+
+    G --> UCB & UC4 & UC2 & UC1 & UC3
+    RU --> UC1 & UCP
+    C --> UCB & UC4 & UC5 & UCO & UC9
+    S --> UC12 & UCM & UCBill & UCR
+    M --> UCI & UCR
+    T --> UC18 & UC19
+    A --> UCS & UCW & UCBill & UCR
+
+    UC6 -.->|«extend»| UCB
+    UC22 -.->|«include»| UCM
+    UC23 -.->|«include»| UC22
+    UC19 -.->|«include»| UC18
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 2 — Actor Generalization Hierarchy</h2>
+        <div class="mermaid">
+flowchart BT
+    G((Guest))
+    RU((Registered User\n«abstract»))
+    IU((Internal User\n«abstract»))
+    C((Customer))
+    S((Sales Staff))
+    M((Inventory Manager))
+    T((Workshop Technician))
+    A((Administrator))
+
+    C --|>|«generalize»| RU
+    IU --|>|«generalize»| RU
+    S --|>|«generalize»| IU
+    M --|>|«generalize»| IU
+    T --|>|«generalize»| IU
+    A --|>|«generalize»| S
+    A --|>|«generalize»| M
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 3 — Use Case Generalization Hierarchy</h2>
+        <div class="mermaid">
+flowchart BT
+    UCA([Authenticate])
+    UC1([Login / Logout]) & UC2([Register]) & UC3([Reset Password])
+    UC1 & UC2 & UC3 --|>|«generalize»| UCA
+
+    UCB([Browse Catalogue])
+    UC4([View Design Details]) --|>|«generalize»| UCB
+
+    UCO([Manage Own Orders])
+    UC5([Place Order]) & UC6([Track Orders]) & UC7([Cancel Order])
+    UC5 & UC6 & UC7 --|>|«generalize»| UCO
+
+    UCM([Manage Orders])
+    UC8([Update Status]) & UC9([View Customers])
+    UC8 & UC9 --|>|«generalize»| UCM
+
+    UCI([Manage Catalogue])
+    UC10([Create/Edit Design]) & UC11([Upload Images]) & UC12([Set Availability])
+    UC10 & UC11 & UC12 --|>|«generalize»| UCI
+
+    UCW([Manage Production])
+    UC13([Assign Technician]) & UC14([View Queue]) & UC15([Update Status]) & UC16([Add Log])
+    UC13 & UC14 & UC15 & UC16 --|>|«generalize»| UCW
+
+    UCBill([Manage Billing 🔜])
+    UC17([Generate Invoice]) & UC18([Record Payment]) & UC19([Print Invoice])
+    UC17 & UC18 & UC19 --|>|«generalize»| UCBill
+
+    UCR([Generate Reports 🔜])
+    UC20([Order Report]) & UC21([Sales Report]) & UC22([Production Report]) & UC23([Inventory Report]) & UC24([Export PDF])
+    UC20 & UC21 & UC22 & UC23 & UC24 --|>|«generalize»| UCR
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 4 — Include &amp; Extend Relationships</h2>
+        <div class="mermaid">
+flowchart LR
+    UC1([Place Order]) -.->|«extend»| UC2([Browse Catalogue])
+    UC3([View Invoice 🔜]) -.->|«extend»| UC4([Track Orders])
+    UC5([Generate Invoice 🔜]) -.->|«include»| UC6([Manage Orders])
+    UC7([Record Payment 🔜]) -.->|«include»| UC5
+    UC8([Add Production Log]) -.->|«include»| UC9([Update Production Status])
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>Figure 5 — Actor × Generalized Use Case Matrix</h2>
+        <table>
+            <tr><th>Generalized Use Case</th><th>Guest</th><th>Customer</th><th>Staff</th><th>Manager</th><th>Admin</th><th>Tech</th></tr>
+            <tr><td>Authenticate</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>Browse Catalogue</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Manage Profile</td><td></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>Manage Own Orders</td><td></td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>View Admin Dashboard</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage Orders</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage Catalogue</td><td></td><td></td><td></td><td>✓</td><td>✓</td><td></td></tr>
+            <tr><td>Manage Production</td><td></td><td></td><td></td><td></td><td>✓*</td><td>✓**</td></tr>
+            <tr><td>Manage System</td><td></td><td></td><td></td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage Billing 🔜</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Generate Reports 🔜</td><td></td><td></td><td>✓</td><td>✓***</td><td>✓</td><td></td></tr>
+        </table>
+        <p style="font-size:0.7rem;color:#64748b;margin-top:6px">* Assign + Queue only · ** Update + Log on assigned jobs · *** Inventory report only</p>
+    </div>
+
+    <div class="note">
+        <strong>Generalization (▷──):</strong> hollow triangle points to parent — child inherits parent use cases.<br>
+        <strong>Administrator</strong> generalizes Sales Staff + Inventory Manager (inherits all their use cases).<br>
+        <strong>Include / Extend:</strong> dashed arrows — billing and production flows.<br>
+        <strong>Print → PDF</strong> · Source: <code>docs/USE_CASE_DIAGRAM.md</code>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { curve: 'basis' } });</script>
+</body>
+</html>

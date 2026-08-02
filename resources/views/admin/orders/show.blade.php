@@ -124,6 +124,51 @@
                 @endif
             </section>
 
+            {{-- Billing --}}
+            <section class="jewel-card jewel-card-body">
+                <h2 class="jewel-section-title mb-4">Billing</h2>
+                @if($order->invoice)
+                    <p class="text-sm text-slate-600 mb-3">
+                        Invoice <span class="font-medium">{{ $order->invoice->invoice_number }}</span>
+                    </p>
+                    <x-invoice-status-badge :status="$order->invoice->invoice_status" class="mb-4" />
+                    <p class="font-display text-xl font-semibold text-jewel-gold-dark mb-4">
+                        LKR {{ number_format($order->invoice->grand_total, 2) }}
+                    </p>
+                    <a href="{{ route('admin.invoices.show', $order->invoice) }}" class="jewel-btn-outline w-full text-center block">
+                        View Invoice
+                    </a>
+                    @can('permission', 'billing.manage')
+                        @if($order->invoice->isEditable())
+                            <a href="{{ route('admin.invoices.edit', $order->invoice) }}" class="mt-2 text-center block text-sm text-jewel-gold-dark hover:text-jewel-gold">
+                                Edit draft
+                            </a>
+                        @endif
+                    @endcan
+                @elseif($order->isBillable())
+                    @can('permission', 'billing.manage')
+                        <p class="text-sm text-slate-500 mb-4">This order is ready to be invoiced.</p>
+                        <a href="{{ route('admin.orders.invoice.create', $order) }}" class="jewel-btn w-full text-center block">
+                            Generate Invoice
+                        </a>
+                    @else
+                        <p class="text-sm text-slate-500">No invoice has been created for this order yet.</p>
+                    @endcan
+                @else
+                    <p class="text-sm text-slate-500">
+                        @if($order->hasInvoice())
+                            Invoice already exists.
+                        @elseif(! $order->hasPrice())
+                            Set an order price before generating an invoice.
+                        @elseif($order->status === \App\Enums\OrderStatus::Pending)
+                            Confirm the order before generating an invoice.
+                        @else
+                            Invoice not available for this order status.
+                        @endif
+                    </p>
+                @endif
+            </section>
+
             @can('permission', 'orders.manage')
             <section class="jewel-card jewel-card-body sticky top-24">
                 <h2 class="jewel-section-title mb-4">Manage Order</h2>

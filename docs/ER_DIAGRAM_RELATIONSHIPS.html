@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajabharana — ER Diagram: Relationships with Attributes</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f1f5f9; padding: 20px; color: #1e293b; }
+        h1 { text-align: center; font-size: 1.2rem; margin-bottom: 4px; }
+        .sub { text-align: center; font-size: 0.84rem; color: #64748b; margin-bottom: 16px; }
+        .legend { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.76rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 20px; overflow: auto; }
+        .page h2 { font-size: 0.9rem; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+        svg { display: block; min-width: 1200px; }
+        .note { max-width: 960px; margin: 0 auto; font-size: 0.78rem; color: #475569; line-height: 1.6; padding: 12px 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.74rem; margin-top: 8px; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        @media print { body { background: #fff; } .page { border: none; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery Management System</h1>
+    <p class="sub">ER Diagram — Entity Attributes + Relationship Attributes (R1–R12)</p>
+
+    <div class="legend">
+        <span style="color:#1d4ed8">■ Entity (blue) ✅</span>
+        <span style="color:#db2777">■ Entity (pink) 🔜</span>
+        <span style="color:#b45309">◆ Relationship diamond</span>
+        <span>PK · UK · FK shown in entity boxes</span>
+    </div>
+
+    <!-- SVG MAIN DIAGRAM -->
+    <div class="page">
+        <h2>Figure 1 — ER Diagram with Entity Attributes &amp; Relationship Attributes</h2>
+        <svg viewBox="0 0 1280 920" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+                    <path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/>
+                </marker>
+                <marker id="arrow-one" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <path d="M0,0 L9,3 L0,6 M9,0 L9,6" stroke="#64748b" stroke-width="1" fill="none"/>
+                </marker>
+            </defs>
+
+            <!-- ===== RELATIONSHIP LINES (behind entities) ===== -->
+            <!-- R4 users -> metal_prices -->
+            <line x1="130" y1="120" x2="130" y2="175" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- R8 catalog_designs -> catalog_images -->
+            <line x1="620" y1="95" x2="820" y2="95" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- R9 catalog_designs -> orders -->
+            <line x1="520" y1="175" x2="520" y2="255" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- R1 users -> orders -->
+            <line x1="230" y1="380" x2="380" y2="340" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- R2 users -> orders (technician) -->
+            <line x1="230" y1="400" x2="380" y2="360" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+            <!-- R3 users -> production_logs -->
+            <line x1="230" y1="420" x2="880" y2="380" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- R10 orders -> production_logs -->
+            <line x1="660" y1="380" x2="880" y2="380" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <!-- R11 orders -> invoices -->
+            <line x1="520" y1="520" x2="520" y2="600" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-one)"/>
+            <!-- R5,R6 users -> invoices -->
+            <line x1="180" y1="480" x2="420" y2="640" stroke="#db2777" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+            <!-- R7 users -> payments -->
+            <line x1="180" y1="500" x2="780" y2="700" stroke="#db2777" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+            <!-- R12 invoices -> payments -->
+            <line x1="660" y1="700" x2="780" y2="700" stroke="#db2777" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+            <!-- ===== RELATIONSHIP DIAMONDS + LABELS ===== -->
+            <!-- R4 -->
+            <polygon points="130,148 142,160 130,172 118,160" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="130" y="190" font-size="9" fill="#92400e" text-anchor="middle" font-weight="600">R4 updates</text>
+            <text x="130" y="202" font-size="8" fill="#64748b" text-anchor="middle">FK: updated_by</text>
+            <text x="130" y="213" font-size="8" fill="#64748b" text-anchor="middle">1:N · NULL · SET NULL</text>
+
+            <!-- R8 -->
+            <polygon points="720,95 732,107 720,119 708,107" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="720" y="132" font-size="9" fill="#92400e" text-anchor="middle" font-weight="600">R8 has_images</text>
+            <text x="720" y="144" font-size="8" fill="#64748b" text-anchor="middle">FK: catalog_design_id</text>
+            <text x="720" y="155" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+
+            <!-- R9 -->
+            <polygon points="540,215 552,227 540,239 528,227" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="570" y="228" font-size="9" fill="#92400e" font-weight="600">R9 references</text>
+            <text x="570" y="240" font-size="8" fill="#64748b">FK: catalog_design_id</text>
+            <text x="570" y="251" font-size="8" fill="#64748b">1:N · NULL · SET NULL</text>
+
+            <!-- R1 -->
+            <polygon points="300,355 312,367 300,379 288,367" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="300" y="345" font-size="9" fill="#92400e" text-anchor="middle" font-weight="600">R1 places</text>
+            <text x="300" y="333" font-size="8" fill="#64748b" text-anchor="middle">FK: user_id</text>
+            <text x="300" y="322" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+            <text x="278" y="367" font-size="8" fill="#64748b">1</text>
+            <text x="318" y="367" font-size="8" fill="#64748b">N</text>
+
+            <!-- R2 -->
+            <polygon points="300,395 312,407 300,419 288,407" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="300" y="435" font-size="9" fill="#92400e" text-anchor="middle" font-weight="600">R2 assigned</text>
+            <text x="300" y="447" font-size="8" fill="#64748b" text-anchor="middle">FK: assigned_technician_id</text>
+            <text x="300" y="458" font-size="8" fill="#64748b" text-anchor="middle">1:N · NULL · SET NULL</text>
+
+            <!-- R3 -->
+            <polygon points="555,395 567,407 555,419 543,407" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="555" y="435" font-size="9" fill="#92400e" text-anchor="middle" font-weight="600">R3 records</text>
+            <text x="555" y="447" font-size="8" fill="#64748b" text-anchor="middle">FK: user_id</text>
+            <text x="555" y="458" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+
+            <!-- R10 -->
+            <polygon points="770,380 782,392 770,404 758,392" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/>
+            <text x="770" y="420" font-size="9" fill="#92400e" text-anchor="middle" font-weight="600">R10 has_logs</text>
+            <text x="770" y="432" font-size="8" fill="#64748b" text-anchor="middle">FK: order_id</text>
+            <text x="770" y="443" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+
+            <!-- R11 -->
+            <polygon points="540,560 552,572 540,584 528,572" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+            <text x="575" y="572" font-size="9" fill="#9d174d" font-weight="600">R11 generates</text>
+            <text x="575" y="584" font-size="8" fill="#64748b">FK: order_id</text>
+            <text x="575" y="595" font-size="8" fill="#64748b">1:1 · NOT NULL · CASCADE</text>
+
+            <!-- R5 -->
+            <polygon points="300,620 312,632 300,644 288,632" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+            <text x="300" y="660" font-size="9" fill="#9d174d" text-anchor="middle" font-weight="600">R5 customer</text>
+            <text x="300" y="672" font-size="8" fill="#64748b" text-anchor="middle">FK: user_id</text>
+            <text x="300" y="683" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+
+            <!-- R6 -->
+            <polygon points="360,620 372,632 360,644 348,632" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+            <text x="360" y="660" font-size="9" fill="#9d174d" text-anchor="middle" font-weight="600">R6 creator</text>
+            <text x="360" y="672" font-size="8" fill="#64748b" text-anchor="middle">FK: created_by</text>
+            <text x="360" y="683" font-size="8" fill="#64748b" text-anchor="middle">1:N · NULL · SET NULL</text>
+
+            <!-- R12 -->
+            <polygon points="720,700 732,712 720,724 708,712" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+            <text x="720" y="740" font-size="9" fill="#9d174d" text-anchor="middle" font-weight="600">R12 receives</text>
+            <text x="720" y="752" font-size="8" fill="#64748b" text-anchor="middle">FK: invoice_id</text>
+            <text x="720" y="763" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+
+            <!-- R7 -->
+            <polygon points="480,700 492,712 480,724 468,712" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+            <text x="480" y="740" font-size="9" fill="#9d174d" text-anchor="middle" font-weight="600">R7 recorder</text>
+            <text x="480" y="752" font-size="8" fill="#64748b" text-anchor="middle">FK: recorded_by</text>
+            <text x="480" y="763" font-size="8" fill="#64748b" text-anchor="middle">1:N · NOT NULL · CASCADE</text>
+
+            <!-- ===== ENTITY: metal_prices ===== -->
+            <rect x="30" y="30" width="200" height="145" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="30" y="30" width="200" height="22" fill="#2563eb" rx="3"/>
+            <text x="130" y="45" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">metal_prices ✅</text>
+            <text x="38" y="62" font-size="9" fill="#334155">id</text><text x="190" y="62" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="38" y="76" font-size="9" fill="#334155">gold_price_per_gram</text><text x="190" y="76" font-size="8" fill="#64748b" text-anchor="end">DECIMAL</text>
+            <text x="38" y="90" font-size="9" fill="#334155">silver_price_per_gram</text><text x="190" y="90" font-size="8" fill="#64748b" text-anchor="end">DECIMAL</text>
+            <text x="38" y="104" font-size="9" fill="#334155">price_date</text><text x="190" y="104" font-size="8" fill="#64748b" text-anchor="end">DATE</text>
+            <text x="38" y="118" font-size="9" fill="#9d174d">updated_by</text><text x="190" y="118" font-size="8" fill="#9d174d" text-anchor="end">FK R4</text>
+            <text x="38" y="132" font-size="9" fill="#334155">created_at / updated_at</text><text x="190" y="132" font-size="8" fill="#64748b" text-anchor="end">TS</text>
+            <text x="38" y="168" font-size="8" fill="#64748b">M4 Metal Prices · 7 attributes</text>
+
+            <!-- ===== ENTITY: catalog_designs ===== -->
+            <rect x="380" y="30" width="280" height="145" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="380" y="30" width="280" height="22" fill="#2563eb" rx="3"/>
+            <text x="520" y="45" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">catalog_designs ✅</text>
+            <text x="388" y="62" font-size="9" fill="#334155">id</text><text x="650" y="62" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="388" y="76" font-size="9" fill="#334155">name · code</text><text x="650" y="76" font-size="8" fill="#1d4ed8" text-anchor="end">UK</text>
+            <text x="388" y="90" font-size="9" fill="#334155">description · category</text>
+            <text x="388" y="104" font-size="9" fill="#334155">gold_quality · weight_grams</text>
+            <text x="388" y="118" font-size="9" fill="#334155">selling_price · availability_status</text>
+            <text x="388" y="132" font-size="9" fill="#334155">created_at / updated_at</text>
+            <text x="388" y="168" font-size="8" fill="#64748b">M2 Catalogue · 11 attributes</text>
+
+            <!-- ===== ENTITY: catalog_images ===== -->
+            <rect x="780" y="30" width="220" height="130" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="780" y="30" width="220" height="22" fill="#2563eb" rx="3"/>
+            <text x="890" y="45" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">catalog_images ✅</text>
+            <text x="788" y="62" font-size="9" fill="#334155">id</text><text x="990" y="62" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="788" y="76" font-size="9" fill="#9d174d">catalog_design_id</text><text x="990" y="76" font-size="8" fill="#9d174d" text-anchor="end">FK R8</text>
+            <text x="788" y="90" font-size="9" fill="#334155">image_path · sort_order</text>
+            <text x="788" y="104" font-size="9" fill="#334155">is_primary</text>
+            <text x="788" y="118" font-size="9" fill="#334155">created_at / updated_at</text>
+            <text x="788" y="153" font-size="8" fill="#64748b">M2 Catalogue · 7 attributes</text>
+
+            <!-- ===== ENTITY: users ===== -->
+            <rect x="30" y="255" width="200" height="250" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="30" y="255" width="200" height="22" fill="#2563eb" rx="3"/>
+            <text x="130" y="270" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">users ✅</text>
+            <text x="38" y="287" font-size="9" fill="#334155">id</text><text x="220" y="287" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="38" y="301" font-size="9" fill="#334155">name · email</text><text x="220" y="301" font-size="8" fill="#1d4ed8" text-anchor="end">UK</text>
+            <text x="38" y="315" font-size="9" fill="#334155">email_verified_at</text>
+            <text x="38" y="329" font-size="9" fill="#334155">password · role</text>
+            <text x="38" y="343" font-size="9" fill="#334155">phone · address · city</text>
+            <text x="38" y="357" font-size="9" fill="#334155">profile_photo_path</text>
+            <text x="38" y="371" font-size="9" fill="#334155">remember_token</text>
+            <text x="38" y="385" font-size="9" fill="#334155">created_at / updated_at</text>
+            <line x1="38" y1="395" x2="222" y2="395" stroke="#cbd5e1"/>
+            <text x="38" y="410" font-size="8" fill="#64748b" font-weight="600">Outgoing FK refs (parent):</text>
+            <text x="38" y="424" font-size="8" fill="#9d174d">→ orders.user_id (R1)</text>
+            <text x="38" y="437" font-size="8" fill="#9d174d">→ orders.assigned_technician_id (R2)</text>
+            <text x="38" y="450" font-size="8" fill="#9d174d">→ production_logs.user_id (R3)</text>
+            <text x="38" y="463" font-size="8" fill="#9d174d">→ metal_prices.updated_by (R4)</text>
+            <text x="38" y="476" font-size="8" fill="#db2777">→ invoices.user_id (R5) 🔜</text>
+            <text x="38" y="489" font-size="8" fill="#db2777">→ invoices.created_by (R6) 🔜</text>
+            <text x="38" y="502" font-size="8" fill="#db2777">→ payments.recorded_by (R7) 🔜</text>
+            <text x="38" y="518" font-size="8" fill="#64748b">M1 Auth/RBAC · 13 attributes</text>
+
+            <!-- ===== ENTITY: orders ===== -->
+            <rect x="380" y="255" width="280" height="265" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="380" y="255" width="280" height="22" fill="#2563eb" rx="3"/>
+            <text x="520" y="270" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">orders ✅</text>
+            <text x="388" y="287" font-size="9" fill="#334155">id</text><text x="650" y="287" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="388" y="301" font-size="9" fill="#334155">order_number</text><text x="650" y="301" font-size="8" fill="#1d4ed8" text-anchor="end">UK</text>
+            <text x="388" y="315" font-size="9" fill="#9d174d">user_id</text><text x="650" y="315" font-size="8" fill="#9d174d" text-anchor="end">FK R1</text>
+            <text x="388" y="329" font-size="9" fill="#9d174d">catalog_design_id</text><text x="650" y="329" font-size="8" fill="#9d174d" text-anchor="end">FK R9</text>
+            <text x="388" y="343" font-size="9" fill="#334155">design_type · item_type · item_name</text>
+            <text x="388" y="357" font-size="9" fill="#334155">size · weight_grams · gold_quality</text>
+            <text x="388" y="371" font-size="9" fill="#334155">gemstone_type · gemstone_details</text>
+            <text x="388" y="385" font-size="9" fill="#334155">quantity · special_instructions</text>
+            <text x="388" y="399" font-size="9" fill="#334155">expected_delivery_date</text>
+            <text x="388" y="413" font-size="9" fill="#334155">contact_phone · delivery_address</text>
+            <text x="388" y="427" font-size="9" fill="#334155">status · estimated_price · admin_notes</text>
+            <text x="388" y="441" font-size="9" fill="#9d174d">assigned_technician_id</text><text x="650" y="441" font-size="8" fill="#9d174d" text-anchor="end">FK R2</text>
+            <text x="388" y="455" font-size="9" fill="#334155">assigned_at · reference_image_path</text>
+            <text x="388" y="469" font-size="9" fill="#334155">specifications · created_at / updated_at</text>
+            <line x1="388" y1="479" x2="652" y2="479" stroke="#cbd5e1"/>
+            <text x="388" y="494" font-size="8" fill="#64748b" font-weight="600">Outgoing FK refs:</text>
+            <text x="388" y="508" font-size="8" fill="#9d174d">→ production_logs.order_id (R10)</text>
+            <text x="388" y="521" font-size="8" fill="#db2777">→ invoices.order_id (R11) 🔜</text>
+            <text x="388" y="537" font-size="8" fill="#64748b">M3 Orders · 26 attributes</text>
+
+            <!-- ===== ENTITY: production_logs ===== -->
+            <rect x="780" y="255" width="220" height="155" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="780" y="255" width="220" height="22" fill="#2563eb" rx="3"/>
+            <text x="890" y="270" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">production_logs ✅</text>
+            <text x="788" y="287" font-size="9" fill="#334155">id</text><text x="990" y="287" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="788" y="301" font-size="9" fill="#9d174d">order_id</text><text x="990" y="301" font-size="8" fill="#9d174d" text-anchor="end">FK R10</text>
+            <text x="788" y="315" font-size="9" fill="#9d174d">user_id</text><text x="990" y="315" font-size="8" fill="#9d174d" text-anchor="end">FK R3</text>
+            <text x="788" y="329" font-size="9" fill="#334155">from_status · to_status</text>
+            <text x="788" y="343" font-size="9" fill="#334155">note</text>
+            <text x="788" y="357" font-size="9" fill="#334155">created_at / updated_at</text>
+            <text x="788" y="395" font-size="8" fill="#64748b">M5 Workshop · 8 attributes</text>
+
+            <!-- ===== ENTITY: invoices ===== -->
+            <rect x="380" y="600" width="280" height="200" fill="#fdf2f8" stroke="#db2777" stroke-width="2" rx="3"/>
+            <rect x="380" y="600" width="280" height="22" fill="#db2777" rx="3"/>
+            <text x="520" y="615" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">invoices 🔜 Sprint 9</text>
+            <text x="388" y="632" font-size="9" fill="#334155">id</text><text x="650" y="632" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="388" y="646" font-size="9" fill="#334155">invoice_number</text><text x="650" y="646" font-size="8" fill="#1d4ed8" text-anchor="end">UK</text>
+            <text x="388" y="660" font-size="9" fill="#9d174d">order_id</text><text x="650" y="660" font-size="8" fill="#9d174d" text-anchor="end">FK R11</text>
+            <text x="388" y="674" font-size="9" fill="#9d174d">user_id</text><text x="650" y="674" font-size="8" fill="#9d174d" text-anchor="end">FK R5</text>
+            <text x="388" y="688" font-size="9" fill="#334155">subtotal · making_charge · discount</text>
+            <text x="388" y="702" font-size="9" fill="#334155">total_amount · amount_paid · balance_due</text>
+            <text x="388" y="716" font-size="9" fill="#334155">status · issued_at · due_date · notes</text>
+            <text x="388" y="730" font-size="9" fill="#9d174d">created_by</text><text x="650" y="730" font-size="8" fill="#9d174d" text-anchor="end">FK R6</text>
+            <text x="388" y="744" font-size="9" fill="#334155">created_at / updated_at</text>
+            <line x1="388" y1="754" x2="652" y2="754" stroke="#fbcfe8"/>
+            <text x="388" y="769" font-size="8" fill="#9d174d">→ payments.invoice_id (R12)</text>
+            <text x="388" y="785" font-size="8" fill="#64748b">M6 Billing · 17 attributes</text>
+
+            <!-- ===== ENTITY: payments ===== -->
+            <rect x="780" y="600" width="220" height="165" fill="#fdf2f8" stroke="#db2777" stroke-width="2" rx="3"/>
+            <rect x="780" y="600" width="220" height="22" fill="#db2777" rx="3"/>
+            <text x="890" y="615" font-size="11" fill="#fff" text-anchor="middle" font-weight="700">payments 🔜 Sprint 9</text>
+            <text x="788" y="632" font-size="9" fill="#334155">id</text><text x="990" y="632" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="788" y="646" font-size="9" fill="#9d174d">invoice_id</text><text x="990" y="646" font-size="8" fill="#9d174d" text-anchor="end">FK R12</text>
+            <text x="788" y="660" font-size="9" fill="#334155">amount · payment_method</text>
+            <text x="788" y="674" font-size="9" fill="#334155">payment_date · reference_number</text>
+            <text x="788" y="688" font-size="9" fill="#334155">notes</text>
+            <text x="788" y="702" font-size="9" fill="#9d174d">recorded_by</text><text x="990" y="702" font-size="8" fill="#9d174d" text-anchor="end">FK R7</text>
+            <text x="788" y="716" font-size="9" fill="#334155">created_at / updated_at</text>
+            <text x="788" y="755" font-size="8" fill="#64748b">M6 Billing · 10 attributes</text>
+
+            <!-- Title -->
+            <text x="640" y="910" font-size="10" fill="#94a3b8" text-anchor="middle">Diamond = Relationship · Labels show FK column · Cardinality · Nullable · On Delete</text>
+        </svg>
+    </div>
+
+    <!-- Relationship attributes table -->
+    <div class="page">
+        <h2>Figure 2 — Relationship Attributes Table (R1 – R12)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rel ID</th><th>Relationship Name</th><th>Parent Entity</th><th>Child Entity</th>
+                    <th>Cardinality</th><th>FK Column (Child)</th><th>Nullable</th><th>On Delete</th><th>Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>R1</strong></td><td>places</td><td>users</td><td>orders</td><td>1 : N</td><td>user_id</td><td>No</td><td>CASCADE</td><td>Customer places orders</td></tr>
+                <tr><td><strong>R2</strong></td><td>assigned_to</td><td>users</td><td>orders</td><td>1 : N</td><td>assigned_technician_id</td><td>Yes</td><td>SET NULL</td><td>Technician assigned to order</td></tr>
+                <tr><td><strong>R3</strong></td><td>records</td><td>users</td><td>production_logs</td><td>1 : N</td><td>user_id</td><td>No</td><td>CASCADE</td><td>Staff/tech records log</td></tr>
+                <tr><td><strong>R4</strong></td><td>updates</td><td>users</td><td>metal_prices</td><td>1 : N</td><td>updated_by</td><td>Yes</td><td>SET NULL</td><td>Admin updates metal rates</td></tr>
+                <tr><td><strong>R5</strong></td><td>billed_customer</td><td>users</td><td>invoices</td><td>1 : N</td><td>user_id</td><td>No</td><td>CASCADE</td><td>Customer on invoice</td></tr>
+                <tr><td><strong>R6</strong></td><td>invoice_creator</td><td>users</td><td>invoices</td><td>1 : N</td><td>created_by</td><td>Yes</td><td>SET NULL</td><td>Staff creates invoice</td></tr>
+                <tr><td><strong>R7</strong></td><td>payment_recorder</td><td>users</td><td>payments</td><td>1 : N</td><td>recorded_by</td><td>No</td><td>CASCADE</td><td>Staff records payment</td></tr>
+                <tr><td><strong>R8</strong></td><td>has_images</td><td>catalog_designs</td><td>catalog_images</td><td>1 : N</td><td>catalog_design_id</td><td>No</td><td>CASCADE</td><td>Design has images</td></tr>
+                <tr><td><strong>R9</strong></td><td>catalog_reference</td><td>catalog_designs</td><td>orders</td><td>1 : N</td><td>catalog_design_id</td><td>Yes</td><td>SET NULL</td><td>Catalog item in order</td></tr>
+                <tr><td><strong>R10</strong></td><td>has_logs</td><td>orders</td><td>production_logs</td><td>1 : N</td><td>order_id</td><td>No</td><td>CASCADE</td><td>Order production history</td></tr>
+                <tr><td><strong>R11</strong></td><td>generates</td><td>orders</td><td>invoices</td><td>1 : 1</td><td>order_id</td><td>No</td><td>CASCADE</td><td>Order generates invoice</td></tr>
+                <tr><td><strong>R12</strong></td><td>receives</td><td>invoices</td><td>payments</td><td>1 : N</td><td>invoice_id</td><td>No</td><td>CASCADE</td><td>Invoice receives payments</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>For Word:</strong> Open in browser → screenshot Figure 1 (visual ER) + Figure 2 (relationship table), or Print → PDF.<br>
+        <strong>Entity attribute lists:</strong> <code>docs/ER_DIAGRAM_WITH_ATTRIBUTES.html</code> · <code>docs/DATABASE_ER_DIAGRAM.md</code> Section 3
+    </div>
+</body>
+</html>

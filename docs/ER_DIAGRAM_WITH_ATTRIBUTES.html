@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajabharana — ER Diagram with Attributes</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Consolas', 'Segoe UI', monospace; background: #f8fafc; color: #1e293b; padding: 20px; font-size: 11px; }
+        h1 { font-family: 'Segoe UI', sans-serif; text-align: center; font-size: 1.2rem; margin-bottom: 4px; }
+        .sub { font-family: 'Segoe UI', sans-serif; text-align: center; color: #64748b; margin-bottom: 16px; font-size: 0.85rem; }
+        .legend { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; font-size: 0.78rem; }
+        .badge { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700; margin-left: 4px; }
+        .pk { background: #fef3c7; color: #92400e; }
+        .uk { background: #dbeafe; color: #1d4ed8; }
+        .fk { background: #fce7f3; color: #9d174d; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 24px; page-break-inside: avoid; }
+        .page h2 { font-family: 'Segoe UI', sans-serif; font-size: 0.95rem; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .entity { border: 2px solid #2563eb; border-radius: 4px; overflow: hidden; background: #fff; }
+        .entity.planned { border-color: #db2777; }
+        .entity-head { background: #2563eb; color: #fff; padding: 6px 10px; font-weight: 700; font-size: 12px; text-transform: uppercase; }
+        .entity.planned .entity-head { background: #db2777; }
+        .entity-body { padding: 0; }
+        .attr { padding: 3px 8px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; gap: 8px; }
+        .attr:last-child { border-bottom: none; }
+        .attr-name { color: #334155; }
+        .attr-type { color: #64748b; font-size: 10px; white-space: nowrap; }
+        .rel-box { font-family: 'Segoe UI', sans-serif; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px; margin-top: 16px; }
+        .rel-box h3 { font-size: 0.85rem; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; font-size: 0.76rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 8px; text-align: left; }
+        th { background: #f1f5f9; }
+        .connectors { font-family: 'Segoe UI', sans-serif; margin: 16px 0; padding: 12px; background: #eff6ff; border-radius: 6px; font-size: 0.8rem; line-height: 1.8; }
+        .note { font-family: 'Segoe UI', sans-serif; max-width: 900px; margin: 16px auto 0; font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; padding: 10px; } .page { border: none; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery Management System</h1>
+    <p class="sub">Entity-Relationship Diagram — All Entities · All Attributes · Relationships R1–R12</p>
+
+    <div class="legend">
+        <span><span class="badge pk">PK</span> Primary Key</span>
+        <span><span class="badge uk">UK</span> Unique Key</span>
+        <span><span class="badge fk">FK</span> Foreign Key</span>
+        <span style="color:#2563eb">■ Implemented ✅</span>
+        <span style="color:#db2777">■ Planned Sprint 9 🔜</span>
+    </div>
+
+    <!-- PAGE 1: Core entities -->
+    <div class="page">
+        <h2>Figure 1 — ER Diagram with Attributes (Implemented Modules)</h2>
+        <div class="grid">
+            <!-- USERS -->
+            <div class="entity">
+                <div class="entity-head">users — M1 Auth &amp; RBAC ✅</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">name</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">email</span><span class="attr-type">VARCHAR(255) <span class="badge uk">UK</span></span></div>
+                    <div class="attr"><span class="attr-name">email_verified_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">password</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">role</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">phone</span><span class="attr-type">VARCHAR(25)</span></div>
+                    <div class="attr"><span class="attr-name">address</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">city</span><span class="attr-type">VARCHAR(100)</span></div>
+                    <div class="attr"><span class="attr-name">profile_photo_path</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">remember_token</span><span class="attr-type">VARCHAR(100)</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+
+            <!-- CATALOG_DESIGNS -->
+            <div class="entity">
+                <div class="entity-head">catalog_designs — M2 Catalogue ✅</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">name</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">code</span><span class="attr-type">VARCHAR(255) <span class="badge uk">UK</span></span></div>
+                    <div class="attr"><span class="attr-name">description</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">category</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">gold_quality</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">weight_grams</span><span class="attr-type">DECIMAL(8,2)</span></div>
+                    <div class="attr"><span class="attr-name">selling_price</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">availability_status</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+
+            <!-- CATALOG_IMAGES -->
+            <div class="entity">
+                <div class="entity-head">catalog_images — M2 Catalogue ✅</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">catalog_design_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R8</span></div>
+                    <div class="attr"><span class="attr-name">image_path</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">sort_order</span><span class="attr-type">SMALLINT</span></div>
+                    <div class="attr"><span class="attr-name">is_primary</span><span class="attr-type">BOOLEAN</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+
+            <!-- METAL_PRICES -->
+            <div class="entity">
+                <div class="entity-head">metal_prices — M4 Metal Rates ✅</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">gold_price_per_gram</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">silver_price_per_gram</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">price_date</span><span class="attr-type">DATE</span></div>
+                    <div class="attr"><span class="attr-name">updated_by</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R4</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+
+            <!-- PRODUCTION_LOGS -->
+            <div class="entity">
+                <div class="entity-head">production_logs — M5 Workshop ✅</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">order_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R10</span></div>
+                    <div class="attr"><span class="attr-name">user_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R3</span></div>
+                    <div class="attr"><span class="attr-name">from_status</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">to_status</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">note</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDERS full width -->
+        <div style="margin-top:16px;">
+            <div class="entity">
+                <div class="entity-head">orders — M3 Customer Orders ✅ (26 attributes)</div>
+                <div class="entity-body" style="display:grid; grid-template-columns: repeat(3, 1fr);">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">order_number</span><span class="attr-type">VARCHAR(255) <span class="badge uk">UK</span></span></div>
+                    <div class="attr"><span class="attr-name">user_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R1</span></div>
+                    <div class="attr"><span class="attr-name">design_type</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">catalog_design_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R9</span></div>
+                    <div class="attr"><span class="attr-name">reference_image_path</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">item_type</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">item_name</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">size</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">weight_grams</span><span class="attr-type">DECIMAL(8,2)</span></div>
+                    <div class="attr"><span class="attr-name">specifications</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">gold_quality</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">gemstone_type</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">gemstone_details</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">quantity</span><span class="attr-type">SMALLINT</span></div>
+                    <div class="attr"><span class="attr-name">special_instructions</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">expected_delivery_date</span><span class="attr-type">DATE</span></div>
+                    <div class="attr"><span class="attr-name">contact_phone</span><span class="attr-type">VARCHAR(20)</span></div>
+                    <div class="attr"><span class="attr-name">delivery_address</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">status</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">estimated_price</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">admin_notes</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">assigned_technician_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R2</span></div>
+                    <div class="attr"><span class="attr-name">assigned_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="connectors">
+            <strong>Relationships (Implemented):</strong><br>
+            R1: users.id → orders.user_id (1:N) &nbsp;|&nbsp;
+            R2: users.id → orders.assigned_technician_id (1:N) &nbsp;|&nbsp;
+            R3: users.id → production_logs.user_id (1:N) &nbsp;|&nbsp;
+            R4: users.id → metal_prices.updated_by (1:N) &nbsp;|&nbsp;
+            R8: catalog_designs.id → catalog_images.catalog_design_id (1:N) &nbsp;|&nbsp;
+            R9: catalog_designs.id → orders.catalog_design_id (1:N) &nbsp;|&nbsp;
+            R10: orders.id → production_logs.order_id (1:N)
+        </div>
+    </div>
+
+    <!-- PAGE 2: Billing planned -->
+    <div class="page">
+        <h2>Figure 2 — ER Diagram with Attributes (Billing Module — Sprint 9 🔜)</h2>
+        <div class="grid-2">
+            <div class="entity planned">
+                <div class="entity-head">invoices — M6 Billing 🔜</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">invoice_number</span><span class="attr-type">VARCHAR(255) <span class="badge uk">UK</span></span></div>
+                    <div class="attr"><span class="attr-name">order_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R11</span></div>
+                    <div class="attr"><span class="attr-name">user_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R5</span></div>
+                    <div class="attr"><span class="attr-name">subtotal</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">making_charge</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">discount</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">total_amount</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">amount_paid</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">balance_due</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">status</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">issued_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">due_date</span><span class="attr-type">DATE</span></div>
+                    <div class="attr"><span class="attr-name">notes</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">created_by</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R6</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+
+            <div class="entity planned">
+                <div class="entity-head">payments — M6 Billing 🔜</div>
+                <div class="entity-body">
+                    <div class="attr"><span class="attr-name">id</span><span class="attr-type">BIGINT <span class="badge pk">PK</span></span></div>
+                    <div class="attr"><span class="attr-name">invoice_id</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R12</span></div>
+                    <div class="attr"><span class="attr-name">amount</span><span class="attr-type">DECIMAL(12,2)</span></div>
+                    <div class="attr"><span class="attr-name">payment_method</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">payment_date</span><span class="attr-type">DATE</span></div>
+                    <div class="attr"><span class="attr-name">reference_number</span><span class="attr-type">VARCHAR(255)</span></div>
+                    <div class="attr"><span class="attr-name">notes</span><span class="attr-type">TEXT</span></div>
+                    <div class="attr"><span class="attr-name">recorded_by</span><span class="attr-type">BIGINT <span class="badge fk">FK</span> R7</span></div>
+                    <div class="attr"><span class="attr-name">created_at</span><span class="attr-type">TIMESTAMP</span></div>
+                    <div class="attr"><span class="attr-name">updated_at</span><span class="attr-type">TIMESTAMP</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="connectors">
+            <strong>Relationships (Billing):</strong><br>
+            R5: users.id → invoices.user_id (1:N) &nbsp;|&nbsp;
+            R6: users.id → invoices.created_by (1:N) &nbsp;|&nbsp;
+            R7: users.id → payments.recorded_by (1:N) &nbsp;|&nbsp;
+            R11: orders.id → invoices.order_id (1:1) &nbsp;|&nbsp;
+            R12: invoices.id → payments.invoice_id (1:N)
+        </div>
+    </div>
+
+    <!-- Relationship table -->
+    <div class="page">
+        <h2>Figure 3 — All Relationship Attributes (R1 – R12)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Parent Entity</th><th>Child Entity</th><th>Cardinality</th>
+                    <th>FK Column</th><th>Nullable</th><th>On Delete</th><th>Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>R1</td><td>users</td><td>orders</td><td>1:N</td><td>user_id</td><td>No</td><td>CASCADE</td><td>Customer places orders</td></tr>
+                <tr><td>R2</td><td>users</td><td>orders</td><td>1:N</td><td>assigned_technician_id</td><td>Yes</td><td>SET NULL</td><td>Technician assigned to order</td></tr>
+                <tr><td>R3</td><td>users</td><td>production_logs</td><td>1:N</td><td>user_id</td><td>No</td><td>CASCADE</td><td>Staff/tech records log</td></tr>
+                <tr><td>R4</td><td>users</td><td>metal_prices</td><td>1:N</td><td>updated_by</td><td>Yes</td><td>SET NULL</td><td>Admin updates rates</td></tr>
+                <tr><td>R5</td><td>users</td><td>invoices</td><td>1:N</td><td>user_id</td><td>No</td><td>CASCADE</td><td>Customer on invoice</td></tr>
+                <tr><td>R6</td><td>users</td><td>invoices</td><td>1:N</td><td>created_by</td><td>Yes</td><td>SET NULL</td><td>Staff creates invoice</td></tr>
+                <tr><td>R7</td><td>users</td><td>payments</td><td>1:N</td><td>recorded_by</td><td>No</td><td>CASCADE</td><td>Staff records payment</td></tr>
+                <tr><td>R8</td><td>catalog_designs</td><td>catalog_images</td><td>1:N</td><td>catalog_design_id</td><td>No</td><td>CASCADE</td><td>Design has images</td></tr>
+                <tr><td>R9</td><td>catalog_designs</td><td>orders</td><td>1:N</td><td>catalog_design_id</td><td>Yes</td><td>SET NULL</td><td>Catalog item in order</td></tr>
+                <tr><td>R10</td><td>orders</td><td>production_logs</td><td>1:N</td><td>order_id</td><td>No</td><td>CASCADE</td><td>Order production history</td></tr>
+                <tr><td>R11</td><td>orders</td><td>invoices</td><td>1:1</td><td>order_id</td><td>No</td><td>CASCADE</td><td>Order generates invoice</td></tr>
+                <tr><td>R12</td><td>invoices</td><td>payments</td><td>1:N</td><td>invoice_id</td><td>No</td><td>CASCADE</td><td>Invoice receives payments</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>For Word:</strong> Open in browser → Print → Save as PDF, or screenshot Figures 1–3.<br>
+        <strong>Mermaid version:</strong> <code>docs/ER_DIAGRAM.html</code> (Figure 2) · <strong>Full tables:</strong> <code>docs/DATABASE_ER_DIAGRAM.md</code> Section 3
+    </div>
+</body>
+</html>

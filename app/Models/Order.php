@@ -7,6 +7,7 @@ use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class Order extends Model
@@ -86,6 +87,39 @@ class Order extends Model
     public function productionLogs(): HasMany
     {
         return $this->hasMany(ProductionLog::class)->latest();
+    }
+
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
+    public function hasInvoice(): bool
+    {
+        return $this->invoice()->exists();
+    }
+
+    public function isBillable(): bool
+    {
+        if ($this->hasInvoice()) {
+            return false;
+        }
+
+        if (in_array($this->status, [OrderStatus::Cancelled, OrderStatus::Pending], true)) {
+            return false;
+        }
+
+        if (! in_array($this->status, [
+            OrderStatus::Confirmed,
+            OrderStatus::InProduction,
+            OrderStatus::QualityCheck,
+            OrderStatus::Ready,
+            OrderStatus::Delivered,
+        ], true)) {
+            return false;
+        }
+
+        return $this->hasPrice();
     }
 
     public function getReferenceImageUrlAttribute(): ?string

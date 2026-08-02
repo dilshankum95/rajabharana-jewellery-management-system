@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajabharana — Database ER Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f1f5f9; color: #1e293b; padding: 28px; }
+        h1 { text-align: center; font-size: 1.35rem; margin-bottom: 6px; }
+        .sub { text-align: center; font-size: 0.9rem; color: #64748b; margin-bottom: 20px; }
+        .legend { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-bottom: 24px; font-size: 0.82rem; }
+        .legend span { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 14px; height: 14px; border-radius: 3px; border: 2px solid; }
+        .dot.impl { background: #dbeafe; border-color: #2563eb; }
+        .dot.plan { background: #fce7f3; border-color: #db2777; }
+        section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; margin-bottom: 28px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+        section h2 { font-size: 1rem; margin-bottom: 16px; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .diagram-wrap { overflow: auto; min-height: 200px; }
+        .mermaid { display: flex; justify-content: center; }
+        .note { max-width: 960px; margin: 0 auto; font-size: 0.82rem; color: #475569; line-height: 1.7; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; }
+        .note code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 12px; }
+        th, td { border: 1px solid #e2e8f0; padding: 6px 10px; text-align: left; }
+        th { background: #f8fafc; font-weight: 600; }
+        @media print { body { background: #fff; padding: 12px; } section { box-shadow: none; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery Management System</h1>
+    <p class="sub">Database ER Diagram — Entities · Attributes · Relationships (R1–R12)</p>
+
+    <div class="legend">
+        <span><i class="dot impl"></i> Implemented (✅)</span>
+        <span><i class="dot plan"></i> Planned Sprint 9 (🔜)</span>
+        <span>PK = Primary Key · UK = Unique Key · FK = Foreign Key</span>
+    </div>
+
+    <!-- ========== OVERVIEW DIAGRAM ========== -->
+    <section>
+        <h2>Figure 1 — Whole System ER Overview (All Modules)</h2>
+        <div class="diagram-wrap">
+            <div class="mermaid">
+flowchart TB
+    subgraph Core["Core — Implemented ✅"]
+        USERS["users<br/>(13 attributes)"]
+        ORDERS["orders<br/>(26 attributes)"]
+        CATALOG["catalog_designs<br/>(11 attributes)"]
+        IMAGES["catalog_images<br/>(7 attributes)"]
+        METAL["metal_prices<br/>(7 attributes)"]
+        LOGS["production_logs<br/>(8 attributes)"]
+    end
+
+    subgraph Billing["Billing — Sprint 9 🔜"]
+        INV["invoices<br/>(17 attributes)"]
+        PAY["payments<br/>(10 attributes)"]
+    end
+
+    subgraph Reports["Reports — Sprint 10"]
+        REP["Report Engine<br/>(read-only queries)"]
+    end
+
+    USERS -->|"R1 user_id"| ORDERS
+    USERS -->|"R2 assigned_technician_id"| ORDERS
+    USERS -->|"R3 user_id"| LOGS
+    USERS -->|"R4 updated_by"| METAL
+    USERS -->|"R5 user_id"| INV
+    USERS -->|"R6 created_by"| INV
+    USERS -->|"R7 recorded_by"| PAY
+
+    CATALOG -->|"R8 catalog_design_id"| IMAGES
+    CATALOG -->|"R9 catalog_design_id"| ORDERS
+
+    ORDERS -->|"R10 order_id"| LOGS
+    ORDERS -->|"R11 order_id 1:1"| INV
+
+    INV -->|"R12 invoice_id"| PAY
+
+    ORDERS -.-> REP
+    USERS -.-> REP
+    CATALOG -.-> REP
+    LOGS -.-> REP
+    INV -.-> REP
+    PAY -.-> REP
+    METAL -.-> REP
+
+    style USERS fill:#dbeafe,stroke:#2563eb
+    style ORDERS fill:#dbeafe,stroke:#2563eb
+    style CATALOG fill:#dbeafe,stroke:#2563eb
+    style IMAGES fill:#dbeafe,stroke:#2563eb
+    style METAL fill:#dbeafe,stroke:#2563eb
+    style LOGS fill:#dbeafe,stroke:#2563eb
+    style INV fill:#fce7f3,stroke:#db2777
+    style PAY fill:#fce7f3,stroke:#db2777
+    style REP fill:#f0fdf4,stroke:#16a34a
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FULL DETAIL DIAGRAM ========== -->
+    <section>
+        <h2>Figure 2 — Full ER Diagram with All Attributes &amp; Relationships</h2>
+        <div class="diagram-wrap">
+            <div class="mermaid">
+erDiagram
+    USERS ||--o{ ORDERS : "R1 places user_id"
+    USERS ||--o{ ORDERS : "R2 assigned assigned_technician_id"
+    USERS ||--o{ PRODUCTION_LOGS : "R3 records user_id"
+    USERS ||--o{ METAL_PRICES : "R4 updates updated_by"
+    USERS ||--o{ INVOICES : "R5 customer user_id"
+    USERS ||--o{ INVOICES : "R6 creator created_by"
+    USERS ||--o{ PAYMENTS : "R7 recorder recorded_by"
+
+    CATALOG_DESIGNS ||--o{ CATALOG_IMAGES : "R8 has catalog_design_id"
+    CATALOG_DESIGNS ||--o{ ORDERS : "R9 references catalog_design_id"
+
+    ORDERS ||--o{ PRODUCTION_LOGS : "R10 logs order_id"
+    ORDERS ||--o| INVOICES : "R11 generates order_id"
+
+    INVOICES ||--o{ PAYMENTS : "R12 receives invoice_id"
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        timestamp email_verified_at
+        string password
+        string role
+        string phone
+        text address
+        string city
+        string profile_photo_path
+        string remember_token
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ORDERS {
+        bigint id PK
+        string order_number UK
+        bigint user_id FK
+        string design_type
+        bigint catalog_design_id FK
+        string reference_image_path
+        string item_type
+        string item_name
+        string size
+        decimal weight_grams
+        text specifications
+        string gold_quality
+        string gemstone_type
+        text gemstone_details
+        int quantity
+        text special_instructions
+        date expected_delivery_date
+        string contact_phone
+        text delivery_address
+        string status
+        decimal estimated_price
+        text admin_notes
+        bigint assigned_technician_id FK
+        timestamp assigned_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CATALOG_DESIGNS {
+        bigint id PK
+        string name
+        string code UK
+        text description
+        string category
+        string gold_quality
+        decimal weight_grams
+        decimal selling_price
+        string availability_status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CATALOG_IMAGES {
+        bigint id PK
+        bigint catalog_design_id FK
+        string image_path
+        int sort_order
+        boolean is_primary
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    METAL_PRICES {
+        bigint id PK
+        decimal gold_price_per_gram
+        decimal silver_price_per_gram
+        date price_date
+        bigint updated_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PRODUCTION_LOGS {
+        bigint id PK
+        bigint order_id FK
+        bigint user_id FK
+        string from_status
+        string to_status
+        text note
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    INVOICES {
+        bigint id PK
+        string invoice_number UK
+        bigint order_id FK
+        bigint user_id FK
+        decimal subtotal
+        decimal making_charge
+        decimal discount
+        decimal total_amount
+        decimal amount_paid
+        decimal balance_due
+        string status
+        timestamp issued_at
+        date due_date
+        text notes
+        bigint created_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PAYMENTS {
+        bigint id PK
+        bigint invoice_id FK
+        decimal amount
+        string payment_method
+        date payment_date
+        string reference_number
+        text notes
+        bigint recorded_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== RELATIONSHIP TABLE ========== -->
+    <section>
+        <h2>Relationship Attributes (R1 – R12)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Parent</th><th>Child</th><th>Cardinality</th>
+                    <th>FK Column</th><th>Meaning</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>R1</td><td>users</td><td>orders</td><td>1 : N</td><td>user_id</td><td>Customer places orders</td></tr>
+                <tr><td>R2</td><td>users</td><td>orders</td><td>1 : N</td><td>assigned_technician_id</td><td>Technician assigned to orders</td></tr>
+                <tr><td>R3</td><td>users</td><td>production_logs</td><td>1 : N</td><td>user_id</td><td>Staff records production logs</td></tr>
+                <tr><td>R4</td><td>users</td><td>metal_prices</td><td>1 : N</td><td>updated_by</td><td>Admin updates metal rates</td></tr>
+                <tr><td>R5</td><td>users</td><td>invoices</td><td>1 : N</td><td>user_id</td><td>Customer billed on invoices</td></tr>
+                <tr><td>R6</td><td>users</td><td>invoices</td><td>1 : N</td><td>created_by</td><td>Staff creates invoices</td></tr>
+                <tr><td>R7</td><td>users</td><td>payments</td><td>1 : N</td><td>recorded_by</td><td>Staff records payments</td></tr>
+                <tr><td>R8</td><td>catalog_designs</td><td>catalog_images</td><td>1 : N</td><td>catalog_design_id</td><td>Design has many images</td></tr>
+                <tr><td>R9</td><td>catalog_designs</td><td>orders</td><td>1 : N</td><td>catalog_design_id</td><td>Catalog item in orders</td></tr>
+                <tr><td>R10</td><td>orders</td><td>production_logs</td><td>1 : N</td><td>order_id</td><td>Order has production history</td></tr>
+                <tr><td>R11</td><td>orders</td><td>invoices</td><td>1 : 1</td><td>order_id</td><td>Order generates one invoice</td></tr>
+                <tr><td>R12</td><td>invoices</td><td>payments</td><td>1 : N</td><td>invoice_id</td><td>Invoice receives payments</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="note" style="margin-top: 24px;">
+        <strong>How to use in Word:</strong> Open this file in Chrome/Edge → screenshot each figure, or <strong>Print → Save as PDF</strong>.<br>
+        <strong>Conceptual Chen diagram</strong> (users as separate entities): see <code>docs/CHEN_ER_DIAGRAM.html</code><br>
+        <strong>Editable source:</strong> Mermaid code in <code>docs/DATABASE_ER_DIAGRAM.md</code> · export PNG at <a href="https://mermaid.live">mermaid.live</a>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            er: { layoutDirection: 'TB', minEntityWidth: 120 },
+            flowchart: { curve: 'basis', htmlLabels: true }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Sequence Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 8px; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Sequence Diagrams</h1>
+    <p class="sub">All main flows · Implemented ✅ · Billing &amp; Reports 🔜</p>
+    <div class="legend">
+        <span style="color:#2563eb">■ Implemented ✅</span>
+        <span style="color:#db2777">■ Planned 🔜</span>
+        <span>Actor → Controller → Model → Database</span>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 1 — Customer Login ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer
+    participant Browser
+    participant Auth as AuthenticatedSessionController
+    participant LoginReq as LoginRequest
+    participant Session as sessions
+    participant User as users
+    Customer->>Browser: email + password
+    Browser->>Auth: POST /login
+    Auth->>LoginReq: validate
+    LoginReq->>User: verify credentials
+    User-->>Auth: User
+    Auth->>Session: regenerate session
+    alt technician
+        Auth-->>Browser: /technician
+    else staff/admin
+        Auth-->>Browser: /admin
+    else customer
+        Auth-->>Browser: /dashboard
+    end
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 2 — Customer Registration ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer
+    participant Auth as RegisteredUserController
+    participant RegReq as RegisterRequest
+    participant User as users
+    Customer->>Auth: POST /register
+    Auth->>RegReq: validate
+    Auth->>User: INSERT role=customer
+    Auth->>Auth: Auth::login()
+    Auth-->>Customer: redirect /dashboard
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 3 — Customer Places Order ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer
+    participant MW as Middleware customer
+    participant OrderCtrl as OrderController
+    participant StoreReq as StoreOrderRequest
+    participant Catalog as catalog_designs
+    participant Order as orders
+    Customer->>MW: POST /orders
+    MW->>OrderCtrl: store()
+    OrderCtrl->>StoreReq: validate
+    opt catalog order
+        OrderCtrl->>Catalog: get selling_price
+        OrderCtrl->>OrderCtrl: set estimated_price
+    end
+    OrderCtrl->>Order: INSERT pending
+    Order-->>OrderCtrl: order_number generated
+    OrderCtrl-->>Customer: redirect order detail
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 4 — Admin Updates Order ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Staff as Sales Staff
+    participant MW as permission orders.manage
+    participant OrderCtrl as Admin OrderController
+    participant Order as orders
+    Staff->>MW: PATCH /admin/orders/{id}
+    MW->>OrderCtrl: update()
+    OrderCtrl->>Order: UPDATE status price notes
+    OrderCtrl-->>Staff: redirect + flash message
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 5 — Admin Assigns Technician ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant AssignCtrl as OrderAssignmentController
+    participant Order as orders
+    participant Log as production_logs
+    Admin->>AssignCtrl: PATCH assign-technician
+    AssignCtrl->>Order: check assignable status
+    AssignCtrl->>Order: UPDATE assigned_technician_id
+    AssignCtrl->>Log: INSERT assignment note
+    AssignCtrl-->>Admin: success message
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 6 — Technician Updates Production ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Technician
+    participant JobCtrl as JobController
+    participant Order as orders
+    participant Log as production_logs
+    Technician->>JobCtrl: PATCH /technician/jobs/{id}
+    JobCtrl->>Order: verify assigned + valid transition
+    JobCtrl->>Order: UPDATE status
+    JobCtrl->>Log: INSERT from_status to_status note
+    JobCtrl-->>Technician: updated job page
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 7 — Manager Updates Catalogue ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Manager
+    participant CatalogCtrl as CatalogDesignController
+    participant Design as catalog_designs
+    participant Images as catalog_images
+    Manager->>CatalogCtrl: POST/PATCH /admin/catalog
+    CatalogCtrl->>Design: INSERT/UPDATE item
+    CatalogCtrl->>Images: INSERT images
+    CatalogCtrl-->>Manager: catalog list
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 8 — Admin Updates Metal Prices ✅</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant PriceCtrl as MetalPriceController
+    participant MetalPrice as metal_prices
+    Admin->>PriceCtrl: PATCH /admin/metal-prices
+    PriceCtrl->>MetalPrice: upsertCurrent()
+    MetalPrice-->>Admin: saved rates
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 9 — Generate Invoice 🔜 Sprint 9</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Staff
+    participant InvCtrl as InvoiceController
+    participant InvSvc as InvoiceService
+    participant Order as orders
+    participant Invoice as invoices
+    participant Items as invoice_items
+    Staff->>InvCtrl: POST generate invoice
+    InvCtrl->>Order: verify billable
+    InvCtrl->>InvSvc: generateFromOrder()
+    InvSvc->>Invoice: INSERT header totals
+    InvSvc->>Items: INSERT line items
+    InvCtrl-->>Staff: print invoice view
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 10 — Record Payment 🔜 Sprint 9</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Staff
+    participant PayCtrl as PaymentController
+    participant Payment as payments
+    participant Invoice as invoices
+    participant Method as payment_methods
+    Staff->>PayCtrl: POST record payment
+    PayCtrl->>Method: verify method
+    PayCtrl->>Payment: INSERT amount
+    PayCtrl->>Invoice: update partial or paid
+    PayCtrl-->>Staff: invoice with payments
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 11 — Generate Report 🔜 Sprint 10</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant ReportCtrl as ReportController
+    participant Engine as ReportEngine
+    participant DB as MySQL
+    participant Export as PDF storage
+    Admin->>ReportCtrl: GET /admin/reports/sales
+    ReportCtrl->>Engine: salesRevenue(filters)
+    Engine->>DB: aggregate queries
+    DB-->>Engine: data
+    Engine-->>ReportCtrl: report dataset
+    ReportCtrl-->>Admin: on-screen report
+    opt export
+        ReportCtrl->>Export: save PDF
+    end
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 12 — Complete Order Lifecycle ✅ + 🔜</h2>
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer
+    actor Staff
+    actor Admin
+    actor Technician
+    participant App as Laravel App
+    participant DB as MySQL
+    Customer->>App: Place order
+    App->>DB: orders pending
+    Staff->>App: Confirm order
+    App->>DB: orders confirmed
+    Admin->>App: Assign technician
+    App->>DB: assigned_technician_id + log
+    Technician->>App: Update production
+    App->>DB: status in_production QC ready
+    Note over Staff,DB: Billing Sprint 9
+    Staff->>App: Generate invoice
+    App->>DB: invoices items
+    Staff->>App: Record payment
+    App->>DB: payments paid
+    Staff->>App: Mark delivered
+    App->>DB: orders delivered
+    Note over Admin,DB: Reports Sprint 10
+    Admin->>App: Run report
+    App->>DB: aggregate data
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>Diagram Index</h2>
+        <table>
+            <tr><th>Figure</th><th>Flow</th><th>Status</th><th>Actor</th></tr>
+            <tr><td>1</td><td>Customer login</td><td>✅</td><td>Customer</td></tr>
+            <tr><td>2</td><td>Customer registration</td><td>✅</td><td>Customer</td></tr>
+            <tr><td>3</td><td>Place order</td><td>✅</td><td>Customer</td></tr>
+            <tr><td>4</td><td>Admin update order</td><td>✅</td><td>Staff</td></tr>
+            <tr><td>5</td><td>Assign technician</td><td>✅</td><td>Admin</td></tr>
+            <tr><td>6</td><td>Update production</td><td>✅</td><td>Technician</td></tr>
+            <tr><td>7</td><td>Manage catalogue</td><td>✅</td><td>Manager</td></tr>
+            <tr><td>8</td><td>Update metal prices</td><td>✅</td><td>Admin</td></tr>
+            <tr><td>9</td><td>Generate invoice</td><td>🔜</td><td>Staff</td></tr>
+            <tr><td>10</td><td>Record payment</td><td>🔜</td><td>Staff</td></tr>
+            <tr><td>11</td><td>Generate report</td><td>🔜</td><td>Admin</td></tr>
+            <tr><td>12</td><td>Complete lifecycle</td><td>✅+🔜</td><td>All</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>Text source:</strong> <code>docs/SEQUENCE_DIAGRAM.md</code><br>
+        <strong>Print → PDF</strong> for Word/project report.<br>
+        <strong>Related:</strong> <code>SYSTEM_ARCHITECTURE.md</code> §7 Order Processing State Diagram.
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', sequence: { actorMargin: 40, messageMargin: 35 } });</script>
+</body>
+</html>

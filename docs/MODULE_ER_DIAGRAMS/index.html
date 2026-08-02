@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajabharana — Module ER Diagrams</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; color: #1e293b; padding: 28px; max-width: 960px; margin: 0 auto; }
+        h1 { font-size: 1.3rem; margin-bottom: 6px; }
+        .sub { color: #64748b; font-size: 0.88rem; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; }
+        .card h2 { font-size: 0.9rem; margin-bottom: 6px; }
+        .card p { font-size: 0.78rem; color: #64748b; margin-bottom: 10px; line-height: 1.5; }
+        .card a { font-size: 0.82rem; color: #2563eb; text-decoration: none; font-weight: 600; }
+        .card a:hover { text-decoration: underline; }
+        .badge { display: inline-block; font-size: 0.68rem; padding: 2px 7px; border-radius: 999px; font-weight: 600; margin-bottom: 8px; }
+        .impl { background: #dcfce7; color: #15803d; }
+        .plan { background: #fce7f3; color: #9d174d; }
+        .links { margin-top: 24px; padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.82rem; line-height: 1.7; }
+        .links h3 { font-size: 0.9rem; margin-bottom: 8px; }
+        code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 0.78rem; }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System</h1>
+    <p class="sub">Module ER Diagrams — 11 modules · Entities · Attributes · Relationships · Chen &amp; Crow's Foot</p>
+
+    <div class="grid">
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M1 Authentication &amp; User Management</h2>
+            <p>users, password_reset_tokens, sessions</p>
+            <a href="01-authentication.md">Open 01-authentication.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M2 Customer Module</h2>
+            <p>Customer profile, places orders (conceptual + physical users)</p>
+            <a href="02-customer.md">Open 02-customer.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M3 Catalogue &amp; Jewellery Design</h2>
+            <p>catalog_designs, catalog_images (design_images)</p>
+            <a href="03-catalogue-design.md">Open 03-catalogue-design.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M4 Order Management</h2>
+            <p>orders (26 attributes), customer &amp; catalogue links</p>
+            <a href="04-order-management.md">Open 04-order-management.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M5 Workshop &amp; Technician</h2>
+            <p>production_logs, technician assignment on orders</p>
+            <a href="05-workshop-technician.md">Open 05-workshop-technician.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Partial</span>
+            <h2>M6 Inventory &amp; Category</h2>
+            <p>availability_status, proposed categories table (3NF)</p>
+            <a href="06-inventory-category.md">Open 06-inventory-category.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M7 Metal Price</h2>
+            <p>metal_prices, daily gold/silver rates</p>
+            <a href="07-metal-price.md">Open 07-metal-price.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge plan">🔜 Sprint 9</span>
+            <h2>M8 Billing</h2>
+            <p>invoices, invoice_items, payment_methods, tax, grand_total</p>
+            <a href="08-billing.md">Open 08-billing.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge plan">🔜 Sprint 9</span>
+            <h2>M9 Payment</h2>
+            <p>payments, partial/full, Cash/Card/Bank Transfer</p>
+            <a href="09-payment.md">Open 09-payment.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge plan">🔜 Planned</span>
+            <h2>M10 Notification</h2>
+            <p>notifications, email/SMS/in-app alerts</p>
+            <a href="10-notification.md">Open 10-notification.md →</a>
+        </div>
+        <div class="card">
+            <span class="badge impl">✅ Implemented</span>
+            <h2>M11 RBAC</h2>
+            <p>roles, permissions, users.role, config/rbac.php</p>
+            <a href="11-rbac.md">Open 11-rbac.md →</a>
+        </div>
+    </div>
+
+    <div class="links">
+        <h3>Each module document includes</h3>
+        Module Overview · Entity list · Attribute tables · Relationships · Cardinality (Crow's Foot) · Participation · Constraints · 3NF Normalization · Mermaid ER diagram · Chen notation (ASCII)
+        <br><br>
+        <h3>Whole-system diagrams</h3>
+        <a href="../ER_DIAGRAM_RELATIONSHIPS.html">ER Diagram — Relationships with Attributes (R1–R12)</a><br>
+        <a href="../ER_DIAGRAM_WITH_ATTRIBUTES.html">ER Diagram — All Entity Attributes</a><br>
+        <a href="../WHOLE_SYSTEM_ER_DIAGRAM.html">Whole System ER — All Users &amp; Modules</a><br>
+        <a href="../DATABASE_ER_DIAGRAM.md">DATABASE_ER_DIAGRAM.md</a> · <a href="README.md">Module index (README)</a>
+        <br><br>
+        <strong>For Word:</strong> Open each <code>.md</code> file in Cursor/VS Code → copy sections, or export Mermaid blocks from <a href="https://mermaid.live">mermaid.live</a>.
+    </div>
+</body>
+</html>

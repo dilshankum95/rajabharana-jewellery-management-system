@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — System Architecture Class Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>System Architecture — Whole System Class Diagram</h1>
+    <p class="sub">Aligned with SYSTEM_ARCHITECTURE.md · 3-Tier · MVC · All Modules · Billing &amp; Reports</p>
+    <div class="legend">
+        <span style="color:#2563eb">■ Implemented ✅</span>
+        <span style="color:#db2777">■ Planned 🔜</span>
+        <span>UML: namespace = layer/module · ..▶ dependency · ──▶ association</span>
+    </div>
+
+    <!-- FIG 1: 3-TIER -->
+    <div class="page wrap">
+        <h2>Figure 1 — Three-Tier Architecture (Class View) · SYSTEM_ARCHITECTURE §1</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    namespace Presentation {
+        class Browser { <<client>> }
+        class BladeViews { <<view>> catalog admin customer technician }
+        class LayoutComponents { AppLayout AdminLayout TechnicianLayout GuestLayout PublicLayout }
+    }
+    namespace Application {
+        class LaravelApp { <<framework>> Laravel 12 }
+        class Routes { web.php auth.php }
+        class Middleware { EnsureCustomer EnsureAdmin EnsureTechnician EnsurePermission }
+        class Controllers { Auth Customer Admin Technician Catalog Profile }
+        class FormRequests { StoreOrderRequest UpdateOrderRequest AssignTechnicianRequest }
+        class Rbac { +userHasPermission() }
+        class ReportEngine { <<planned>> +generateReport() +exportPdf() }
+    }
+    namespace Domain {
+        class EloquentModels { User Order CatalogDesign CatalogImage ProductionLog MetalPrice }
+        class Enums { UserRole Permission OrderStatus DesignType AvailabilityStatus }
+    }
+    namespace Data {
+        class MySQL { <<database>> 8 tables }
+        class FileStorage { images PDF exports }
+    }
+    Browser --> BladeViews
+    BladeViews ..> Controllers : HTTP
+    LaravelApp --> Routes --> Middleware --> Controllers
+    Controllers --> FormRequests
+    Controllers --> Rbac
+    Controllers --> EloquentModels
+    Controllers --> ReportEngine
+    ReportEngine --> EloquentModels
+    EloquentModels --> MySQL
+    Controllers --> FileStorage
+    EloquentModels --> Enums
+        </div>
+    </div>
+
+    <!-- FIG 2: MODULES -->
+    <div class="page wrap">
+        <h2>Figure 2 — Module Architecture (All Modules → Classes) · §3 &amp; §12</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    namespace M1_Auth {
+        class AuthControllers
+        class StaffUserController
+        class Rbac
+        class User
+    }
+    namespace M2_Customer {
+        class CustomerDashboardController
+        class CustomerOrderController
+        class ProfileController
+    }
+    namespace M3_Catalog {
+        class CatalogController
+        class CatalogDesignController
+        class CatalogDesign
+        class CatalogImage
+    }
+    namespace M4_Orders {
+        class AdminOrderController
+        class Order
+        class OrderStatus
+    }
+    namespace M5_Workshop {
+        class WorkshopController
+        class OrderAssignmentController
+        class TechnicianJobController
+        class ProductionLog
+    }
+    namespace M7_MetalPrice {
+        class MetalPriceController
+        class MetalPrice
+    }
+    namespace M8_Billing {
+        class InvoiceController { <<planned>> }
+        class Invoice { <<planned>> }
+        class InvoiceItem { <<planned>> }
+    }
+    namespace M9_Payment {
+        class PaymentController { <<planned>> }
+        class Payment { <<planned>> }
+        class PaymentMethod { <<planned>> }
+    }
+    namespace M11_Reports {
+        class ReportController { <<planned>> }
+        class ReportEngine { <<planned>> }
+        class ReportExport { <<planned>> }
+    }
+    M2_Customer --> M4_Orders
+    M3_Catalog --> M4_Orders
+    M4_Orders --> M5_Workshop
+    M4_Orders --> M8_Billing
+    M8_Billing --> M9_Payment
+    M8_Billing --> M11_Reports
+    M5_Workshop --> M11_Reports
+    M1_Auth --> M2_Customer
+        </div>
+    </div>
+
+    <!-- FIG 3: MVC -->
+    <div class="page wrap">
+        <h2>Figure 3 — MVC Request Flow (Class Interactions) · §4</h2>
+        <div class="mermaid">
+classDiagram
+    direction LR
+    class HTTPRequest { <<external>> }
+    class WebRoutes { web.php auth.php }
+    class MiddlewareStack { auth verified customer admin permission }
+    class Controller { <<abstract>> +store() +update() }
+    class FormRequest { <<abstract>> +rules() +authorize() }
+    class EloquentModel { <<abstract>> +save() +find() }
+    class BladeView { <<view>> +render() }
+    class MySQLDatabase { <<database>> }
+    HTTPRequest --> WebRoutes --> MiddlewareStack --> Controller
+    Controller --> FormRequest
+    Controller --> EloquentModel --> MySQLDatabase
+    Controller --> BladeView
+        </div>
+    </div>
+
+    <!-- FIG 4: RBAC -->
+    <div class="page wrap">
+        <h2>Figure 4 — Security &amp; RBAC Class Diagram · §5</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class AuthenticatedSessionController { +store() }
+    class User { +UserRole role +hasPermission() bool }
+    class EnsureCustomer { +handle() }
+    class EnsureAdmin { +handle() }
+    class EnsureTechnician { +handle() }
+    class EnsurePermission { +handle(permissions) }
+    class Rbac { +userHasPermission() +permissionsForRole() }
+    class UserRole { <<enum>> Customer Admin Manager Staff Technician }
+    class Permission { <<enum>> OrdersView CatalogManage ProductionAssign }
+    class ConfigRbac { <<config>> rbac.php }
+    AuthenticatedSessionController ..> User
+    EnsurePermission ..> Rbac
+    EnsurePermission ..> User
+    User ..> Rbac
+    Rbac ..> ConfigRbac
+    Rbac ..> Permission
+    User --> UserRole
+        </div>
+    </div>
+
+    <!-- FIG 5: DOMAIN -->
+    <div class="page wrap">
+        <h2>Figure 5 — Domain Model (Implemented + Planned) · §6</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class User { <<Model>> +orders() +assignedOrders() }
+    class CatalogDesign { <<Model>> +images() +orders() }
+    class CatalogImage { <<Model>> +catalogDesign() }
+    class Order { <<Model>> +productionLogs() +user() }
+    class ProductionLog { <<Model>> +order() +user() }
+    class MetalPrice { <<Model>> +updatedBy() }
+    class Invoice { <<planned>> +items() +payments() }
+    class InvoiceItem { <<planned>> +invoice() }
+    class Payment { <<planned>> +invoice() }
+    class PaymentMethod { <<planned>> +payments() }
+    class ReportExport { <<planned>> +generatedBy() }
+    User "1" --> "*" Order
+    User "1" --> "*" ProductionLog
+    CatalogDesign "1" --> "*" CatalogImage
+    CatalogDesign "1" --> "*" Order
+    Order "1" --> "*" ProductionLog
+    Order "1" --> "0..1" Invoice
+    Invoice "1" --> "*" InvoiceItem
+    Invoice "1" --> "*" Payment
+    PaymentMethod "1" --> "*" Payment
+    User "1" --> "*" Invoice
+    User "1" --> "*" ReportExport
+        </div>
+    </div>
+
+    <!-- FIG 6: BILLING -->
+    <div class="page wrap">
+        <h2>Figure 6 — Billing Module Classes 🔜 · §10</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class InvoiceController { <<planned>> +create() +store() +print() }
+    class InvoiceService { <<planned>> +generateFromOrder() +calculateTotals() }
+    class Invoice { <<planned>> +grand_total +status }
+    class InvoiceItem { <<planned>> +line_total }
+    class PaymentController { <<planned>> +store() }
+    class Payment { <<planned>> +amount }
+    class PaymentMethod { <<planned>> cash card bank_transfer }
+    class Order { <<Model>> }
+    class User { <<Model>> }
+    InvoiceController ..> InvoiceService
+    InvoiceService ..> Invoice
+    InvoiceService ..> InvoiceItem
+    InvoiceService ..> Order
+    Invoice "1" --> "*" InvoiceItem
+    Invoice "1" --> "*" Payment
+    PaymentController ..> Payment
+    Payment --> PaymentMethod
+    Invoice --> Order
+    Invoice --> User
+        </div>
+    </div>
+
+    <!-- FIG 7: REPORTS -->
+    <div class="page wrap">
+        <h2>Figure 7 — Reports Module Classes 🔜 · §11</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class ReportController { <<planned>> +orders() +sales() +exportPdf() }
+    class ReportEngine { <<planned>> +orderSummary() +salesRevenue() +billingCollection() }
+    class ReportExport { <<planned>> +report_type +file_path }
+    class FilterReportRequest { <<planned>> +date_from +date_to }
+    class Order { <<Model>> }
+    class User { <<Model>> }
+    class CatalogDesign { <<Model>> }
+    class ProductionLog { <<Model>> }
+    class Invoice { <<planned>> }
+    class Payment { <<planned>> }
+    class MetalPrice { <<Model>> }
+    ReportController ..> ReportEngine
+    ReportController ..> FilterReportRequest
+    ReportController ..> ReportExport
+    ReportEngine ..> Order
+    ReportEngine ..> User
+    ReportEngine ..> CatalogDesign
+    ReportEngine ..> ProductionLog
+    ReportEngine ..> Invoice
+    ReportEngine ..> Payment
+    ReportEngine ..> MetalPrice
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="page">
+        <h2>Figure 8 — Complete Class Inventory</h2>
+        <table>
+            <tr><th>Layer</th><th>Implemented ✅</th><th>Planned 🔜</th></tr>
+            <tr><td>Models</td><td>User, Order, CatalogDesign, CatalogImage, ProductionLog, MetalPrice</td><td>Invoice, InvoiceItem, Payment, PaymentMethod, Category, Notification, ReportExport</td></tr>
+            <tr><td>Controllers</td><td>Auth (8), Customer (2), Admin (8), Technician (2), Catalog, Profile</td><td>InvoiceController, PaymentController, ReportController</td></tr>
+            <tr><td>Middleware</td><td>EnsureCustomer, EnsureAdmin, EnsureTechnician, EnsurePermission</td><td>—</td></tr>
+            <tr><td>Enums</td><td>UserRole, Permission, OrderStatus, DesignType, AvailabilityStatus</td><td>—</td></tr>
+            <tr><td>Support</td><td>Rbac, ValidationRules, ValidPhone</td><td>InvoiceService, ReportEngine</td></tr>
+            <tr><td>Form Requests</td><td>22 classes</td><td>StoreInvoiceRequest, StorePaymentRequest, FilterReportRequest</td></tr>
+            <tr><td>View Components</td><td>AppLayout, AdminLayout, TechnicianLayout, GuestLayout, PublicLayout</td><td>—</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>Source:</strong> <code>docs/SYSTEM_ARCHITECTURE.md</code> · <code>docs/SYSTEM_ARCHITECTURE_CLASS_DIAGRAM.md</code><br>
+        <strong>Print → PDF</strong> for Word/project report.<br>
+        <strong>Architecture pattern:</strong> 3-Tier MVC — Browser → Laravel Controllers → Eloquent Models → MySQL + File Storage.
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', class: { fontSize: 10 } });</script>
+</body>
+</html>

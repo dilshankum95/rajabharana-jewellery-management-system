@@ -126,6 +126,20 @@
                         @endif
                     </section>
 
+                    @if($order->invoice && $order->invoice->isIssued())
+                    <section class="jewel-card jewel-card-body">
+                        <h3 class="jewel-section-title mb-4">Invoice</h3>
+                        <p class="text-sm text-slate-600 mb-2">{{ $order->invoice->invoice_number }}</p>
+                        <x-invoice-status-badge :status="$order->invoice->invoice_status" class="mb-3" />
+                        <p class="font-display text-xl font-semibold text-jewel-gold-dark mb-4">
+                            LKR {{ number_format($order->invoice->grand_total, 2) }}
+                        </p>
+                        <a href="{{ route('orders.invoice.show', $order) }}" class="jewel-btn-outline w-full text-center block">
+                            View Invoice
+                        </a>
+                    </section>
+                    @endif
+
                     <section class="jewel-card jewel-card-body">
                         <h3 class="jewel-section-title mb-4">Delivery</h3>
                         <dl class="space-y-3 text-sm">

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Chen ER Diagram (Database Full)</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Consolas, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .wrap { overflow: auto; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; }
+        svg { display: block; min-width: 1200px; }
+        .entity { fill: #dbeafe; stroke: #1e40af; stroke-width: 2; }
+        .entity-planned { fill: #fce7f3; stroke: #be185d; }
+        .entity-reports { fill: #dcfce7; stroke: #16a34a; }
+        .entity-text { font-size: 10px; font-weight: 700; fill: #1e3a8a; text-anchor: middle; }
+        .entity-text-planned { fill: #9d174d; }
+        .entity-text-reports { fill: #15803d; }
+        .rel { fill: #fef3c7; stroke: #b45309; stroke-width: 1.5; }
+        .rel-text { font-size: 8px; font-weight: 600; fill: #92400e; text-anchor: middle; }
+        .line { stroke: #64748b; stroke-width: 1; fill: none; }
+        .line-dash { stroke: #94a3b8; stroke-width: 1; fill: none; stroke-dasharray: 5,4; }
+        .card { font-size: 7px; fill: #64748b; font-weight: 600; }
+        .chen-entity { border: 2px solid #1e40af; border-radius: 2px; padding: 6px 10px; font-weight: 700; text-align: center; background: #dbeafe; font-size: 10px; margin-bottom: 8px; }
+        .chen-entity.planned { border-color: #be185d; background: #fce7f3; color: #9d174d; }
+        .chen-entity.reports { border-color: #16a34a; background: #dcfce7; color: #15803d; }
+        .attrs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+        .attr { border: 1px solid #64748b; border-radius: 50%; padding: 3px 8px; font-size: 9px; background: #fff; white-space: nowrap; }
+        .attr.pk { border-color: #92400e; color: #92400e; font-weight: 700; }
+        .attr.uk { border-color: #1d4ed8; color: #1d4ed8; }
+        .attr.fk { border-color: #9d174d; color: #9d174d; }
+        .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Chen Notation ER Diagram</h1>
+    <p class="sub">Database mapping · 15 entities · Full attributes · Billing + Reports</p>
+    <div class="legend">
+        <span>▭ Entity (Rectangle)</span>
+        <span>○ Attribute (Ellipse)</span>
+        <span>◆ Relationship (Diamond)</span>
+        <span style="color:#1e40af">■ Implemented</span>
+        <span style="color:#be185d">■ Planned Billing/Payment</span>
+        <span style="color:#16a34a">■ Reports</span>
+    </div>
+
+    <!-- FIGURE 1: RELATIONSHIP DIAGRAM -->
+    <div class="page">
+        <h2>Figure 1 — Chen Relationship Diagram (Database Tables)</h2>
+        <div class="wrap">
+            <svg viewBox="0 0 1300 920" xmlns="http://www.w3.org/2000/svg">
+                <!-- USERS -->
+                <rect class="entity" x="40" y="360" width="80" height="32" rx="2"/>
+                <text class="entity-text" x="80" y="380">USERS</text>
+
+                <!-- SESSIONS -->
+                <rect class="entity" x="40" y="80" width="90" height="32" rx="2"/>
+                <text class="entity-text" x="85" y="100">SESSIONS</text>
+
+                <!-- PASSWORD_RESET -->
+                <rect class="entity" x="40" y="200" width="130" height="32" rx="2"/>
+                <text class="entity-text" x="105" y="220">PASSWORD_RESET_TOKENS</text>
+
+                <!-- CATEGORIES -->
+                <rect class="entity entity-planned" x="280" y="40" width="90" height="32" rx="2"/>
+                <text class="entity-text entity-text-planned" x="325" y="60">CATEGORIES</text>
+
+                <!-- CATALOG_DESIGNS -->
+                <rect class="entity" x="280" y="140" width="120" height="32" rx="2"/>
+                <text class="entity-text" x="340" y="160">CATALOG_DESIGNS</text>
+
+                <!-- CATALOG_IMAGES -->
+                <rect class="entity" x="480" y="140" width="120" height="32" rx="2"/>
+                <text class="entity-text" x="540" y="160">CATALOG_IMAGES</text>
+
+                <!-- ORDERS -->
+                <rect class="entity" x="280" y="360" width="80" height="32" rx="2"/>
+                <text class="entity-text" x="320" y="380">ORDERS</text>
+
+                <!-- METAL_PRICES -->
+                <rect class="entity" x="480" y="360" width="100" height="32" rx="2"/>
+                <text class="entity-text" x="530" y="380">METAL_PRICES</text>
+
+                <!-- PRODUCTION_LOGS -->
+                <rect class="entity" x="480" y="480" width="120" height="32" rx="2"/>
+                <text class="entity-text" x="540" y="500">PRODUCTION_LOGS</text>
+
+                <!-- INVOICES -->
+                <rect class="entity entity-planned" x="280" y="620" width="80" height="32" rx="2"/>
+                <text class="entity-text entity-text-planned" x="320" y="640">INVOICES</text>
+
+                <!-- INVOICE_ITEMS -->
+                <rect class="entity entity-planned" x="480" y="620" width="110" height="32" rx="2"/>
+                <text class="entity-text entity-text-planned" x="535" y="640">INVOICE_ITEMS</text>
+
+                <!-- PAYMENT_METHODS -->
+                <rect class="entity entity-planned" x="680" y="620" width="120" height="32" rx="2"/>
+                <text class="entity-text entity-text-planned" x="740" y="640">PAYMENT_METHODS</text>
+
+                <!-- PAYMENTS -->
+                <rect class="entity entity-planned" x="680" y="740" width="80" height="32" rx="2"/>
+                <text class="entity-text entity-text-planned" x="720" y="760">PAYMENTS</text>
+
+                <!-- NOTIFICATIONS -->
+                <rect class="entity entity-planned" x="40" y="520" width="100" height="32" rx="2"/>
+                <text class="entity-text entity-text-planned" x="90" y="540">NOTIFICATIONS</text>
+
+                <!-- REPORT_EXPORTS -->
+                <rect class="entity entity-reports" x="900" y="360" width="110" height="32" rx="2"/>
+                <text class="entity-text entity-text-reports" x="955" y="380">REPORT_EXPORTS</text>
+
+                <!-- REPORT ENGINE (logical) -->
+                <rect class="entity entity-reports" x="900" y="480" width="110" height="32" rx="2" stroke-dasharray="4,3"/>
+                <text class="entity-text entity-text-reports" x="955" y="500">REPORT_ENGINE</text>
+
+                <!-- Relationships -->
+                <!-- has_session -->
+                <polygon class="rel" points="120,120 135,135 120,150 105,135"/>
+                <text class="rel-text" x="120" y="138">has_session</text>
+                <text class="card" x="95" y="132">1</text><text class="card" x="142" y="142">N</text>
+                <line class="line" x1="80" y1="360" x2="105" y2="150"/>
+                <line class="line" x1="135" y1="135" x2="85" y2="112"/>
+
+                <!-- requests_reset -->
+                <polygon class="rel" points="120,280 135,295 120,310 105,295"/>
+                <text class="rel-text" x="120" y="298">requests_reset</text>
+                <line class="line" x1="80" y1="360" x2="105" y2="310"/>
+                <line class="line" x1="135" y1="295" x2="105" y2="232"/>
+
+                <!-- places -->
+                <polygon class="rel" points="180,380 195,395 180,410 165,395"/>
+                <text class="rel-text" x="180" y="398">places</text>
+                <text class="card" x="155" y="392">1</text><text class="card" x="202" y="402">N</text>
+                <line class="line" x1="120" y1="376" x2="165" y2="395"/>
+                <line class="line" x1="195" y1="395" x2="280" y2="376"/>
+
+                <!-- assigned_to -->
+                <polygon class="rel" points="180,440 195,455 180,470 165,455"/>
+                <text class="rel-text" x="180" y="458">assigned_to</text>
+                <line class="line" x1="120" y1="392" x2="165" y2="455"/>
+                <line class="line" x1="195" y1="455" x2="280" y2="392"/>
+
+                <!-- categorizes -->
+                <polygon class="rel" points="325,100 340,115 325,130 310,115"/>
+                <text class="rel-text" x="325" y="118">categorizes</text>
+                <text class="card" x="300" y="112">1</text><text class="card" x="347" y="122">N</text>
+                <line class="line" x1="325" y1="72" x2="325" y2="100"/>
+                <line class="line" x1="325" y1="130" x2="325" y2="140"/>
+
+                <!-- has_images -->
+                <polygon class="rel" points="420,155 435,170 420,185 405,170"/>
+                <text class="rel-text" x="420" y="173">has_images</text>
+                <text class="card" x="395" y="167">1</text><text class="card" x="442" y="177">N</text>
+                <line class="line" x1="400" y1="156" x2="405" y2="170"/>
+                <line class="line" x1="435" y1="170" x2="480" y2="156"/>
+
+                <!-- referenced_by -->
+                <polygon class="rel" points="340,280 355,295 340,310 325,295"/>
+                <text class="rel-text" x="340" y="298">referenced_by</text>
+                <line class="line" x1="340" y1="172" x2="340" y2="280"/>
+                <line class="line" x1="340" y1="310" x2="320" y2="360"/>
+
+                <!-- updates -->
+                <polygon class="rel" points="420,380 435,395 420,410 405,395"/>
+                <text class="rel-text" x="420" y="398">updates</text>
+                <line class="line" x1="120" y1="376" x2="405" y2="395"/>
+                <line class="line" x1="435" y1="395" x2="480" y2="376"/>
+
+                <!-- has_logs -->
+                <polygon class="rel" points="400,440 415,455 400,470 385,455"/>
+                <text class="rel-text" x="400" y="458">has_logs</text>
+                <text class="card" x="378" y="472">1</text><text class="card" x="422" y="448">N</text>
+                <line class="line" x1="360" y1="392" x2="385" y2="455"/>
+                <line class="line" x1="415" y1="455" x2="480" y2="496"/>
+
+                <!-- records -->
+                <polygon class="rel" points="420,520 435,535 420,550 405,535"/>
+                <text class="rel-text" x="420" y="538">records</text>
+                <line class="line" x1="120" y1="392" x2="405" y2="535"/>
+                <line class="line" x1="435" y1="535" x2="480" y2="512"/>
+
+                <!-- generates invoice -->
+                <polygon class="rel" points="320,520 335,535 320,550 305,535"/>
+                <text class="rel-text" x="320" y="538">generates</text>
+                <text class="card" x="308" y="552">1</text><text class="card" x="342" y="528">1</text>
+                <line class="line" x1="320" y1="392" x2="320" y2="520"/>
+                <line class="line" x1="320" y1="550" x2="320" y2="620"/>
+
+                <!-- billed_to -->
+                <polygon class="rel" points="180,580 195,595 180,610 165,595"/>
+                <text class="rel-text" x="180" y="598">billed_to</text>
+                <line class="line" x1="80" y1="392" x2="165" y2="595"/>
+                <line class="line" x1="195" y1="595" x2="280" y2="636"/>
+
+                <!-- contains -->
+                <polygon class="rel" points="400,640 415,655 400,670 385,655"/>
+                <text class="rel-text" x="400" y="658">contains</text>
+                <text class="card" x="378" y="672">1</text><text class="card" x="422" y="648">N</text>
+                <line class="line" x1="360" y1="636" x2="385" y2="655"/>
+                <line class="line" x1="415" y1="655" x2="480" y2="636"/>
+
+                <!-- line_from -->
+                <polygon class="rel" points="400,580 415,595 400,610 385,595"/>
+                <text class="rel-text" x="400" y="598">line_from</text>
+                <line class="line" x1="360" y1="392" x2="385" y2="595"/>
+                <line class="line" x1="415" y1="595" x2="480" y2="628"/>
+
+                <!-- receives payment -->
+                <polygon class="rel" points="420,700 435,715 420,730 405,715"/>
+                <text class="rel-text" x="420" y="718">receives</text>
+                <text class="card" x="408" y="732">1</text><text class="card" x="442" y="708">N</text>
+                <line class="line" x1="360" y1="652" x2="405" y2="715"/>
+                <line class="line" x1="435" y1="715" x2="680" y2="756"/>
+
+                <!-- uses_method -->
+                <polygon class="rel" points="740,680 755,695 740,710 725,695"/>
+                <text class="rel-text" x="740" y="698">uses_method</text>
+                <text class="card" x="718" y="712">1</text><text class="card" x="762" y="688">N</text>
+                <line class="line" x1="740" y1="652" x2="740" y2="680"/>
+                <line class="line" x1="740" y1="710" x2="720" y2="740"/>
+
+                <!-- receives_alert -->
+                <polygon class="rel" points="80,480 95,495 80,510 65,495"/>
+                <text class="rel-text" x="80" y="498">receives_alert</text>
+                <line class="line" x1="80" y1="392" x2="65" y2="495"/>
+                <line class="line" x1="95" y1="495" x2="90" y2="520"/>
+
+                <!-- generates_export -->
+                <polygon class="rel" points="520,380 535,395 520,410 505,395"/>
+                <text class="rel-text" x="520" y="398">generates_export</text>
+                <text class="card" x="498" y="412">1</text><text class="card" x="542" y="388">N</text>
+                <line class="line" x1="120" y1="376" x2="505" y2="395"/>
+                <line class="line" x1="535" y1="395" x2="900" y2="376"/>
+
+                <!-- Report engine reads (dashed) -->
+                <line class="line-dash" x1="955" y1="480" x2="320" y2="376"/>
+                <line class="line-dash" x1="955" y1="480" x2="320" y2="636"/>
+                <line class="line-dash" x1="955" y1="480" x2="540" y2="496"/>
+                <line class="line-dash" x1="955" y1="480" x2="340" y2="156"/>
+                <line class="line-dash" x1="955" y1="480" x2="720" y2="756"/>
+                <text class="card" x="620" y="430">reads (logical)</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- FIGURE 2: ALL ATTRIBUTES (Chen ellipses) -->
+    <div class="page">
+        <h2>Figure 2 — Entity Attributes (Chen Ellipses) — Auth &amp; Core ✅</h2>
+        <div class="grid3">
+            <div>
+                <div class="chen-entity">USERS (13)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr">name</span><span class="attr uk">email UK</span>
+                    <span class="attr">email_verified_at</span><span class="attr">password</span><span class="attr">role</span>
+                    <span class="attr">phone</span><span class="attr">address</span><span class="attr">city</span>
+                    <span class="attr">profile_photo_path</span><span class="attr">remember_token</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity">SESSIONS (6)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr fk">user_id FK</span>
+                    <span class="attr">ip_address</span><span class="attr">user_agent</span>
+                    <span class="attr">payload</span><span class="attr">last_activity</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity">PASSWORD_RESET_TOKENS (3)</div>
+                <div class="attrs">
+                    <span class="attr pk">email PK</span><span class="attr">token</span><span class="attr">created_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity">CATALOG_DESIGNS (12)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr">name</span><span class="attr uk">code UK</span>
+                    <span class="attr">description</span><span class="attr">category</span><span class="attr fk">category_id FK</span>
+                    <span class="attr">gold_quality</span><span class="attr">weight_grams</span><span class="attr">selling_price</span>
+                    <span class="attr">availability_status</span><span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity">CATALOG_IMAGES (7)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr fk">catalog_design_id FK</span>
+                    <span class="attr">image_path</span><span class="attr">sort_order</span><span class="attr">is_primary</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity">METAL_PRICES (7)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr">gold_price_per_gram</span><span class="attr">silver_price_per_gram</span>
+                    <span class="attr">price_date</span><span class="attr fk">updated_by FK</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+        </div>
+        <div class="chen-entity" style="max-width:100%">ORDERS (26)</div>
+        <div class="attrs">
+            <span class="attr pk">id PK</span><span class="attr uk">order_number UK</span><span class="attr fk">user_id FK</span>
+            <span class="attr">design_type</span><span class="attr fk">catalog_design_id FK</span><span class="attr">reference_image_path</span>
+            <span class="attr">item_type</span><span class="attr">item_name</span><span class="attr">size</span>
+            <span class="attr">weight_grams</span><span class="attr">specifications</span><span class="attr">gold_quality</span>
+            <span class="attr">gemstone_type</span><span class="attr">gemstone_details</span><span class="attr">quantity</span>
+            <span class="attr">special_instructions</span><span class="attr">expected_delivery_date</span><span class="attr">contact_phone</span>
+            <span class="attr">delivery_address</span><span class="attr">status</span><span class="attr">estimated_price</span>
+            <span class="attr">admin_notes</span><span class="attr fk">assigned_technician_id FK</span><span class="attr">assigned_at</span>
+            <span class="attr">created_at</span><span class="attr">updated_at</span>
+        </div>
+        <div class="chen-entity" style="max-width:280px">PRODUCTION_LOGS (8)</div>
+        <div class="attrs">
+            <span class="attr pk">id PK</span><span class="attr fk">order_id FK</span><span class="attr fk">user_id FK</span>
+            <span class="attr">from_status</span><span class="attr">to_status</span><span class="attr">note</span>
+            <span class="attr">created_at</span><span class="attr">updated_at</span>
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>Figure 3 — Entity Attributes — Billing · Payment · Reports 🔜</h2>
+        <div class="grid2">
+            <div>
+                <div class="chen-entity planned">CATEGORIES (7)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr uk">name UK</span><span class="attr uk">slug UK</span>
+                    <span class="attr">description</span><span class="attr">is_active</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity planned">INVOICES (18) — M8 Billing</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr uk">invoice_number UK</span>
+                    <span class="attr fk">order_id FK UK</span><span class="attr fk">user_id FK</span>
+                    <span class="attr">subtotal</span><span class="attr">making_charge</span><span class="attr">discount</span>
+                    <span class="attr">tax</span><span class="attr">grand_total</span><span class="attr">amount_paid</span>
+                    <span class="attr">balance_due</span><span class="attr">status</span><span class="attr">issued_at</span>
+                    <span class="attr">due_date</span><span class="attr">notes</span><span class="attr fk">created_by FK</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity planned">INVOICE_ITEMS (9)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr fk">invoice_id FK</span><span class="attr fk">order_id FK</span>
+                    <span class="attr">description</span><span class="attr">quantity</span>
+                    <span class="attr">unit_price</span><span class="attr">line_total</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity planned">PAYMENT_METHODS (6)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr uk">code UK</span><span class="attr">label</span>
+                    <span class="attr">is_active</span><span class="attr">sort_order</span><span class="attr">created_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity planned">PAYMENTS (11) — M9</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr fk">invoice_id FK</span><span class="attr fk">payment_method_id FK</span>
+                    <span class="attr">amount</span><span class="attr">payment_status</span><span class="attr">payment_date</span>
+                    <span class="attr">reference_number</span><span class="attr">notes</span><span class="attr fk">recorded_by FK</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity planned">NOTIFICATIONS (10)</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr fk">user_id FK</span>
+                    <span class="attr">type</span><span class="attr">title</span><span class="attr">message</span>
+                    <span class="attr">channel</span><span class="attr">read_at</span><span class="attr">data</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+        </div>
+        <div class="grid2" style="margin-top:12px">
+            <div>
+                <div class="chen-entity reports">REPORT_EXPORTS (10) — M12</div>
+                <div class="attrs">
+                    <span class="attr pk">id PK</span><span class="attr">report_type</span>
+                    <span class="attr">date_from</span><span class="attr">date_to</span><span class="attr fk">generated_by FK</span>
+                    <span class="attr">file_path</span><span class="attr">format</span><span class="attr">parameters</span>
+                    <span class="attr">created_at</span><span class="attr">updated_at</span>
+                </div>
+            </div>
+            <div>
+                <div class="chen-entity reports" style="border-style:dashed">REPORT_ENGINE (logical)</div>
+                <div class="attrs">
+                    <span class="attr">order_summary</span><span class="attr">sales_revenue</span><span class="attr">customer</span>
+                    <span class="attr">production</span><span class="attr">delivery</span><span class="attr">inventory</span>
+                    <span class="attr">billing_collection</span><span class="attr">daily_summary</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RELATIONSHIP TABLE -->
+    <div class="page">
+        <h2>Figure 4 — Relationships (Diamonds) with Cardinality</h2>
+        <table>
+            <tr><th>Diamond</th><th>Entity A</th><th>Card.</th><th>Entity B</th><th>FK</th><th>Module</th></tr>
+            <tr><td>has_session</td><td>USERS</td><td>1:N</td><td>SESSIONS</td><td>user_id</td><td>Auth</td></tr>
+            <tr><td>requests_reset</td><td>USERS</td><td>1:0..1</td><td>PASSWORD_RESET_TOKENS</td><td>email</td><td>Auth</td></tr>
+            <tr><td>places</td><td>USERS</td><td>1:N</td><td>ORDERS</td><td>user_id</td><td>Orders</td></tr>
+            <tr><td>assigned_to</td><td>USERS</td><td>1:N</td><td>ORDERS</td><td>assigned_technician_id</td><td>Workshop</td></tr>
+            <tr><td>records</td><td>USERS</td><td>1:N</td><td>PRODUCTION_LOGS</td><td>user_id</td><td>Workshop</td></tr>
+            <tr><td>updates</td><td>USERS</td><td>1:N</td><td>METAL_PRICES</td><td>updated_by</td><td>Metal Price</td></tr>
+            <tr><td>billed_to</td><td>USERS</td><td>1:N</td><td>INVOICES</td><td>user_id</td><td>Billing</td></tr>
+            <tr><td>creates</td><td>USERS</td><td>1:N</td><td>INVOICES</td><td>created_by</td><td>Billing</td></tr>
+            <tr><td>records_payment</td><td>USERS</td><td>1:N</td><td>PAYMENTS</td><td>recorded_by</td><td>Payment</td></tr>
+            <tr><td>receives_alert</td><td>USERS</td><td>1:N</td><td>NOTIFICATIONS</td><td>user_id</td><td>Notification</td></tr>
+            <tr><td>generates_export</td><td>USERS</td><td>1:N</td><td>REPORT_EXPORTS</td><td>generated_by</td><td>Reports</td></tr>
+            <tr><td>categorizes</td><td>CATEGORIES</td><td>1:N</td><td>CATALOG_DESIGNS</td><td>category_id</td><td>Inventory</td></tr>
+            <tr><td>has_images</td><td>CATALOG_DESIGNS</td><td>1:N</td><td>CATALOG_IMAGES</td><td>catalog_design_id</td><td>Catalogue</td></tr>
+            <tr><td>referenced_by</td><td>CATALOG_DESIGNS</td><td>1:N</td><td>ORDERS</td><td>catalog_design_id</td><td>Orders</td></tr>
+            <tr><td>has_logs</td><td>ORDERS</td><td>1:N</td><td>PRODUCTION_LOGS</td><td>order_id</td><td>Workshop</td></tr>
+            <tr><td>generates</td><td>ORDERS</td><td>1:1</td><td>INVOICES</td><td>order_id</td><td>Billing</td></tr>
+            <tr><td>contains</td><td>INVOICES</td><td>1:N</td><td>INVOICE_ITEMS</td><td>invoice_id</td><td>Billing</td></tr>
+            <tr><td>line_from</td><td>ORDERS</td><td>1:N</td><td>INVOICE_ITEMS</td><td>order_id</td><td>Billing</td></tr>
+            <tr><td>receives</td><td>INVOICES</td><td>1:N</td><td>PAYMENTS</td><td>invoice_id</td><td>Payment</td></tr>
+            <tr><td>uses_method</td><td>PAYMENT_METHODS</td><td>1:N</td><td>PAYMENTS</td><td>payment_method_id</td><td>Payment</td></tr>
+            <tr><td>reads</td><td>REPORT_ENGINE</td><td>M:N</td><td>ALL TABLES</td><td>—</td><td>Reports (logical)</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>Open in browser → Print → PDF</strong> for your project report.<br>
+        <strong>Chen notation:</strong> Rectangle = Entity (MySQL table) · Ellipse = Attribute · Diamond = Relationship · PK/UK/FK underlined in colour.<br>
+        <strong>Also see:</strong> <code>docs/DATABASE_ER_FULL.html</code> (Crow's Foot/Mermaid) · <code>docs/CHEN_ER_DIAGRAM.html</code> (user-role conceptual diagram).<br>
+        <strong>Physical DB:</strong> 8 tables implemented · 7 planned (billing, payment, notifications, categories, report_exports).
+    </div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Use Case Diagram (Administrator)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 4px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .page .desc { font-size: 0.75rem; color: #64748b; margin: 0 0 10px; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 8px; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana — Use Case Diagram (Administrator)</h1>
+    <p class="sub">Role: admin · Permission: * · Panel: /admin/* · ✅ Implemented · 🔜 Planned</p>
+    <div class="legend">
+        <span>(( Administrator ))</span>
+        <span>([ Use Case ])</span>
+        <span>--|> «generalize»</span>
+        <span>-.-> «include» / «extend»</span>
+        <span style="color:#db2777">🔜 Planned</span>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 1 — Administrator Use Case Diagram</h2>
+        <p class="desc">All admin use cases grouped by module inside system boundary</p>
+        <div class="mermaid">
+flowchart TB
+    A((Administrator))
+
+    subgraph SYS[" «system» Rajabharana Admin Panel "]
+        direction TB
+
+        subgraph AUTH["Authentication & Profile"]
+            UC1([Login / Logout])
+            UC2([Manage Profile])
+            UC3([Change Password])
+        end
+
+        subgraph DASH["Dashboard"]
+            UC4([View Admin Dashboard KPIs])
+        end
+
+        subgraph ORD["Order Management ✅"]
+            UCM([Manage Orders])
+            UC5([List & Filter Orders])
+            UC6([View Order Detail])
+            UC7([Update Order Status])
+            UC8([Set Price & Delivery Date])
+            UC9([Add Admin Notes])
+            UC5 & UC6 & UC7 & UC8 & UC9 --|>|«generalize»| UCM
+        end
+
+        subgraph CUST["Customer Management ✅"]
+            UC10([View Customer List])
+            UC11([View Customer Profile & Orders])
+        end
+
+        subgraph INV["Inventory Management ✅"]
+            UCI([Manage Catalogue])
+            UC12([Create Design])
+            UC13([Edit Design])
+            UC14([Delete Design])
+            UC15([Upload Design Images])
+            UC16([Set Primary Image])
+            UC17([Set Availability Status])
+            UC12 & UC13 & UC14 & UC15 & UC16 & UC17 --|>|«generalize»| UCI
+        end
+
+        subgraph WS["Workshop ✅"]
+            UCW([Manage Production])
+            UC18([Assign Technician])
+            UC19([Unassign Technician])
+            UC20([View Workshop Queue])
+            UC21([View Technician Roster])
+            UC22([View Technician Workload])
+            UC18 & UC19 & UC20 & UC21 & UC22 --|>|«generalize»| UCW
+        end
+
+        subgraph SYSADM["System Administration ✅"]
+            UCS([Manage System])
+            UC23([Manage Metal Prices])
+            UC24([Manage Staff Accounts])
+            UC25([Create Staff Account])
+            UC26([Edit Staff Account])
+            UC27([Delete Staff Account])
+            UC23 & UC24 & UC25 & UC26 & UC27 --|>|«generalize»| UCS
+        end
+
+        subgraph BILL["Billing 🔜"]
+            UCB([Manage Billing])
+            UC28([Generate Invoice])
+            UC29([Record Payment])
+            UC30([Print Invoice])
+            UC28 & UC29 & UC30 --|>|«generalize»| UCB
+        end
+
+        subgraph REP["Reports 🔜"]
+            UCR([Generate Reports])
+            UC31([Order Summary Report])
+            UC32([Sales & Revenue Report])
+            UC33([Production Report])
+            UC34([Inventory Report])
+            UC35([Export Report PDF])
+            UC31 & UC32 & UC33 & UC34 & UC35 --|>|«generalize»| UCR
+        end
+    end
+
+    A --> UC1 & UC2 & UC3
+    A --> UC4 & UCM & UC10 & UC11
+    A --> UCI & UCW & UCS
+    A --> UCB & UCR
+
+    UC28 -.->|«include»| UCM
+    UC29 -.->|«include»| UC28
+    UC15 -.->|«include»| UC12
+    UC15 -.->|«include»| UC13
+    UC18 -.->|«include»| UC6
+    UC21 -.->|«extend»| UC20
+    UC22 -.->|«extend»| UC21
+    UC35 -.->|«include»| UCR
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 2 — Actor Generalization</h2>
+        <p class="desc">Administrator inherits Sales Staff + Inventory Manager use cases</p>
+        <div class="mermaid">
+flowchart BT
+    RU((Registered User))
+    IU((Internal User))
+    S((Sales Staff))
+    M((Inventory Manager))
+    A((Administrator))
+
+    S --|>|«generalize»| IU
+    M --|>|«generalize»| IU
+    IU --|>|«generalize»| RU
+    A --|>|«generalize»| S
+    A --|>|«generalize»| M
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 3 — Include &amp; Extend Relationships</h2>
+        <div class="mermaid">
+flowchart LR
+    UC1([Generate Invoice 🔜]) -.->|«include»| UC2([Manage Orders])
+    UC3([Record Payment 🔜]) -.->|«include»| UC1
+    UC4([Upload Images]) -.->|«include»| UC5([Create / Edit Design])
+    UC6([Assign Technician]) -.->|«include»| UC7([View Order Detail])
+    UC8([View Technician Roster]) -.->|«extend»| UC9([View Workshop Queue])
+    UC10([View Technician Workload]) -.->|«extend»| UC8
+    UC11([Export PDF 🔜]) -.->|«include»| UC12([Generate Reports])
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>Figure 4 — Use Cases by Module</h2>
+        <table>
+            <tr><th>Module</th><th>Use Case</th><th>Route</th><th>Status</th></tr>
+            <tr><td>Dashboard</td><td>View Admin Dashboard</td><td>/admin</td><td>✅</td></tr>
+            <tr><td>Orders</td><td>List, View, Update Orders</td><td>/admin/orders/*</td><td>✅</td></tr>
+            <tr><td>Customers</td><td>View Customers &amp; Orders</td><td>/admin/customers/*</td><td>✅</td></tr>
+            <tr><td>Catalogue</td><td>CRUD Designs &amp; Images</td><td>/admin/catalog/*</td><td>✅</td></tr>
+            <tr><td>Workshop</td><td>Assign Technician, View Queue</td><td>/admin/workshop/*</td><td>✅</td></tr>
+            <tr><td>Metal Prices</td><td>Update Gold &amp; Silver</td><td>/admin/metal-prices</td><td>✅</td></tr>
+            <tr><td>Staff</td><td>CRUD Staff Accounts</td><td>/admin/users/*</td><td>✅</td></tr>
+            <tr><td>Profile</td><td>Manage Profile &amp; Password</td><td>/profile</td><td>✅</td></tr>
+            <tr><td>Billing</td><td>Invoice &amp; Payment</td><td>—</td><td>🔜</td></tr>
+            <tr><td>Reports</td><td>Generate &amp; Export Reports</td><td>—</td><td>🔜</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>Administrator</strong> has permission <code>*</code> — full system access.<br>
+        <strong>Generalizes:</strong> Sales Staff (orders, customers) + Inventory Manager (catalogue).<br>
+        <strong>Cannot:</strong> place customer orders, update production jobs (technician panel).<br>
+        <strong>Print → PDF</strong> · Source: <code>docs/USE_CASE_DIAGRAM_ADMIN.md</code>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { curve: 'basis' } });</script>
+</body>
+</html>

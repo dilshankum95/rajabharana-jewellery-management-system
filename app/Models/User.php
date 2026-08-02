@@ -45,6 +45,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'customer_id');
+    }
+
     public function isCustomer(): bool
     {
         return $this->role === UserRole::Customer;

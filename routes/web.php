@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\MetalPriceController;
 use App\Http\Controllers\Admin\CatalogDesignController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\StaffUserController;
 use App\Http\Controllers\Admin\WorkshopController;
 use App\Http\Controllers\Customer\DashboardController;
+use App\Http\Controllers\Customer\InvoiceController as CustomerInvoiceController;
 use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Technician\DashboardController as TechnicianDashboardController;
@@ -36,6 +38,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
         Route::post('/', [OrderController::class, 'store'])->name('store');
         Route::get('/{order}', [OrderController::class, 'show'])->name('show');
         Route::patch('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+        Route::get('/{order}/invoice', [CustomerInvoiceController::class, 'show'])->name('invoice.show');
     });
 });
 
@@ -104,6 +107,23 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/{user}/edit', [StaffUserController::class, 'edit'])->name('edit');
         Route::patch('/{user}', [StaffUserController::class, 'update'])->name('update');
         Route::delete('/{user}', [StaffUserController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::middleware('permission:'.Permission::BillingView->value)->prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', [InvoiceController::class, 'index'])->name('index');
+        Route::post('/', [InvoiceController::class, 'store'])
+            ->middleware('permission:'.Permission::BillingManage->value)
+            ->name('store');
+        Route::get('/{invoice}/print', [InvoiceController::class, 'print'])->name('print');
+        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
+    });
+
+    Route::middleware('permission:'.Permission::BillingManage->value)->group(function () {
+        Route::get('/orders/{order}/invoice/create', [InvoiceController::class, 'create'])->name('orders.invoice.create');
+        Route::get('/invoices/{invoice}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
+        Route::patch('/invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+        Route::post('/invoices/{invoice}/issue', [InvoiceController::class, 'issue'])->name('invoices.issue');
+        Route::post('/invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');
     });
 });
 

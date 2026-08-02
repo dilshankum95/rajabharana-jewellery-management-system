@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Full Database ER Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Consolas, sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.2rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 16px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 20px; page-break-inside: avoid; }
+        .page h2 { font-size: 0.95rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .entity { border: 2px solid #2563eb; border-radius: 4px; overflow: hidden; }
+        .entity.planned { border-color: #db2777; }
+        .entity.reports { border-color: #16a34a; }
+        .eh { padding: 5px 8px; font-weight: 700; font-size: 11px; color: #fff; background: #2563eb; }
+        .entity.planned .eh { background: #db2777; }
+        .entity.reports .eh { background: #16a34a; }
+        .em { font-size: 9px; color: #64748b; padding: 2px 8px; background: #f8fafc; }
+        .attr { display: flex; justify-content: space-between; padding: 2px 8px; border-bottom: 1px solid #f1f5f9; }
+        .pk { color: #92400e; font-weight: 700; }
+        .uk { color: #1d4ed8; }
+        .fk { color: #9d174d; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .wrap { overflow: auto; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; margin-top: 16px; }
+        @media print { body { background: #fff; } .page { border: none; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Full Database ER Diagram</h1>
+    <p class="sub">All modules · 15 tables · Full attributes · Billing + Reports · Maps to MySQL</p>
+    <div class="legend">
+        <span style="color:#2563eb">■ Implemented ✅</span>
+        <span style="color:#db2777">■ Billing / Payment 🔜 Sprint 9</span>
+        <span style="color:#16a34a">■ Reports 🔜 Sprint 10</span>
+        <span>PK · UK · FK</span>
+    </div>
+
+    <!-- MERMAID FULL DIAGRAM -->
+    <div class="page wrap">
+        <h2>Figure 1 — Complete ER Diagram (Database Mapping — All Attributes)</h2>
+        <div class="mermaid">
+erDiagram
+    USERS ||--o{ SESSIONS : "R-AUTH-1 user_id"
+    USERS ||--o| PASSWORD_RESET_TOKENS : "R-AUTH-2 email"
+    USERS ||--o{ ORDERS : "R1 user_id"
+    USERS ||--o{ ORDERS : "R2 assigned_technician_id"
+    USERS ||--o{ PRODUCTION_LOGS : "R3 user_id"
+    USERS ||--o{ METAL_PRICES : "R4 updated_by"
+    USERS ||--o{ INVOICES : "R5 user_id"
+    USERS ||--o{ INVOICES : "R6 created_by"
+    USERS ||--o{ PAYMENTS : "R7 recorded_by"
+    USERS ||--o{ NOTIFICATIONS : "R13 user_id"
+    USERS ||--o{ REPORT_EXPORTS : "R15 generated_by"
+    CATEGORIES ||--o{ CATALOG_DESIGNS : "R14 category_id"
+    CATALOG_DESIGNS ||--o{ CATALOG_IMAGES : "R8 catalog_design_id"
+    CATALOG_DESIGNS ||--o{ ORDERS : "R9 catalog_design_id"
+    ORDERS ||--o{ PRODUCTION_LOGS : "R10 order_id"
+    ORDERS ||--o| INVOICES : "R11 order_id"
+    ORDERS ||--o{ INVOICE_ITEMS : "R11b order_id"
+    INVOICES ||--o{ INVOICE_ITEMS : "R11a invoice_id"
+    INVOICES ||--o{ PAYMENTS : "R12 invoice_id"
+    PAYMENT_METHODS ||--o{ PAYMENTS : "R12a payment_method_id"
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        timestamp email_verified_at
+        string password
+        string role
+        string phone
+        text address
+        string city
+        string profile_photo_path
+        string remember_token
+        timestamp created_at
+        timestamp updated_at
+    }
+    SESSIONS {
+        string id PK
+        bigint user_id FK
+        string ip_address
+        text user_agent
+        longtext payload
+        int last_activity
+    }
+    PASSWORD_RESET_TOKENS {
+        string email PK
+        string token
+        timestamp created_at
+    }
+    CATEGORIES {
+        bigint id PK
+        string name UK
+        string slug UK
+        text description
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+    CATALOG_DESIGNS {
+        bigint id PK
+        string name
+        string code UK
+        text description
+        string category
+        bigint category_id FK
+        string gold_quality
+        decimal weight_grams
+        decimal selling_price
+        string availability_status
+        timestamp created_at
+        timestamp updated_at
+    }
+    CATALOG_IMAGES {
+        bigint id PK
+        bigint catalog_design_id FK
+        string image_path
+        int sort_order
+        boolean is_primary
+        timestamp created_at
+        timestamp updated_at
+    }
+    ORDERS {
+        bigint id PK
+        string order_number UK
+        bigint user_id FK
+        string design_type
+        bigint catalog_design_id FK
+        string reference_image_path
+        string item_type
+        string item_name
+        string size
+        decimal weight_grams
+        text specifications
+        string gold_quality
+        string gemstone_type
+        text gemstone_details
+        int quantity
+        text special_instructions
+        date expected_delivery_date
+        string contact_phone
+        text delivery_address
+        string status
+        decimal estimated_price
+        text admin_notes
+        bigint assigned_technician_id FK
+        timestamp assigned_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    METAL_PRICES {
+        bigint id PK
+        decimal gold_price_per_gram
+        decimal silver_price_per_gram
+        date price_date
+        bigint updated_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    PRODUCTION_LOGS {
+        bigint id PK
+        bigint order_id FK
+        bigint user_id FK
+        string from_status
+        string to_status
+        text note
+        timestamp created_at
+        timestamp updated_at
+    }
+    INVOICES {
+        bigint id PK
+        string invoice_number UK
+        bigint order_id FK UK
+        bigint user_id FK
+        decimal subtotal
+        decimal making_charge
+        decimal discount
+        decimal tax
+        decimal grand_total
+        decimal amount_paid
+        decimal balance_due
+        string status
+        timestamp issued_at
+        date due_date
+        text notes
+        bigint created_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    INVOICE_ITEMS {
+        bigint id PK
+        bigint invoice_id FK
+        bigint order_id FK
+        string description
+        int quantity
+        decimal unit_price
+        decimal line_total
+        timestamp created_at
+        timestamp updated_at
+    }
+    PAYMENT_METHODS {
+        bigint id PK
+        string code UK
+        string label
+        boolean is_active
+        int sort_order
+        timestamp created_at
+    }
+    PAYMENTS {
+        bigint id PK
+        bigint invoice_id FK
+        bigint payment_method_id FK
+        decimal amount
+        string payment_status
+        date payment_date
+        string reference_number
+        text notes
+        bigint recorded_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    NOTIFICATIONS {
+        uuid id PK
+        bigint user_id FK
+        string type
+        string title
+        text message
+        string channel
+        timestamp read_at
+        json data
+        timestamp created_at
+        timestamp updated_at
+    }
+    REPORT_EXPORTS {
+        bigint id PK
+        string report_type
+        date date_from
+        date date_to
+        bigint generated_by FK
+        string file_path
+        string format
+        json parameters
+        timestamp created_at
+        timestamp updated_at
+    }
+        </div>
+    </div>
+
+    <!-- IMPLEMENTED ENTITIES -->
+    <div class="page">
+        <h2>Figure 2 — Entity Boxes: Implemented ✅ (M1–M7)</h2>
+        <div class="grid">
+            <div class="entity"><div class="eh">users (13)</div><div class="em">M1 Auth · M2 Customer · M11 RBAC</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span>name</span><span>VARCHAR</span></div>
+                <div class="attr"><span class="uk">email</span><span>VARCHAR UK</span></div>
+                <div class="attr"><span>email_verified_at</span><span>TIMESTAMP</span></div>
+                <div class="attr"><span>password</span><span>VARCHAR</span></div>
+                <div class="attr"><span>role</span><span>VARCHAR</span></div>
+                <div class="attr"><span>phone</span><span>VARCHAR</span></div>
+                <div class="attr"><span>address</span><span>TEXT</span></div>
+                <div class="attr"><span>city</span><span>VARCHAR</span></div>
+                <div class="attr"><span>profile_photo_path</span><span>VARCHAR</span></div>
+                <div class="attr"><span>remember_token</span><span>VARCHAR</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity"><div class="eh">password_reset_tokens (3)</div><div class="em">M1 Auth</div>
+                <div class="attr"><span class="pk">email</span><span>VARCHAR PK</span></div>
+                <div class="attr"><span>token</span><span>VARCHAR</span></div>
+                <div class="attr"><span>created_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity"><div class="eh">sessions (6)</div><div class="em">M1 Auth</div>
+                <div class="attr"><span class="pk">id</span><span>VARCHAR PK</span></div>
+                <div class="attr"><span class="fk">user_id</span><span>BIGINT FK</span></div>
+                <div class="attr"><span>ip_address</span><span>VARCHAR</span></div>
+                <div class="attr"><span>user_agent</span><span>TEXT</span></div>
+                <div class="attr"><span>payload</span><span>LONGTEXT</span></div>
+                <div class="attr"><span>last_activity</span><span>INT</span></div>
+            </div>
+            <div class="entity"><div class="eh">catalog_designs (11)</div><div class="em">M3 Catalogue · M6 Inventory</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span>name</span><span>VARCHAR</span></div>
+                <div class="attr"><span class="uk">code</span><span>VARCHAR UK</span></div>
+                <div class="attr"><span>description</span><span>TEXT</span></div>
+                <div class="attr"><span>category</span><span>VARCHAR</span></div>
+                <div class="attr"><span>gold_quality</span><span>VARCHAR</span></div>
+                <div class="attr"><span>weight_grams</span><span>DECIMAL</span></div>
+                <div class="attr"><span>selling_price</span><span>DECIMAL</span></div>
+                <div class="attr"><span>availability_status</span><span>VARCHAR</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity"><div class="eh">catalog_images (7)</div><div class="em">M3 Catalogue</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="fk">catalog_design_id</span><span>FK R8</span></div>
+                <div class="attr"><span>image_path</span><span>VARCHAR</span></div>
+                <div class="attr"><span>sort_order</span><span>SMALLINT</span></div>
+                <div class="attr"><span>is_primary</span><span>BOOLEAN</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity"><div class="eh">metal_prices (7)</div><div class="em">M7 Metal Price</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span>gold_price_per_gram</span><span>DECIMAL</span></div>
+                <div class="attr"><span>silver_price_per_gram</span><span>DECIMAL</span></div>
+                <div class="attr"><span>price_date</span><span>DATE</span></div>
+                <div class="attr"><span class="fk">updated_by</span><span>FK R4</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+        </div>
+        <div style="margin-top:12px">
+            <div class="entity"><div class="eh">orders (26) — M2 Customer · M4 Orders · M5 Workshop</div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr)">
+                    <div class="attr"><span class="pk">id</span><span>PK</span></div>
+                    <div class="attr"><span class="uk">order_number</span><span>UK</span></div>
+                    <div class="attr"><span class="fk">user_id</span><span>FK R1</span></div>
+                    <div class="attr"><span>design_type</span><span>VARCHAR</span></div>
+                    <div class="attr"><span class="fk">catalog_design_id</span><span>FK R9</span></div>
+                    <div class="attr"><span>reference_image_path</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>item_type</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>item_name</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>size</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>weight_grams</span><span>DECIMAL</span></div>
+                    <div class="attr"><span>specifications</span><span>TEXT</span></div>
+                    <div class="attr"><span>gold_quality</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>gemstone_type</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>gemstone_details</span><span>TEXT</span></div>
+                    <div class="attr"><span>quantity</span><span>SMALLINT</span></div>
+                    <div class="attr"><span>special_instructions</span><span>TEXT</span></div>
+                    <div class="attr"><span>expected_delivery_date</span><span>DATE</span></div>
+                    <div class="attr"><span>contact_phone</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>delivery_address</span><span>TEXT</span></div>
+                    <div class="attr"><span>status</span><span>VARCHAR</span></div>
+                    <div class="attr"><span>estimated_price</span><span>DECIMAL</span></div>
+                    <div class="attr"><span>admin_notes</span><span>TEXT</span></div>
+                    <div class="attr"><span class="fk">assigned_technician_id</span><span>FK R2</span></div>
+                    <div class="attr"><span>assigned_at</span><span>TIMESTAMP</span></div>
+                    <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="grid" style="margin-top:12px">
+            <div class="entity"><div class="eh">production_logs (8)</div><div class="em">M5 Workshop</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="fk">order_id</span><span>FK R10</span></div>
+                <div class="attr"><span class="fk">user_id</span><span>FK R3</span></div>
+                <div class="attr"><span>from_status / to_status</span><span>VARCHAR</span></div>
+                <div class="attr"><span>note</span><span>TEXT</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BILLING + PAYMENT + REPORTS -->
+    <div class="page">
+        <h2>Figure 3 — Entity Boxes: Billing · Payment · Reports 🔜</h2>
+        <div class="grid">
+            <div class="entity planned"><div class="eh">categories (7)</div><div class="em">M6 Inventory 🔜</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="uk">name / slug</span><span>UK</span></div>
+                <div class="attr"><span>description</span><span>TEXT</span></div>
+                <div class="attr"><span>is_active</span><span>BOOLEAN</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity planned"><div class="eh">invoices (18)</div><div class="em">M8 Billing 🔜</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="uk">invoice_number</span><span>UK</span></div>
+                <div class="attr"><span class="fk">order_id</span><span>FK R11 UK</span></div>
+                <div class="attr"><span class="fk">user_id</span><span>FK R5</span></div>
+                <div class="attr"><span>subtotal / making_charge</span><span>DECIMAL</span></div>
+                <div class="attr"><span>discount / tax</span><span>DECIMAL</span></div>
+                <div class="attr"><span>grand_total</span><span>DECIMAL</span></div>
+                <div class="attr"><span>amount_paid / balance_due</span><span>DECIMAL</span></div>
+                <div class="attr"><span>status</span><span>VARCHAR</span></div>
+                <div class="attr"><span>issued_at / due_date</span><span>TS / DATE</span></div>
+                <div class="attr"><span>notes</span><span>TEXT</span></div>
+                <div class="attr"><span class="fk">created_by</span><span>FK R6</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity planned"><div class="eh">invoice_items (9)</div><div class="em">M8 Billing 🔜</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="fk">invoice_id</span><span>FK R11a</span></div>
+                <div class="attr"><span class="fk">order_id</span><span>FK R11b</span></div>
+                <div class="attr"><span>description</span><span>VARCHAR</span></div>
+                <div class="attr"><span>quantity</span><span>INT</span></div>
+                <div class="attr"><span>unit_price / line_total</span><span>DECIMAL</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity planned"><div class="eh">payment_methods (5)</div><div class="em">M8/M9 Lookup 🔜</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="uk">code</span><span>UK cash/card/bank</span></div>
+                <div class="attr"><span>label</span><span>VARCHAR</span></div>
+                <div class="attr"><span>is_active / sort_order</span><span>BOOL/INT</span></div>
+                <div class="attr"><span>created_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity planned"><div class="eh">payments (11)</div><div class="em">M9 Payment 🔜</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span class="fk">invoice_id</span><span>FK R12</span></div>
+                <div class="attr"><span class="fk">payment_method_id</span><span>FK R12a</span></div>
+                <div class="attr"><span>amount</span><span>DECIMAL</span></div>
+                <div class="attr"><span>payment_status</span><span>VARCHAR</span></div>
+                <div class="attr"><span>payment_date</span><span>DATE</span></div>
+                <div class="attr"><span>reference_number / notes</span><span>VARCHAR/TEXT</span></div>
+                <div class="attr"><span class="fk">recorded_by</span><span>FK R7</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity planned"><div class="eh">notifications (10)</div><div class="em">M10 Notification 🔜</div>
+                <div class="attr"><span class="pk">id</span><span>UUID PK</span></div>
+                <div class="attr"><span class="fk">user_id</span><span>FK R13</span></div>
+                <div class="attr"><span>type / title / message</span><span>VARCHAR/TEXT</span></div>
+                <div class="attr"><span>channel</span><span>VARCHAR</span></div>
+                <div class="attr"><span>read_at</span><span>TIMESTAMP</span></div>
+                <div class="attr"><span>data</span><span>JSON</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+        </div>
+        <div class="grid2" style="margin-top:12px">
+            <div class="entity reports"><div class="eh">report_exports (9)</div><div class="em">M12 Reports 🔜 — saved PDF/CSV metadata</div>
+                <div class="attr"><span class="pk">id</span><span>BIGINT PK</span></div>
+                <div class="attr"><span>report_type</span><span>VARCHAR</span></div>
+                <div class="attr"><span>date_from / date_to</span><span>DATE</span></div>
+                <div class="attr"><span class="fk">generated_by</span><span>FK R15 → users</span></div>
+                <div class="attr"><span>file_path</span><span>VARCHAR</span></div>
+                <div class="attr"><span>format</span><span>VARCHAR pdf/csv</span></div>
+                <div class="attr"><span>parameters</span><span>JSON filters</span></div>
+                <div class="attr"><span>created_at / updated_at</span><span>TIMESTAMP</span></div>
+            </div>
+            <div class="entity reports" style="border-style:dashed"><div class="eh">Report Engine (logical)</div><div class="em">M12 — no table; reads via SQL</div>
+                <div class="attr"><span>Order Summary</span><span>→ orders</span></div>
+                <div class="attr"><span>Sales &amp; Revenue</span><span>→ orders, invoices</span></div>
+                <div class="attr"><span>Customer Report</span><span>→ users, orders</span></div>
+                <div class="attr"><span>Production Report</span><span>→ orders, production_logs</span></div>
+                <div class="attr"><span>Delivery Report</span><span>→ orders</span></div>
+                <div class="attr"><span>Inventory Report</span><span>→ catalog_designs</span></div>
+                <div class="attr"><span>Billing Collection</span><span>→ invoices, payments</span></div>
+                <div class="attr"><span>Daily Summary</span><span>→ all tables</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RELATIONSHIPS -->
+    <div class="page">
+        <h2>Figure 4 — All Relationships (Database FK Mapping)</h2>
+        <table>
+            <tr><th>ID</th><th>Parent</th><th>Child</th><th>FK Column</th><th>Card.</th><th>Module</th></tr>
+            <tr><td>R-AUTH-1</td><td>users</td><td>sessions</td><td>user_id</td><td>1:N</td><td>Auth</td></tr>
+            <tr><td>R-AUTH-2</td><td>users</td><td>password_reset_tokens</td><td>email</td><td>1:0..1</td><td>Auth</td></tr>
+            <tr><td>R1</td><td>users</td><td>orders</td><td>user_id</td><td>1:N</td><td>Customer/Orders</td></tr>
+            <tr><td>R2</td><td>users</td><td>orders</td><td>assigned_technician_id</td><td>1:N</td><td>Workshop</td></tr>
+            <tr><td>R3</td><td>users</td><td>production_logs</td><td>user_id</td><td>1:N</td><td>Workshop</td></tr>
+            <tr><td>R4</td><td>users</td><td>metal_prices</td><td>updated_by</td><td>1:N</td><td>Metal Price</td></tr>
+            <tr><td>R5</td><td>users</td><td>invoices</td><td>user_id</td><td>1:N</td><td>Billing</td></tr>
+            <tr><td>R6</td><td>users</td><td>invoices</td><td>created_by</td><td>1:N</td><td>Billing</td></tr>
+            <tr><td>R7</td><td>users</td><td>payments</td><td>recorded_by</td><td>1:N</td><td>Payment</td></tr>
+            <tr><td>R8</td><td>catalog_designs</td><td>catalog_images</td><td>catalog_design_id</td><td>1:N</td><td>Catalogue</td></tr>
+            <tr><td>R9</td><td>catalog_designs</td><td>orders</td><td>catalog_design_id</td><td>1:N</td><td>Orders</td></tr>
+            <tr><td>R10</td><td>orders</td><td>production_logs</td><td>order_id</td><td>1:N</td><td>Workshop</td></tr>
+            <tr><td>R11</td><td>orders</td><td>invoices</td><td>order_id</td><td>1:1</td><td>Billing</td></tr>
+            <tr><td>R11a</td><td>invoices</td><td>invoice_items</td><td>invoice_id</td><td>1:N</td><td>Billing</td></tr>
+            <tr><td>R11b</td><td>orders</td><td>invoice_items</td><td>order_id</td><td>1:N</td><td>Billing</td></tr>
+            <tr><td>R12</td><td>invoices</td><td>payments</td><td>invoice_id</td><td>1:N</td><td>Payment</td></tr>
+            <tr><td>R12a</td><td>payment_methods</td><td>payments</td><td>payment_method_id</td><td>1:N</td><td>Payment</td></tr>
+            <tr><td>R13</td><td>users</td><td>notifications</td><td>user_id</td><td>1:N</td><td>Notification</td></tr>
+            <tr><td>R14</td><td>categories</td><td>catalog_designs</td><td>category_id</td><td>1:N</td><td>Inventory</td></tr>
+            <tr><td>R15</td><td>users</td><td>report_exports</td><td>generated_by</td><td>1:N</td><td>Reports</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>For Word:</strong> Print this page → PDF, or screenshot Figures 1–4.<br>
+        <strong>Text source:</strong> <code>docs/DATABASE_ER_FULL.md</code><br>
+        <strong>Implemented today in MySQL:</strong> users, password_reset_tokens, sessions, catalog_designs, catalog_images, orders, metal_prices, production_logs (8 tables).<br>
+        <strong>Planned migrations:</strong> categories, invoices, invoice_items, payment_methods, payments, notifications, report_exports (7 tables).
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', er: { layoutDirection: 'TB' } });</script>
+</body>
+</html>

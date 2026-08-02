@@ -25,6 +25,8 @@ return [
             Permission::OrdersManage->value,
             Permission::CustomersView->value,
             Permission::CatalogView->value,
+            Permission::BillingView->value,
+            Permission::BillingManage->value,
         ],
 
         UserRole::Technician->value => [

@@ -109,7 +109,7 @@ class OrderController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id, 403);
 
-        $order->load('catalogDesign');
+        $order->load('catalogDesign', 'invoice');
 
         return view('customer.orders.show', compact('order'));
     }

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rajabharana — ER Diagram (All Users)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; padding: 28px; color: #1e293b; }
+        h1 { text-align: center; font-size: 1.3rem; margin-bottom: 6px; }
+        .sub { text-align: center; font-size: 0.88rem; color: #64748b; margin-bottom: 20px; }
+        .legend { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 22px; font-size: 0.8rem; }
+        .pill { padding: 3px 10px; border-radius: 999px; font-weight: 600; font-size: 0.75rem; }
+        .cust { background: #dbeafe; color: #1d4ed8; }
+        .staff { background: #dcfce7; color: #15803d; }
+        .mgr { background: #fef9c3; color: #a16207; }
+        .admin { background: #fee2e2; color: #b91c1c; }
+        .tech { background: #f3e8ff; color: #7e22ce; }
+        section { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 22px; margin-bottom: 24px; }
+        section h2 { font-size: 0.95rem; margin-bottom: 14px; color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .wrap { overflow: auto; }
+        .note { max-width: 920px; margin: 0 auto; font-size: 0.82rem; color: #475569; line-height: 1.65; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.76rem; margin-top: 10px; }
+        th, td { border: 1px solid #e2e8f0; padding: 7px 10px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; }
+        code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 0.78rem; }
+        @media print { body { background: #fff; } section { page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery Management System</h1>
+    <p class="sub">ER Diagram — All Users · All Modules · All Entities · Relationships R1–R12</p>
+    <p style="text-align:center;font-size:0.82rem;margin-bottom:18px;"><a href="WHOLE_SYSTEM_ER_DIAGRAM.html">→ Open full whole-system diagram (recommended)</a></p>
+
+    <div class="legend">
+        <span><span class="pill cust">Customer</span> /customer</span>
+        <span><span class="pill staff">Sales Staff</span> /staff</span>
+        <span><span class="pill mgr">Inventory Manager</span> /manager</span>
+        <span><span class="pill admin">Administrator</span> /admin</span>
+        <span><span class="pill tech">Technician</span> /technician</span>
+    </div>
+
+    <!-- Figure 1: User hierarchy -->
+    <section>
+        <h2>Figure 1 — User Entities &amp; Account Management (Conceptual ER)</h2>
+        <div class="wrap">
+            <div class="mermaid">
+flowchart TB
+    subgraph Users["All User Entities (Conceptual)"]
+        CUST["CUSTOMER<br/>role = customer<br/>Panel: /dashboard"]
+        STAFF["SALES STAFF<br/>role = staff<br/>Panel: /admin"]
+        MGR["INVENTORY MANAGER<br/>role = manager<br/>Panel: /admin"]
+        ADMIN["ADMINISTRATOR<br/>role = admin<br/>Panel: /admin"]
+        TECH["TECHNICIAN<br/>role = technician<br/>Panel: /technician"]
+    end
+
+    REG["registers<br/>(self signup)"]
+    CREATE["creates<br/>(staff accounts)"]
+    ASSIGN["assigns<br/>(to orders)"]
+
+    REG --> CUST
+    ADMIN -->|"creates M:N"| CREATE
+    CREATE --> STAFF
+    CREATE --> MGR
+    CREATE --> TECH
+    CREATE --> ADMIN
+    ADMIN -->|"supervises 1:M"| STAFF
+    ADMIN -->|"supervises 1:M"| MGR
+    ADMIN -->|"supervises 1:M"| TECH
+    ADMIN --> ASSIGN
+    ASSIGN --> TECH
+
+    style CUST fill:#dbeafe,stroke:#2563eb
+    style STAFF fill:#dcfce7,stroke:#16a34a
+    style MGR fill:#fef9c3,stroke:#ca8a04
+    style ADMIN fill:#fee2e2,stroke:#dc2626
+    style TECH fill:#f3e8ff,stroke:#9333ea
+            </div>
+        </div>
+    </section>
+
+    <!-- Figure 2: All users operations -->
+    <section>
+        <h2>Figure 2 — All Users → System Operations (Conceptual ER)</h2>
+        <div class="wrap">
+            <div class="mermaid">
+flowchart LR
+    subgraph U["Users"]
+        C["CUSTOMER"]
+        S["SALES STAFF"]
+        M["INVENTORY MANAGER"]
+        A["ADMINISTRATOR"]
+        T["TECHNICIAN"]
+    end
+
+    subgraph E["Data Entities"]
+        O["ORDERS"]
+        CD["CATALOG_DESIGNS"]
+        CI["CATALOG_IMAGES"]
+        MP["METAL_PRICES"]
+        PL["PRODUCTION_LOGS"]
+        INV["INVOICES 🔜"]
+        PAY["PAYMENTS 🔜"]
+        REP["REPORTS 🔜"]
+    end
+
+    C -->|"places"| O
+    S -->|"processes"| O
+    S -->|"records payment"| PAY
+    M -->|"creates/edits"| CD
+    M -->|"uploads"| CI
+    A -->|"manages"| O
+    A -->|"assigns technician"| O
+    A -->|"updates"| MP
+    A -->|"records log"| PL
+    A -->|"creates invoice"| INV
+    A -->|"generates"| REP
+    T -->|"updates status"| O
+    T -->|"records log"| PL
+    O -->|"generates 1:1"| INV
+    INV -->|"receives"| PAY
+    CD -->|"referenced by"| O
+    CD -->|"has images"| CI
+    REP -.->|"reads all"| O
+    REP -.->|"reads all"| INV
+    REP -.->|"reads all"| PL
+
+    style C fill:#dbeafe,stroke:#2563eb
+    style S fill:#dcfce7,stroke:#16a34a
+    style M fill:#fef9c3,stroke:#ca8a04
+    style A fill:#fee2e2,stroke:#dc2626
+    style T fill:#f3e8ff,stroke:#9333ea
+    style INV fill:#fce7f3,stroke:#db2777
+    style PAY fill:#fce7f3,stroke:#db2777
+    style REP fill:#f0fdf4,stroke:#16a34a
+            </div>
+        </div>
+    </section>
+
+    <!-- Figure 3: Physical users table -->
+    <section>
+        <h2>Figure 3 — Physical Database: users Table &amp; Role-Based Relationships</h2>
+        <div class="wrap">
+            <div class="mermaid">
+erDiagram
+    USERS ||--o{ ORDERS : "R1 places user_id customer"
+    USERS ||--o{ ORDERS : "R2 assigned assigned_technician_id technician"
+    USERS ||--o{ PRODUCTION_LOGS : "R3 records user_id staff or tech"
+    USERS ||--o{ METAL_PRICES : "R4 updates updated_by admin"
+    USERS ||--o{ INVOICES : "R5 customer user_id"
+    USERS ||--o{ INVOICES : "R6 created_by admin or staff"
+    USERS ||--o{ PAYMENTS : "R7 recorded_by staff"
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        string role "customer|admin|manager|staff|technician"
+        string phone
+        text address
+        string city
+        string profile_photo_path
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ORDERS {
+        bigint id PK
+        bigint user_id FK "customer"
+        bigint assigned_technician_id FK "technician"
+        string status
+        string order_number UK
+    }
+
+    PRODUCTION_LOGS {
+        bigint id PK
+        bigint order_id FK
+        bigint user_id FK
+    }
+
+    METAL_PRICES {
+        bigint id PK
+        bigint updated_by FK "admin"
+    }
+
+    INVOICES {
+        bigint id PK
+        bigint user_id FK "customer"
+        bigint created_by FK "admin or staff"
+    }
+
+    PAYMENTS {
+        bigint id PK
+        bigint recorded_by FK "staff"
+    }
+            </div>
+        </div>
+    </section>
+
+    <!-- Figure 4: All modules -->
+    <section>
+        <h2>Figure 4 — All Modules + Entities + Relationships (R1–R12)</h2>
+        <div class="wrap">
+            <div class="mermaid">
+flowchart TB
+    subgraph USERS["All Users"]
+        C["CUSTOMER"]
+        S["SALES STAFF"]
+        M["INVENTORY MGR"]
+        A["ADMIN"]
+        T["TECHNICIAN"]
+    end
+
+    subgraph M1["M1 Auth ✅"]
+        E1[("users")]
+    end
+    subgraph M2["M2 Catalogue ✅"]
+        E2[("catalog_designs")]
+        E3[("catalog_images")]
+    end
+    subgraph M3["M3 Orders ✅"]
+        E4[("orders")]
+    end
+    subgraph M4["M4 Metal ✅"]
+        E5[("metal_prices")]
+    end
+    subgraph M5["M5 Workshop ✅"]
+        E6[("production_logs")]
+    end
+    subgraph M6["M6 Billing 🔜"]
+        E7[("invoices")]
+        E8[("payments")]
+    end
+    subgraph M7["M7 Reports 🔜"]
+        E9["Report Engine"]
+    end
+
+    C -->|"R1"| E4
+    S --> E4
+    M --> E2
+    M --> E3
+    A --> E1
+    A --> E4
+    A --> E5
+    A --> E6
+    A --> E7
+    A --> E9
+    T --> E4
+    T --> E6
+
+    E1 -->|"R1 R2"| E4
+    E1 -->|"R3"| E6
+    E1 -->|"R4"| E5
+    E1 -->|"R5 R6"| E7
+    E1 -->|"R7"| E8
+    E2 -->|"R8"| E3
+    E2 -->|"R9"| E4
+    E4 -->|"R10"| E6
+    E4 -->|"R11"| E7
+    E7 -->|"R12"| E8
+    E9 -.-> E1
+    E9 -.-> E2
+    E9 -.-> E4
+    E9 -.-> E5
+    E9 -.-> E6
+    E9 -.-> E7
+    E9 -.-> E8
+            </div>
+        </div>
+    </section>
+
+    <!-- User attributes table -->
+    <section>
+        <h2>All User Entities — Attributes &amp; Access</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User Entity</th>
+                    <th>role value</th>
+                    <th>Attributes</th>
+                    <th>Panel / URL</th>
+                    <th>Operations</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>CUSTOMER</strong></td>
+                    <td><code>customer</code></td>
+                    <td>id PK, name, email UK, password, phone, address, city</td>
+                    <td><code>/dashboard</code>, <code>/orders</code></td>
+                    <td>places → ORDERS (R1)</td>
+                </tr>
+                <tr>
+                    <td><strong>SALES STAFF</strong></td>
+                    <td><code>staff</code></td>
+                    <td>id PK, name, email UK, password, role</td>
+                    <td><code>/admin/*</code> (orders, customers, catalog view)</td>
+                    <td>processes → ORDERS; records → PAYMENTS (R7)</td>
+                </tr>
+                <tr>
+                    <td><strong>INVENTORY MANAGER</strong></td>
+                    <td><code>manager</code></td>
+                    <td>id PK, name, email UK, password, role</td>
+                    <td><code>/admin/catalog/*</code></td>
+                    <td>creates → CATALOG_DESIGNS; uploads → CATALOG_IMAGES</td>
+                </tr>
+                <tr>
+                    <td><strong>ADMINISTRATOR</strong></td>
+                    <td><code>admin</code></td>
+                    <td>id PK, name, email UK, password, role</td>
+                    <td><code>/admin/*</code> (full access)</td>
+                    <td>creates staff accounts; manages → ORDERS; assigns → TECHNICIAN; updates → METAL_PRICES; records → PRODUCTION_LOGS; creates → INVOICES; generates → REPORTS</td>
+                </tr>
+                <tr>
+                    <td><strong>TECHNICIAN</strong></td>
+                    <td><code>technician</code></td>
+                    <td>id PK, name, email UK, password, role</td>
+                    <td><code>/technician/*</code> (no customer PII)</td>
+                    <td>updates → ORDERS (R2); records → PRODUCTION_LOGS (R3)</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="note" style="margin-top: 20px;">
+        <strong>Conceptual vs Physical:</strong> Figure 1–2 show five separate user entities (Chen-style, like your sample diagram). Figure 3 shows the <strong>physical</strong> implementation: one <code>users</code> table with a <code>role</code> column.<br><br>
+        <strong>For Word:</strong> Open <code>WHOLE_SYSTEM_ER_DIAGRAM.html</code> for the complete diagram, or screenshot figures here.<br>
+        <strong>Full diagram:</strong> <code>docs/WHOLE_SYSTEM_ER_DIAGRAM.html</code> · <strong>Database ER:</strong> <code>docs/ER_DIAGRAM.html</code> · <strong>Chen:</strong> <code>docs/CHEN_ER_DIAGRAM.html</code>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { curve: 'basis', htmlLabels: true } });
+    </script>
+</body>
+</html>

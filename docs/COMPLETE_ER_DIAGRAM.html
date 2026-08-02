@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Complete ER Diagram (All Modules)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 20px; margin: 0; }
+        h1 { text-align: center; font-size: 1.2rem; }
+        .sub { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 16px; }
+        .legend { text-align: center; font-size: 0.78rem; margin-bottom: 16px; }
+        section { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 20px; overflow: auto; }
+        section h2 { font-size: 0.9rem; margin: 0 0 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 6px; text-align: left; }
+        th { background: #f8fafc; position: sticky; top: 0; }
+        .note { max-width: 900px; margin: 0 auto; font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System</h1>
+    <p class="sub">Complete ER Diagram — All 11 Modules · 14 Entities · 18 Relationships · All Attributes</p>
+    <p class="legend">Blue entities in diagram = core implemented · Pink/styled planned = Sprint 9–10 · Export: Print → PDF or screenshot</p>
+
+    <section>
+        <h2>Figure 1 — One ER Diagram (All Modules, All Entities, All Attributes, All Relationships)</h2>
+        <div class="mermaid">
+erDiagram
+    USERS ||--o{ SESSIONS : "R-AUTH-1 user_id"
+    USERS ||--o| PASSWORD_RESET_TOKENS : "R-AUTH-2 email"
+    USERS ||--o{ ORDERS : "R1 user_id"
+    USERS ||--o{ ORDERS : "R2 assigned_technician_id"
+    USERS ||--o{ PRODUCTION_LOGS : "R3 user_id"
+    USERS ||--o{ METAL_PRICES : "R4 updated_by"
+    USERS ||--o{ INVOICES : "R5 user_id"
+    USERS ||--o{ INVOICES : "R6 created_by"
+    USERS ||--o{ PAYMENTS : "R7 recorded_by"
+    USERS ||--o{ NOTIFICATIONS : "R13 user_id"
+    CATEGORIES ||--o{ CATALOG_DESIGNS : "R14 category_id"
+    CATALOG_DESIGNS ||--o{ CATALOG_IMAGES : "R8 catalog_design_id"
+    CATALOG_DESIGNS ||--o{ ORDERS : "R9 catalog_design_id"
+    ORDERS ||--o{ PRODUCTION_LOGS : "R10 order_id"
+    ORDERS ||--o| INVOICES : "R11 order_id"
+    ORDERS ||--o{ INVOICE_ITEMS : "R11b order_id"
+    INVOICES ||--o{ INVOICE_ITEMS : "R11a invoice_id"
+    INVOICES ||--o{ PAYMENTS : "R12 invoice_id"
+    PAYMENT_METHODS ||--o{ PAYMENTS : "R12a payment_method_id"
+
+    USERS { bigint id PK string name string email UK string password string role string phone text address string city timestamp created_at }
+    SESSIONS { string id PK bigint user_id FK longtext payload int last_activity }
+    PASSWORD_RESET_TOKENS { string email PK string token timestamp created_at }
+    CATEGORIES { bigint id PK string name UK string slug UK boolean is_active }
+    CATALOG_DESIGNS { bigint id PK string code UK string name string category bigint category_id FK string gold_quality decimal selling_price string availability_status }
+    CATALOG_IMAGES { bigint id PK bigint catalog_design_id FK string image_path int sort_order boolean is_primary }
+    ORDERS { bigint id PK string order_number UK bigint user_id FK bigint catalog_design_id FK bigint assigned_technician_id FK string status decimal estimated_price date expected_delivery_date }
+    METAL_PRICES { bigint id PK decimal gold_price_per_gram decimal silver_price_per_gram date price_date bigint updated_by FK }
+    PRODUCTION_LOGS { bigint id PK bigint order_id FK bigint user_id FK string from_status string to_status text note }
+    INVOICES { bigint id PK string invoice_number UK bigint order_id FK bigint user_id FK decimal grand_total decimal balance_due string status bigint created_by FK }
+    INVOICE_ITEMS { bigint id PK bigint invoice_id FK bigint order_id FK int quantity decimal unit_price decimal line_total }
+    PAYMENT_METHODS { bigint id PK string code UK string label boolean is_active }
+    PAYMENTS { bigint id PK bigint invoice_id FK bigint payment_method_id FK decimal amount string payment_status bigint recorded_by FK }
+    NOTIFICATIONS { uuid id PK bigint user_id FK string type string title string channel timestamp read_at json data }
+        </div>
+    </section>
+
+    <section>
+        <h2>Table 1 — All Entities (14)</h2>
+        <table>
+            <tr><th>#</th><th>Entity</th><th>Module</th><th>Status</th><th>Attributes</th><th>PK</th></tr>
+            <tr><td>E1</td><td>users</td><td>M1 Auth, M2 Customer, M11 RBAC</td><td>✅</td><td>13</td><td>id</td></tr>
+            <tr><td>E2</td><td>password_reset_tokens</td><td>M1 Auth</td><td>✅</td><td>3</td><td>email</td></tr>
+            <tr><td>E3</td><td>sessions</td><td>M1 Auth</td><td>✅</td><td>6</td><td>id</td></tr>
+            <tr><td>E4</td><td>categories</td><td>M6 Inventory</td><td>🔜</td><td>7</td><td>id</td></tr>
+            <tr><td>E5</td><td>catalog_designs</td><td>M3 Catalogue, M6 Inventory</td><td>✅</td><td>12</td><td>id</td></tr>
+            <tr><td>E6</td><td>catalog_images</td><td>M3 Catalogue</td><td>✅</td><td>7</td><td>id</td></tr>
+            <tr><td>E7</td><td>orders</td><td>M2, M4, M5</td><td>✅</td><td>26</td><td>id</td></tr>
+            <tr><td>E8</td><td>metal_prices</td><td>M7 Metal Price</td><td>✅</td><td>7</td><td>id</td></tr>
+            <tr><td>E9</td><td>production_logs</td><td>M5 Workshop</td><td>✅</td><td>8</td><td>id</td></tr>
+            <tr><td>E10</td><td>invoices</td><td>M8 Billing</td><td>🔜</td><td>18</td><td>id</td></tr>
+            <tr><td>E11</td><td>invoice_items</td><td>M8 Billing</td><td>🔜</td><td>9</td><td>id</td></tr>
+            <tr><td>E12</td><td>payment_methods</td><td>M8/M9</td><td>🔜</td><td>5</td><td>id</td></tr>
+            <tr><td>E13</td><td>payments</td><td>M9 Payment</td><td>🔜</td><td>11</td><td>id</td></tr>
+            <tr><td>E14</td><td>notifications</td><td>M10 Notification</td><td>🔜</td><td>10</td><td>id</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Table 2 — All Relationships with Attributes (18)</h2>
+        <table>
+            <tr><th>ID</th><th>Name</th><th>Parent</th><th>Child</th><th>FK Column</th><th>Card.</th><th>Null</th><th>On Delete</th></tr>
+            <tr><td>R-AUTH-1</td><td>has_session</td><td>users</td><td>sessions</td><td>user_id</td><td>1:N</td><td>Yes</td><td>—</td></tr>
+            <tr><td>R-AUTH-2</td><td>requests_reset</td><td>users</td><td>password_reset_tokens</td><td>email</td><td>1:0..1</td><td>No</td><td>—</td></tr>
+            <tr><td>R1</td><td>places</td><td>users</td><td>orders</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R2</td><td>assigned_to</td><td>users</td><td>orders</td><td>assigned_technician_id</td><td>1:N</td><td>Yes</td><td>SET NULL</td></tr>
+            <tr><td>R3</td><td>records</td><td>users</td><td>production_logs</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R4</td><td>updates</td><td>users</td><td>metal_prices</td><td>updated_by</td><td>1:N</td><td>Yes</td><td>SET NULL</td></tr>
+            <tr><td>R5</td><td>billed_customer</td><td>users</td><td>invoices</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R6</td><td>invoice_creator</td><td>users</td><td>invoices</td><td>created_by</td><td>1:N</td><td>Yes</td><td>SET NULL</td></tr>
+            <tr><td>R7</td><td>payment_recorder</td><td>users</td><td>payments</td><td>recorded_by</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R8</td><td>has_images</td><td>catalog_designs</td><td>catalog_images</td><td>catalog_design_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R9</td><td>referenced_by</td><td>catalog_designs</td><td>orders</td><td>catalog_design_id</td><td>1:N</td><td>Yes</td><td>SET NULL</td></tr>
+            <tr><td>R10</td><td>has_logs</td><td>orders</td><td>production_logs</td><td>order_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R11</td><td>generates</td><td>orders</td><td>invoices</td><td>order_id</td><td>1:1</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R11a</td><td>contains</td><td>invoices</td><td>invoice_items</td><td>invoice_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R11b</td><td>line_from</td><td>orders</td><td>invoice_items</td><td>order_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R12</td><td>receives</td><td>invoices</td><td>payments</td><td>invoice_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R12a</td><td>uses_method</td><td>payment_methods</td><td>payments</td><td>payment_method_id</td><td>1:N</td><td>No</td><td>RESTRICT</td></tr>
+            <tr><td>R13</td><td>receives_alert</td><td>users</td><td>notifications</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td></tr>
+            <tr><td>R14</td><td>categorizes</td><td>categories</td><td>catalog_designs</td><td>category_id</td><td>1:N</td><td>Yes</td><td>SET NULL</td></tr>
+        </table>
+    </section>
+
+    <div class="note">
+        <strong>Full attribute lists:</strong> <code>docs/COMPLETE_ER_DIAGRAM.md</code> (Part A — every attribute for every entity).<br>
+        <strong>Mermaid source:</strong> Part C in same file · export PNG at <a href="https://mermaid.live">mermaid.live</a>.<br>
+        <strong>Reports module (M12):</strong> no table — reads all entities via relationships above.
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral', er: { layoutDirection: 'TB', minEntityWidth: 100 } });
+    </script>
+</body>
+</html>

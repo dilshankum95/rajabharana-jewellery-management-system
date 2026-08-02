@@ -15,6 +15,8 @@ enum Permission: string
     case ProductionView = 'production.view';
     case ProductionAssign = 'production.assign';
     case ProductionManage = 'production.manage';
+    case BillingView = 'billing.view';
+    case BillingManage = 'billing.manage';
 
     public function label(): string
     {
@@ -30,6 +32,8 @@ enum Permission: string
             self::ProductionView => 'View production queue',
             self::ProductionAssign => 'Assign technicians to orders',
             self::ProductionManage => 'Manage assigned production jobs',
+            self::BillingView => 'View invoices',
+            self::BillingManage => 'Manage invoices',
         };
     }
 }

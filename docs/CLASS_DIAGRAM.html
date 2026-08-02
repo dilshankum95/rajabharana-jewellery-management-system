@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Whole System Class Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 12px; }
+        h1 { text-align: center; font-size: 1.2rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 16px; }
+        .legend { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.8rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .page h2 { font-size: 0.95rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
+        th, td { border: 1px solid #e2e8f0; padding: 6px 8px; text-align: left; }
+        th { background: #f8fafc; }
+        .note { font-size: 0.82rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Whole System Class Diagram</h1>
+    <p class="sub">Laravel 12 · Domain models · Controllers · Enums · RBAC · Planned modules</p>
+    <div class="legend">
+        <span style="color:#2563eb">■ Implemented ✅</span>
+        <span style="color:#db2777">■ Planned 🔜</span>
+        <span>UML: ──▷ inheritance · ──▶ association · ..▶ dependency</span>
+    </div>
+
+    <!-- DOMAIN MODEL -->
+    <div class="page wrap">
+        <h2>Figure 1 — Domain Model (Eloquent Models + Associations) ✅</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class User {
+        <<Model>>
+        +id: bigint
+        +name: string
+        +email: string
+        +role: UserRole
+        +phone: string
+        +orders() HasMany
+        +assignedOrders() HasMany
+        +hasPermission() bool
+    }
+    class CatalogDesign {
+        <<Model>>
+        +id: bigint
+        +code: string
+        +category: string
+        +selling_price: decimal
+        +availability_status: enum
+        +images() HasMany
+        +orders() HasMany
+    }
+    class CatalogImage {
+        <<Model>>
+        +id: bigint
+        +catalog_design_id: FK
+        +image_path: string
+        +is_primary: bool
+        +catalogDesign() BelongsTo
+    }
+    class Order {
+        <<Model>>
+        +id: bigint
+        +order_number: string
+        +user_id: FK
+        +catalog_design_id: FK
+        +status: OrderStatus
+        +assigned_technician_id: FK
+        +user() BelongsTo
+        +catalogDesign() BelongsTo
+        +assignedTechnician() BelongsTo
+        +productionLogs() HasMany
+    }
+    class ProductionLog {
+        <<Model>>
+        +id: bigint
+        +order_id: FK
+        +user_id: FK
+        +from_status: OrderStatus
+        +to_status: OrderStatus
+        +order() BelongsTo
+        +user() BelongsTo
+    }
+    class MetalPrice {
+        <<Model>>
+        +id: bigint
+        +gold_price_per_gram: decimal
+        +price_date: date
+        +updated_by: FK
+        +updatedBy() BelongsTo
+        +current() MetalPrice
+    }
+    User "1" --> "*" Order : places
+    User "1" --> "*" Order : assigned_to
+    User "1" --> "*" ProductionLog : records
+    User "1" --> "*" MetalPrice : updates
+    CatalogDesign "1" --> "*" CatalogImage : has_images
+    CatalogDesign "1" --> "*" Order : referenced_by
+    Order "1" --> "*" ProductionLog : has_logs
+        </div>
+    </div>
+
+    <!-- ENUMS -->
+    <div class="page wrap">
+        <h2>Figure 2 — Enumerations ✅</h2>
+        <div class="mermaid">
+classDiagram
+    direction LR
+    class UserRole {
+        <<enum>>
+        Customer
+        Admin
+        Manager
+        Staff
+        Technician
+    }
+    class Permission {
+        <<enum>>
+        DashboardView
+        OrdersView
+        OrdersManage
+        CatalogView
+        CatalogManage
+        ProductionAssign
+        ProductionManage
+        UsersManage
+    }
+    class OrderStatus {
+        <<enum>>
+        Pending
+        Confirmed
+        InProduction
+        QualityCheck
+        Ready
+        Delivered
+        Cancelled
+    }
+    class DesignType {
+        <<enum>>
+        Catalog
+        Custom
+    }
+    class AvailabilityStatus {
+        <<enum>>
+        Available
+        OutOfStock
+    }
+    User --> UserRole
+    Order --> OrderStatus
+    Order --> DesignType
+    CatalogDesign --> AvailabilityStatus
+        </div>
+    </div>
+
+    <!-- CONTROLLERS -->
+    <div class="page wrap">
+        <h2>Figure 3 — Controller Layer (by Module) ✅</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class Controller {
+        <<abstract>>
+    }
+    class AuthControllers {
+        <<package Auth>>
+        AuthenticatedSessionController
+        RegisteredUserController
+        PasswordResetLinkController
+        NewPasswordController
+    }
+    class CustomerControllers {
+        <<package Customer>>
+        DashboardController
+        OrderController
+    }
+    class AdminControllers {
+        <<package Admin>>
+        DashboardController
+        OrderController
+        OrderAssignmentController
+        CatalogDesignController
+        CustomerController
+        WorkshopController
+        MetalPriceController
+        StaffUserController
+    }
+    class TechnicianControllers {
+        <<package Technician>>
+        DashboardController
+        JobController
+    }
+    class CatalogController {
+        <<Public>>
+        +index()
+        +show()
+    }
+    class ProfileController {
+        <<Shared>>
+        +edit()
+        +update()
+    }
+    Controller <|-- AuthControllers
+    Controller <|-- CustomerControllers
+    Controller <|-- AdminControllers
+    Controller <|-- TechnicianControllers
+    Controller <|-- CatalogController
+    Controller <|-- ProfileController
+    CustomerControllers ..> Order : uses
+    CustomerControllers ..> CatalogDesign : uses
+    AdminControllers ..> Order : uses
+    AdminControllers ..> ProductionLog : creates
+    AdminControllers ..> CatalogDesign : uses
+    AdminControllers ..> MetalPrice : uses
+    AdminControllers ..> User : manages
+    TechnicianControllers ..> Order : updates
+    TechnicianControllers ..> ProductionLog : creates
+        </div>
+    </div>
+
+    <!-- RBAC -->
+    <div class="page wrap">
+        <h2>Figure 4 — Security &amp; RBAC ✅</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class EnsureCustomer {
+        <<Middleware>>
+        +handle()
+    }
+    class EnsureAdmin {
+        <<Middleware>>
+        +handle()
+    }
+    class EnsureTechnician {
+        <<Middleware>>
+        +handle()
+    }
+    class EnsurePermission {
+        <<Middleware>>
+        +handle(permissions)
+    }
+    class Rbac {
+        <<Support>>
+        +userHasPermission() bool
+        +permissionsForRole() array
+    }
+    class User {
+        <<Model>>
+        +hasPermission() bool
+    }
+    EnsurePermission ..> Rbac : uses
+    EnsurePermission ..> User : checks
+    User ..> Rbac : delegates
+    Rbac ..> Permission : config/rbac.php
+        </div>
+    </div>
+
+    <!-- PLANNED -->
+    <div class="page wrap">
+        <h2>Figure 5 — Planned Domain Classes 🔜 (Billing · Payment · Reports)</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class Invoice {
+        <<Model planned>>
+        +invoice_number
+        +grand_total
+        +order() BelongsTo
+        +items() HasMany
+        +payments() HasMany
+    }
+    class InvoiceItem {
+        <<Model planned>>
+        +line_total
+        +invoice() BelongsTo
+    }
+    class Payment {
+        <<Model planned>>
+        +amount
+        +invoice() BelongsTo
+        +paymentMethod() BelongsTo
+    }
+    class PaymentMethod {
+        <<Model planned>>
+        cash card bank_transfer
+        +payments() HasMany
+    }
+    class Notification {
+        <<Model planned>>
+        +type
+        +data JSON
+        +user() BelongsTo
+    }
+    class Category {
+        <<Model planned>>
+        +name
+        +catalogDesigns() HasMany
+    }
+    class ReportExport {
+        <<Model planned>>
+        +report_type
+        +generatedBy() BelongsTo
+    }
+    class Order {
+        <<Model>>
+    }
+    class User {
+        <<Model>>
+    }
+    class CatalogDesign {
+        <<Model>>
+    }
+    Order "1" --> "0..1" Invoice
+    Invoice "1" --> "*" InvoiceItem
+    Invoice "1" --> "*" Payment
+    PaymentMethod "1" --> "*" Payment
+    User "1" --> "*" Invoice
+    User "1" --> "*" Notification
+    Category "1" --> "*" CatalogDesign
+    User "1" --> "*" ReportExport
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="page">
+        <h2>Figure 6 — Module → Class Map</h2>
+        <table>
+            <tr><th>Module</th><th>Models</th><th>Controllers</th><th>Middleware / Support</th><th>Planned</th></tr>
+            <tr><td>M1 Auth</td><td>User</td><td>Auth/*, ProfileController</td><td>EnsureCustomer, EnsureAdmin, EnsureTechnician</td><td>—</td></tr>
+            <tr><td>M2 Customer</td><td>User, Order</td><td>Customer\DashboardController, OrderController</td><td>EnsureCustomer</td><td>—</td></tr>
+            <tr><td>M3 Catalogue</td><td>CatalogDesign, CatalogImage</td><td>CatalogController, Admin\CatalogDesignController</td><td>permission:catalog.*</td><td>Category</td></tr>
+            <tr><td>M4 Orders</td><td>Order</td><td>Customer\OrderController, Admin\OrderController</td><td>permission:orders.*</td><td>—</td></tr>
+            <tr><td>M5 Workshop</td><td>Order, ProductionLog</td><td>WorkshopController, OrderAssignmentController, Technician\JobController</td><td>permission:production.*</td><td>—</td></tr>
+            <tr><td>M6 Inventory</td><td>CatalogDesign</td><td>CatalogDesignController</td><td>—</td><td>Category</td></tr>
+            <tr><td>M7 Metal Price</td><td>MetalPrice</td><td>MetalPriceController</td><td>permission:metal-prices.manage</td><td>—</td></tr>
+            <tr><td>M8 Billing</td><td>—</td><td>—</td><td>—</td><td>Invoice, InvoiceItem</td></tr>
+            <tr><td>M9 Payment</td><td>—</td><td>—</td><td>—</td><td>Payment, PaymentMethod</td></tr>
+            <tr><td>M10 Notification</td><td>—</td><td>—</td><td>—</td><td>Notification</td></tr>
+            <tr><td>M11 RBAC</td><td>User</td><td>StaffUserController</td><td>EnsurePermission, Rbac, Permission enum</td><td>—</td></tr>
+            <tr><td>M12 Reports</td><td>—</td><td>—</td><td>—</td><td>ReportExport, ReportService</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>For Word/PDF:</strong> Print this page → Save as PDF.<br>
+        <strong>Text source:</strong> <code>docs/CLASS_DIAGRAM.md</code><br>
+        <strong>Implemented:</strong> 6 models · 5 enums · 20+ controllers · 4 middleware · Rbac support class.<br>
+        <strong>Architecture:</strong> MVC — Routes → Middleware → Controller → FormRequest → Model → Database.
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', class: { fontSize: 11 } });</script>
+</body>
+</html>

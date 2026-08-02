@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — User Module ER (Relationships with Attributes)</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; padding: 20px; margin: 0; }
+        h1 { text-align: center; font-size: 1.15rem; }
+        .sub { text-align: center; color: #64748b; font-size: 0.85rem; margin-bottom: 16px; }
+        .wrap { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; overflow: auto; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.76rem; background: #fff; }
+        th, td { border: 1px solid #e2e8f0; padding: 6px 8px; text-align: left; }
+        th { background: #f1f5f9; }
+        section { margin-bottom: 20px; }
+        section h2 { font-size: 0.9rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+    </style>
+</head>
+<body>
+    <h1>User Module — Entities &amp; Relationships with Attributes</h1>
+    <p class="sub">Rajabharana Jewellery System · users · sessions · roles · R1–R7 · R-AUTH · R14</p>
+
+    <div class="wrap">
+        <svg viewBox="0 0 1100 780" xmlns="http://www.w3.org/2000/svg">
+            <!-- USERS central entity -->
+            <rect x="380" y="280" width="220" height="200" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="4"/>
+            <rect x="380" y="280" width="220" height="24" fill="#2563eb" rx="4"/>
+            <text x="490" y="297" fill="#fff" text-anchor="middle" font-size="12" font-weight="700">users</text>
+            <text x="392" y="318" font-size="9" fill="#334155">id</text><text x="590" y="318" font-size="8" fill="#92400e" text-anchor="end">PK</text>
+            <text x="392" y="332" font-size="9" fill="#334155">name · email</text><text x="590" y="332" font-size="8" fill="#1d4ed8" text-anchor="end">UK</text>
+            <text x="392" y="346" font-size="9" fill="#334155">password · role</text>
+            <text x="392" y="360" font-size="9" fill="#334155">phone · address · city</text>
+            <text x="392" y="374" font-size="9" fill="#334155">email_verified_at</text>
+            <text x="392" y="388" font-size="9" fill="#334155">profile_photo_path</text>
+            <text x="392" y="402" font-size="9" fill="#334155">remember_token</text>
+            <text x="392" y="416" font-size="9" fill="#334155">created_at / updated_at</text>
+            <line x1="392" y1="424" x2="588" y2="424" stroke="#cbd5e1"/>
+            <text x="392" y="440" font-size="8" fill="#64748b">5 roles: customer | staff | manager</text>
+            <text x="392" y="452" font-size="8" fill="#64748b">admin | technician</text>
+            <text x="392" y="472" font-size="8" fill="#64748b">13 attributes · M1 Auth + M11 RBAC</text>
+
+            <!-- SESSIONS -->
+            <rect x="40" y="80" width="180" height="110" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="40" y="80" width="180" height="20" fill="#2563eb"/>
+            <text x="130" y="94" fill="#fff" text-anchor="middle" font-size="10" font-weight="700">sessions</text>
+            <text x="48" y="112" font-size="8" fill="#334155">id PK</text>
+            <text x="48" y="126" font-size="8" fill="#9d174d">user_id FK</text>
+            <text x="48" y="140" font-size="8" fill="#334155">ip_address · user_agent</text>
+            <text x="48" y="154" font-size="8" fill="#334155">payload · last_activity</text>
+            <line x1="220" y1="135" x2="380" y2="320" stroke="#94a3b8"/>
+            <polygon points="300,220 312,232 300,244 288,232" fill="#fef3c7" stroke="#b45309"/>
+            <text x="300" y="258" font-size="8" fill="#92400e" text-anchor="middle" font-weight="600">R-AUTH-1 has_session</text>
+            <text x="300" y="270" font-size="7" fill="#64748b" text-anchor="middle">FK: user_id · 1:N · NULL</text>
+
+            <!-- PASSWORD_RESET -->
+            <rect x="40" y="220" width="180" height="80" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="40" y="220" width="180" height="20" fill="#2563eb"/>
+            <text x="130" y="234" fill="#fff" text-anchor="middle" font-size="9" font-weight="700">password_reset_tokens</text>
+            <text x="48" y="252" font-size="8" fill="#334155">email PK</text>
+            <text x="48" y="266" font-size="8" fill="#334155">token · created_at</text>
+            <line x1="220" y1="260" x2="380" y2="340" stroke="#94a3b8"/>
+            <polygon points="300,300 312,312 300,324 288,312" fill="#fef3c7" stroke="#b45309"/>
+            <text x="300" y="340" font-size="8" fill="#92400e" text-anchor="middle" font-weight="600">R-AUTH-2 requests_reset</text>
+            <text x="300" y="352" font-size="7" fill="#64748b" text-anchor="middle">FK: email · 1:0..1</text>
+
+            <!-- ROLE -->
+            <rect x="420" y="40" width="140" height="70" fill="#f0fdf4" stroke="#16a34a" stroke-width="2" rx="3"/>
+            <text x="490" y="58" text-anchor="middle" font-size="10" font-weight="700" fill="#15803d">ROLE (conceptual)</text>
+            <text x="430" y="74" font-size="8" fill="#334155">role_code · role_label</text>
+            <text x="430" y="88" font-size="8" fill="#64748b">physical: users.role</text>
+            <line x1="490" y1="110" x2="490" y2="280" stroke="#94a3b8"/>
+            <polygon points="490,200 502,212 490,224 478,212" fill="#fef3c7" stroke="#b45309"/>
+            <text x="530" y="212" font-size="8" fill="#92400e" font-weight="600">R14 assigned</text>
+            <text x="530" y="224" font-size="7" fill="#64748b">attr: role · M:1 · NOT NULL</text>
+
+            <!-- ORDERS -->
+            <rect x="720" y="260" width="200" height="100" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <rect x="720" y="260" width="200" height="20" fill="#2563eb"/>
+            <text x="820" y="274" fill="#fff" text-anchor="middle" font-size="10" font-weight="700">orders</text>
+            <text x="728" y="292" font-size="8" fill="#9d174d">user_id FK R1</text>
+            <text x="728" y="306" font-size="8" fill="#9d174d">assigned_technician_id FK R2</text>
+            <text x="728" y="320" font-size="8" fill="#334155">order_number UK · status · ...</text>
+            <line x1="600" y1="340" x2="720" y2="310" stroke="#94a3b8"/>
+            <polygon points="660,320 672,332 660,344 648,332" fill="#fef3c7" stroke="#b45309"/>
+            <text x="660" y="358" font-size="8" fill="#92400e" text-anchor="middle" font-weight="600">R1 places</text>
+            <text x="660" y="370" font-size="7" fill="#64748b" text-anchor="middle">FK: user_id · 1:N · NOT NULL · CASCADE</text>
+            <polygon points="660,280 672,292 660,304 648,292" fill="#fef3c7" stroke="#b45309"/>
+            <text x="660" y="268" font-size="8" fill="#92400e" text-anchor="middle" font-weight="600">R2 assigned</text>
+            <text x="660" y="256" font-size="7" fill="#64748b" text-anchor="middle">FK: assigned_technician_id · NULL · SET NULL</text>
+
+            <!-- PRODUCTION_LOGS -->
+            <rect x="720" y="400" width="200" height="80" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <text x="820" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">production_logs</text>
+            <text x="728" y="438" font-size="8" fill="#9d174d">user_id FK R3</text>
+            <text x="728" y="452" font-size="8" fill="#9d174d">order_id FK R10</text>
+            <line x1="600" y1="400" x2="720" y2="430" stroke="#94a3b8"/>
+            <polygon points="660,415 672,427 660,439 648,427" fill="#fef3c7" stroke="#b45309"/>
+            <text x="660" y="455" font-size="8" fill="#92400e" text-anchor="middle" font-weight="600">R3 records</text>
+            <text x="660" y="467" font-size="7" fill="#64748b" text-anchor="middle">FK: user_id · 1:N · NOT NULL · CASCADE</text>
+
+            <!-- METAL_PRICES -->
+            <rect x="40" y="400" width="180" height="80" fill="#eff6ff" stroke="#2563eb" stroke-width="2" rx="3"/>
+            <text x="130" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">metal_prices</text>
+            <text x="48" y="438" font-size="8" fill="#9d174d">updated_by FK R4</text>
+            <text x="48" y="452" font-size="8" fill="#334155">gold/silver · price_date</text>
+            <line x1="220" y1="440" x2="380" y2="400" stroke="#94a3b8"/>
+            <polygon points="300,420 312,432 300,444 288,432" fill="#fef3c7" stroke="#b45309"/>
+            <text x="300" y="460" font-size="8" fill="#92400e" text-anchor="middle" font-weight="600">R4 updates</text>
+            <text x="300" y="472" font-size="7" fill="#64748b" text-anchor="middle">FK: updated_by · NULL · SET NULL</text>
+
+            <!-- INVOICES -->
+            <rect x="380" y="560" width="200" height="90" fill="#fdf2f8" stroke="#db2777" stroke-width="2" rx="3"/>
+            <text x="480" y="580" text-anchor="middle" font-size="10" font-weight="700" fill="#9d174d">invoices 🔜</text>
+            <text x="388" y="598" font-size="8" fill="#9d174d">user_id FK R5</text>
+            <text x="388" y="612" font-size="8" fill="#9d174d">created_by FK R6</text>
+            <text x="388" y="626" font-size="8" fill="#334155">order_id FK R11 · grand_total</text>
+            <line x1="490" y1="480" x2="490" y2="560" stroke="#db2777" stroke-dasharray="4,3"/>
+            <polygon points="490,520 502,532 490,544 478,532" fill="#fce7f3" stroke="#db2777"/>
+            <text x="530" y="532" font-size="8" fill="#9d174d" font-weight="600">R5 customer / R6 creator</text>
+            <text x="530" y="544" font-size="7" fill="#64748b">FK: user_id · created_by</text>
+
+            <!-- PAYMENTS -->
+            <rect x="720" y="560" width="200" height="70" fill="#fdf2f8" stroke="#db2777" stroke-width="2" rx="3"/>
+            <text x="820" y="580" text-anchor="middle" font-size="10" font-weight="700" fill="#9d174d">payments 🔜</text>
+            <text x="728" y="598" font-size="8" fill="#9d174d">recorded_by FK R7</text>
+            <text x="728" y="612" font-size="8" fill="#334155">invoice_id FK R12</text>
+            <line x1="580" y1="620" x2="720" y2="595" stroke="#db2777" stroke-dasharray="4,3"/>
+            <polygon points="650,600 662,612 650,624 638,612" fill="#fce7f3" stroke="#db2777"/>
+            <text x="650" y="640" font-size="8" fill="#9d174d" text-anchor="middle" font-weight="600">R7 recorder</text>
+            <text x="650" y="652" font-size="7" fill="#64748b" text-anchor="middle">FK: recorded_by · NOT NULL · CASCADE</text>
+
+            <text x="550" y="770" font-size="9" fill="#94a3b8" text-anchor="middle">Blue ✅ implemented · Pink 🔜 planned · Diamond = relationship with FK attribute</text>
+        </svg>
+    </div>
+
+    <section>
+        <h2>Relationship Attributes Table — User Module</h2>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Name</th><th>Parent</th><th>Child</th><th>FK Column</th><th>Card.</th><th>Null</th><th>On Delete</th><th>Role / Rule</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>R-AUTH-1</td><td>has_session</td><td>users</td><td>sessions</td><td>user_id</td><td>1:N</td><td>Yes</td><td>—</td><td>Guest sessions allowed</td></tr>
+                <tr><td>R-AUTH-2</td><td>requests_reset</td><td>users</td><td>password_reset_tokens</td><td>email</td><td>1:0..1</td><td>No</td><td>—</td><td>Password recovery</td></tr>
+                <tr><td>R14</td><td>assigned</td><td>users</td><td>ROLE</td><td>role</td><td>M:1</td><td>No</td><td>—</td><td>One role per user</td></tr>
+                <tr><td>R1</td><td>places</td><td>users</td><td>orders</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td><td>Customer places order</td></tr>
+                <tr><td>R2</td><td>assigned_to</td><td>users</td><td>orders</td><td>assigned_technician_id</td><td>1:N</td><td>Yes</td><td>SET NULL</td><td>Technician on order</td></tr>
+                <tr><td>R3</td><td>records</td><td>users</td><td>production_logs</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td><td>Admin/tech logs</td></tr>
+                <tr><td>R4</td><td>updates</td><td>users</td><td>metal_prices</td><td>updated_by</td><td>1:N</td><td>Yes</td><td>SET NULL</td><td>Admin updates rates</td></tr>
+                <tr><td>R5</td><td>billed_customer</td><td>users</td><td>invoices</td><td>user_id</td><td>1:N</td><td>No</td><td>CASCADE</td><td>Customer on invoice 🔜</td></tr>
+                <tr><td>R6</td><td>invoice_creator</td><td>users</td><td>invoices</td><td>created_by</td><td>1:N</td><td>Yes</td><td>SET NULL</td><td>Staff creates bill 🔜</td></tr>
+                <tr><td>R7</td><td>payment_recorder</td><td>users</td><td>payments</td><td>recorded_by</td><td>1:N</td><td>No</td><td>CASCADE</td><td>Staff records pay 🔜</td></tr>
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Use Case Diagram (Users by Role)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 4px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .page .desc { font-size: 0.75rem; color: #64748b; margin: 0 0 10px; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 4px 6px; text-align: center; }
+        th { background: #f8fafc; }
+        th:first-child, td:first-child { text-align: left; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Use Case Diagram (Users)</h1>
+    <p class="sub">6 user types · Per-role use cases · ✅ Implemented · 🔜 Planned</p>
+    <div class="legend">
+        <span>(( Actor ))</span>
+        <span>([ Use Case ])</span>
+        <span style="color:#db2777">🔜 Planned</span>
+        <span>── association · -. include/extend</span>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 1 — All Users &amp; System Panels</h2>
+        <p class="desc">Guest · Customer · Sales Staff · Inventory Manager · Administrator · Technician</p>
+        <div class="mermaid">
+flowchart LR
+    G((Guest))
+    C((Customer))
+    S((Sales Staff))
+    M((Inventory Manager))
+    A((Administrator))
+    T((Technician))
+
+    subgraph System[" «system» Rajabharana Jewellery System "]
+        PUB["Public Site\n/ · /catalog"]
+        CP["Customer Portal\n/dashboard · /orders"]
+        AP["Admin Panel\n/admin/*"]
+        WP["Workshop Panel\n/technician/*"]
+    end
+
+    G --> PUB
+    C --> PUB & CP
+    S --> AP
+    M --> AP
+    A --> AP
+    T --> WP
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 2 — Guest</h2>
+        <p class="desc">Not registered · Public site only · / · /catalog · /register · /login</p>
+        <div class="mermaid">
+flowchart TB
+    G((Guest))
+    subgraph SYS[" «system» Public Access "]
+        UC1([Browse Catalogue])
+        UC2([View Design Details])
+        UC3([Register Account])
+        UC4([Login])
+        UC5([Forgot Password])
+        UC6([Reset Password])
+    end
+    G --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6
+    UC3 -.->|«extend»| UC1
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 3 — Customer</h2>
+        <p class="desc">Role: customer · Panel: /dashboard · /orders · Public catalogue</p>
+        <div class="mermaid">
+flowchart TB
+    C((Customer))
+    subgraph SYS[" «system» Customer Portal "]
+        UC1([Browse Catalogue])
+        UC2([View Dashboard])
+        UC3([Place Order])
+        UC4([Track Orders])
+        UC5([Cancel Order])
+        UC6([Manage Profile])
+        UC7([View Invoice 🔜])
+        UC8([Receive Notifications 🔜])
+    end
+    C --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8
+    UC3 -.->|«extend»| UC1
+    UC7 -.->|«extend»| UC4
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 4 — Sales Staff</h2>
+        <p class="desc">Role: staff · Panel: /admin/* · Permissions: orders, customers, dashboard</p>
+        <div class="mermaid">
+flowchart TB
+    S((Sales Staff))
+    subgraph SYS[" «system» Order Management "]
+        UC1([Login / Logout])
+        UC2([View Admin Dashboard])
+        UC3([Manage Orders])
+        UC4([View Customers])
+        UC5([View Catalogue Read-only])
+        UC6([Manage Profile])
+        UC7([Generate Invoice 🔜])
+        UC8([Record Payment 🔜])
+        UC9([View Sales Reports 🔜])
+    end
+    S --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9
+    UC7 -.->|«include»| UC3
+    UC8 -.->|«include»| UC7
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 5 — Inventory Manager</h2>
+        <p class="desc">Role: manager · Panel: /admin/catalog/* · Permissions: catalog.view, catalog.manage</p>
+        <div class="mermaid">
+flowchart TB
+    M((Inventory Manager))
+    subgraph SYS[" «system» Inventory Module "]
+        UC1([Login / Logout])
+        UC2([List Catalogue Designs])
+        UC3([Create Design])
+        UC4([Edit Design])
+        UC5([Delete Design])
+        UC6([Upload Images])
+        UC7([Set Primary Image])
+        UC8([Set Availability Status])
+        UC9([Manage Profile])
+        UC10([Inventory Report 🔜])
+    end
+    M --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10
+    UC6 -.->|«include»| UC3
+    UC6 -.->|«include»| UC4
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 6 — Administrator</h2>
+        <p class="desc">Role: admin · Panel: /admin/* · Full access (permission *)</p>
+        <div class="mermaid">
+flowchart TB
+    A((Administrator))
+    subgraph SYS[" «system» Full Administration "]
+        direction TB
+        subgraph Orders["Sales &amp; Orders"]
+            UC1([Manage Orders])
+            UC2([View Customers])
+            UC3([View Admin Dashboard])
+        end
+        subgraph Inv["Inventory"]
+            UC4([Manage Catalogue])
+            UC5([Upload Images])
+        end
+        subgraph Admin["Administration"]
+            UC6([Assign Technician])
+            UC7([View Workshop Queue])
+            UC8([Manage Metal Prices])
+            UC9([Manage Staff Accounts])
+        end
+        subgraph Planned["Planned 🔜"]
+            UC10([Generate Invoice])
+            UC11([Record Payment])
+            UC12([Generate Reports])
+            UC13([Export Report PDF])
+        end
+        UC14([Manage Profile])
+    end
+    A --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC11 & UC12 & UC13 & UC14
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 7 — Workshop Technician</h2>
+        <p class="desc">Role: technician · Panel: /technician/* · Assigned jobs only · No customer PII</p>
+        <div class="mermaid">
+flowchart TB
+    T((Technician))
+    subgraph SYS[" «system» Workshop Panel "]
+        UC1([Login / Logout])
+        UC2([View Assigned Jobs])
+        UC3([View Job Specifications])
+        UC4([Update Production Status])
+        UC5([Add Production Log])
+        UC6([Manage Profile])
+        UC7([Receive Job Alerts 🔜])
+    end
+    T --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7
+    UC4 -.->|«include»| UC5
+    UC3 -.->|«extend»| UC2
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>Figure 8 — Actor × Use Case Matrix</h2>
+        <table>
+            <tr><th>Use Case</th><th>Guest</th><th>Customer</th><th>Staff</th><th>Manager</th><th>Admin</th><th>Tech</th></tr>
+            <tr><td>Browse catalogue</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Register / Login / Reset password</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>Manage profile</td><td></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>View customer dashboard</td><td></td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Place / track / cancel order</td><td></td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>View admin dashboard</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage orders</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>View customers</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage catalogue &amp; images</td><td></td><td></td><td></td><td>✓</td><td>✓</td><td></td></tr>
+            <tr><td>Assign technician</td><td></td><td></td><td></td><td></td><td>✓</td><td></td></tr>
+            <tr><td>View workshop queue</td><td></td><td></td><td></td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage metal prices</td><td></td><td></td><td></td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Manage staff accounts</td><td></td><td></td><td></td><td></td><td>✓</td><td></td></tr>
+            <tr><td>View / update assigned jobs</td><td></td><td></td><td></td><td></td><td></td><td>✓</td></tr>
+            <tr><td>Generate invoice 🔜</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>Record payment 🔜</td><td></td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+            <tr><td>View invoice 🔜</td><td></td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Reports / export 🔜</td><td></td><td></td><td>✓</td><td>✓*</td><td>✓</td><td></td></tr>
+        </table>
+        <p style="font-size:0.7rem;color:#64748b;margin-top:6px">* Manager: inventory report only · Test accounts: *@rajabharana.com</p>
+    </div>
+
+    <div class="note">
+        <strong>6 user types:</strong> Guest (public), Customer, Sales Staff, Inventory Manager, Administrator, Workshop Technician.<br>
+        <strong>Panels:</strong> Public · Customer Portal · Admin · Workshop · RBAC via <code>users.role</code> + middleware.<br>
+        <strong>Print → PDF</strong> for Word · Source: <code>docs/USE_CASE_DIAGRAM_USERS.md</code>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { curve: 'basis' } });</script>
+</body>
+</html>

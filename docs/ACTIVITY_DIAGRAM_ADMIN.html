@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Activity Diagram (Administrator)</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 4px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .page .desc { font-size: 0.75rem; color: #64748b; margin: 0 0 10px; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; margin-top: 8px; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana — Activity Diagram (Administrator)</h1>
+    <p class="sub">Include · Extend · ✅ Implemented · 🔜 Planned · Panel: /admin/*</p>
+    <div class="legend">
+        <span>(( ● Start / ⏹ End ))</span>
+        <span>[ Activity ]</span>
+        <span>{ Decision }</span>
+        <span>-.-> «include» / «extend»</span>
+        <span style="color:#db2777">🔜 Planned</span>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 1 — Admin Session Overview</h2>
+        <p class="desc">Login → RBAC → select module (Dashboard, Orders, Catalogue, Workshop, Staff, Metal Prices, Reports)</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    A1[Open Admin Panel]
+    A2[Select Module]
+    subgraph INC1[" «include» Authenticate "]
+        I1[Enter email & password]
+        I2[Verify credentials]
+        I3[Check role = admin]
+        I1 --> I2 --> I3
+    end
+    subgraph INC2[" «include» Verify RBAC "]
+        R1[Load permission map]
+        R2[Grant wildcard access *]
+        R1 --> R2
+    end
+    M1[View Dashboard]
+    M2[Manage Orders]
+    M3[Manage Catalogue]
+    M4[Manage Workshop]
+    M5[Manage Staff]
+    M6[Update Metal Prices]
+    M7[Generate Reports 🔜]
+    START --> A1
+    A1 -.->|«include»| INC1
+    INC1 --> INC2
+    INC2 --> A2
+    A2 --> M1 & M2 & M3 & M4 & M5 & M6 & M7
+    M1 & M2 & M3 & M4 & M5 & M6 & M7 --> END
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 2 — Manage Order</h2>
+        <p class="desc">/admin/orders · include: Authenticate, Load Order · extend: Assign Technician, Invoice 🔜, Delivery Warning</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    O1[List / Filter Orders]
+    O2[Select Order]
+    O3[View Order Detail]
+    O4[Edit Status / Price / Delivery / Notes]
+    O5[Save Order Update]
+    O6{Delivery overdue\nor due soon?}
+    O7[Show Delivery Warning]
+    D1{Order confirmed\n& in production?}
+    D2{Mark delivered?}
+    subgraph INC1[" «include» Authenticate "]
+        AUTH[Verify admin session]
+    end
+    subgraph INC2[" «include» Load Order Data "]
+        L1[Load customer & design]
+        L2[Load production logs]
+        L1 --> L2
+    end
+    subgraph EXT1[" «extend» Assign Technician "]
+        T1[Select technician]
+        T2[Update assigned_technician_id]
+        T3[Create production log]
+        T1 --> T2 --> T3
+    end
+    subgraph EXT2[" «extend» Generate Invoice 🔜 "]
+        B1[Create invoice from order]
+        B2[Add invoice line items]
+        B1 --> B2
+    end
+    START --> O1
+    O1 -.->|«include»| INC1
+    O1 --> O2 --> O3
+    O3 -.->|«include»| INC2
+    O3 --> O4 --> O5 --> O6
+    O6 -->|Yes| O7 --> END
+    O6 -->|No| END
+    O3 --> D1
+    D1 -->|Yes| EXT1
+    EXT1 --> O5
+    O5 --> D2
+    D2 -->|Yes| EXT2
+    EXT2 --> END
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 3 — Assign Technician to Order</h2>
+        <p class="desc">PATCH /admin/orders/{id}/assign-technician · include: Production Log · extend: View Workshop Queue</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    A1[Open Order Detail]
+    A2{Unassign\ntechnician?}
+    A3[Clear assignment]
+    A4{Order assignable?}
+    A5[Show error]
+    A6[Select Technician]
+    A7[Save assignment]
+    A8{Already assigned\nto same tech?}
+    subgraph INC1[" «include» Authenticate "]
+        AUTH[Verify admin + production.assign]
+    end
+    subgraph INC2[" «include» Write Production Log "]
+        LOG[INSERT production_logs]
+    end
+    subgraph EXT1[" «extend» View Workshop Queue "]
+        W1[Browse /admin/workshop]
+        W2[Check technician workload]
+        W1 --> W2
+    end
+    START --> A1
+    A1 -.->|«include»| INC1
+    A1 -.->|«extend»| EXT1
+    EXT1 --> A6
+    A1 --> A2
+    A2 -->|Yes| A3 --> INC2 --> END
+    A2 -->|No| A4
+    A4 -->|No| A5 --> END
+    A4 -->|Yes| A6 --> A8
+    A8 -->|No| A7 --> INC2 --> END
+    A8 -->|Yes| END
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 4 — Manage Catalogue Design</h2>
+        <p class="desc">/admin/catalog/* · include: Validate Form · extend: Upload Images, Set Availability</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    C1[List Catalogue Designs]
+    C2{Action?}
+    C3[Open Create Form]
+    C4[Open Edit Form]
+    C5[Confirm Delete]
+    C6[Save Design to DB]
+    subgraph INC1[" «include» Authenticate "]
+        AUTH[Verify admin session]
+    end
+    subgraph INC2[" «include» Validate Design Form "]
+        V1[Validate name, code, category]
+        V2[Validate price & weight]
+        V1 --> V2
+    end
+    subgraph EXT1[" «extend» Upload Images "]
+        U1[Store image files]
+        U2[Set sort order & primary]
+        U1 --> U2
+    end
+    subgraph EXT2[" «extend» Set Availability "]
+        S1[Update in_stock / out_of_stock]
+    end
+    START --> C1
+    C1 -.->|«include»| INC1
+    C1 --> C2
+    C2 -->|Create| C3 --> INC2
+    C2 -->|Edit| C4 --> INC2
+    C2 -->|Delete| C5 --> END
+    INC2 --> C6
+    C6 -.->|«extend»| EXT1
+    C6 -.->|«extend»| EXT2
+    EXT1 --> END
+    EXT2 --> END
+    C6 --> END
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 5 — Manage Staff Account</h2>
+        <p class="desc">/admin/users/* · include: Validate Form · extend: Guard Last Admin</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    S1[List Staff Accounts]
+    S2{Action?}
+    S3[Fill Create Form]
+    S4[Fill Edit Form]
+    S5[Confirm Delete]
+    S6[Save to users table]
+    subgraph INC1[" «include» Authenticate "]
+        AUTH[Verify users.manage permission]
+    end
+    subgraph INC2[" «include» Validate Staff Form "]
+        V1[Validate name, email, role]
+        V2[Hash password]
+        V1 --> V2
+    end
+    subgraph EXT1[" «extend» Guard Last Admin "]
+        G1{Last admin\nbeing removed?}
+        G2[Block — show error]
+        G1 -->|Yes| G2
+    end
+    START --> S1
+    S1 -.->|«include»| INC1
+    S1 --> S2
+    S2 -->|Create| S3 --> INC2 --> S6 --> END
+    S2 -->|Edit| S4 --> INC2 --> EXT1
+    EXT1 -->|No| S6 --> END
+    EXT1 -->|Yes| END
+    S2 -->|Delete| S5 --> EXT1
+    S5 --> S6
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 6 — Update Metal Prices</h2>
+        <p class="desc">/admin/metal-prices · include: Upsert today's gold &amp; silver rates</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    M1[Open Metal Prices Form]
+    M2[Enter Gold & Silver per Gram]
+    M3[Submit Update]
+    M4[Show Success Message]
+    subgraph INC1[" «include» Authenticate "]
+        AUTH[Verify metal-prices.manage]
+    end
+    subgraph INC2[" «include» Upsert Metal Price "]
+        U1[Load or create today's record]
+        U2[Set updated_by = admin]
+        U3[Save gold & silver prices]
+        U1 --> U2 --> U3
+    end
+    START --> M1
+    M1 -.->|«include»| INC1
+    M1 --> M2 --> M3
+    M3 -.->|«include»| INC2
+    INC2 --> M4 --> END
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>Figure 7 — View Customers &amp; Workshop</h2>
+        <p class="desc">Read-only flows · extend: roster → workload</p>
+        <div class="mermaid">
+flowchart TB
+    START((●))
+    END(((⏹)))
+    CH{Choose module}
+    V1[View Customer List]
+    V2[View Customer Profile & Orders]
+    W1[View Workshop Queue]
+    W2[View Technician Roster]
+    W3[View Technician Workload]
+    subgraph INC1[" «include» Authenticate "]
+        AUTH[Verify admin session]
+    end
+    subgraph INC2[" «include» Load Related Data "]
+        LD[Query users / orders / logs]
+    end
+    START --> CH
+    CH -->|Customers| V1 --> V2
+    CH -->|Workshop| W1
+    W1 -.->|«extend»| W2
+    W2 -.->|«extend»| W3
+    V1 & V2 & W1 & W2 & W3 -.->|«include»| INC1
+    V2 & W3 -.->|«include»| INC2
+    V2 & W3 --> END
+    W1 --> END
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>Include &amp; Extend Summary</h2>
+        <table>
+            <tr><th>Base activity</th><th>«include» (mandatory)</th><th>«extend» (conditional)</th></tr>
+            <tr><td>Admin session</td><td>Authenticate, Verify RBAC</td><td>—</td></tr>
+            <tr><td>Manage order</td><td>Authenticate, Load order data</td><td>Assign technician, Generate invoice 🔜, Delivery warning</td></tr>
+            <tr><td>Assign technician</td><td>Authenticate, Write production log</td><td>View workshop queue first</td></tr>
+            <tr><td>Manage catalogue</td><td>Authenticate, Validate form</td><td>Upload images, Set availability</td></tr>
+            <tr><td>Manage staff</td><td>Authenticate, Validate form</td><td>Guard last admin</td></tr>
+            <tr><td>Update metal prices</td><td>Authenticate, Upsert price record</td><td>—</td></tr>
+            <tr><td>View customers / workshop</td><td>Authenticate, Load related data</td><td>Technician roster → workload</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>«include»</strong> = always runs as part of the base activity.<br>
+        <strong>«extend»</strong> = runs only when a condition is true (e.g. order confirmed → assign technician).<br>
+        <strong>Print → PDF</strong> · Source: <code>docs/ACTIVITY_DIAGRAM_ADMIN.md</code>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', flowchart: { curve: 'basis' } });</script>
+</body>
+</html>

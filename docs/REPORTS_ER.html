@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Exports — Entity Relationship Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 20px; color: #1e293b; font-size: 11px; }
+        h1 { text-align: center; font-size: 1.15rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 14px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 0.78rem; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
+        .page h2 { font-size: 0.92rem; margin: 0 0 10px; padding-bottom: 5px; border-bottom: 2px solid #e2e8f0; }
+        .wrap { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 5px 7px; text-align: left; }
+        th { background: #f8fafc; }
+        .attrs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0; }
+        .attr { border: 1px solid #64748b; border-radius: 50%; padding: 3px 8px; font-size: 9px; background: #fff; }
+        .attr.pk { border-color: #92400e; color: #92400e; font-weight: 700; }
+        .attr.fk { border-color: #9d174d; color: #9d174d; }
+        .entity-box { border: 2px solid #16a34a; border-radius: 4px; padding: 8px; background: #dcfce7; text-align: center; font-weight: 700; max-width: 200px; margin: 0 auto 8px; }
+        .note { font-size: 0.8rem; color: #475569; line-height: 1.6; padding: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; }
+        @media print { body { background: #fff; } }
+    </style>
+</head>
+<body>
+    <h1>REPORT_EXPORTS — Relationship Diagram</h1>
+    <p class="sub">M12 Reports · Entity E15 · 🔜 Planned · Rajabharana Jewellery System</p>
+    <div class="legend">
+        <span style="color:#16a34a">■ report_exports (planned)</span>
+        <span style="color:#2563eb">■ Implemented ✅</span>
+        <span style="color:#db2777">■ Billing 🔜</span>
+        <span>── FK &nbsp; - - - logical read</span>
+    </div>
+
+    <!-- FIGURE 1: FULL RELATIONSHIP -->
+    <div class="page wrap">
+        <h2>Figure 1 — REPORT_EXPORTS Relationships (Physical + Logical)</h2>
+        <div class="mermaid">
+erDiagram
+    USERS ||--o{ REPORT_EXPORTS : "R15 generated_by FK"
+    REPORT_ENGINE }o..o{ ORDERS : "reads order_summary delivery production sales"
+    REPORT_ENGINE }o..o{ USERS : "reads customer sales"
+    REPORT_ENGINE }o..o{ CATALOG_DESIGNS : "reads inventory order_summary"
+    REPORT_ENGINE }o..o{ PRODUCTION_LOGS : "reads production"
+    REPORT_ENGINE }o..o{ METAL_PRICES : "reads daily_summary"
+    REPORT_ENGINE }o..o{ INVOICES : "reads sales billing_collection"
+    REPORT_ENGINE }o..o{ PAYMENTS : "reads sales billing_collection"
+    REPORT_ENGINE }o..o{ CATEGORIES : "reads inventory"
+    USERS ||--o{ REPORT_EXPORTS : "admin generates"
+
+    REPORT_EXPORTS {
+        bigint id PK
+        string report_type
+        date date_from
+        date date_to
+        bigint generated_by FK
+        string file_path
+        string format
+        json parameters
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string role
+    }
+
+    ORDERS {
+        bigint id PK
+        string order_number UK
+        string status
+    }
+
+    CATALOG_DESIGNS {
+        bigint id PK
+        string name
+        string availability_status
+    }
+
+    PRODUCTION_LOGS {
+        bigint id PK
+        bigint order_id FK
+    }
+
+    INVOICES {
+        bigint id PK
+        decimal grand_total
+    }
+
+    PAYMENTS {
+        bigint id PK
+        decimal amount
+    }
+
+    METAL_PRICES {
+        bigint id PK
+        date price_date
+    }
+
+    CATEGORIES {
+        bigint id PK
+        string name UK
+    }
+        </div>
+    </div>
+
+    <!-- FIGURE 2: FOCUSED ON REPORT_EXPORTS -->
+    <div class="page wrap">
+        <h2>Figure 2 — Focused View: REPORT_EXPORTS at Center</h2>
+        <div class="mermaid">
+flowchart TB
+    subgraph Physical["Physical FK Relationship"]
+        U["USERS<br/>(Administrator / Staff)"]
+        RE["REPORT_EXPORTS<br/>E15 🔜"]
+        U -->|"R15 generates_export<br/>1 : N<br/>FK: generated_by"| RE
+    end
+
+    subgraph Logical["Logical Read (Report Engine — no FK)"]
+        RE2["REPORT_ENGINE<br/>(application layer)"]
+        O["ORDERS"]
+        CU["USERS<br/>(customers)"]
+        CD["CATALOG_DESIGNS"]
+        PL["PRODUCTION_LOGS"]
+        MP["METAL_PRICES"]
+        INV["INVOICES 🔜"]
+        PAY["PAYMENTS 🔜"]
+        CAT["CATEGORIES 🔜"]
+        RE2 -.->|reads| O
+        RE2 -.->|reads| CU
+        RE2 -.->|reads| CD
+        RE2 -.->|reads| PL
+        RE2 -.->|reads| MP
+        RE2 -.->|reads| INV
+        RE2 -.->|reads| PAY
+        RE2 -.->|reads| CAT
+    end
+
+    U -->|runs export| RE2
+    RE2 -->|saves metadata| RE
+        </div>
+    </div>
+
+    <!-- ATTRIBUTES -->
+    <div class="page">
+        <h2>Figure 3 — REPORT_EXPORTS Attributes (10)</h2>
+        <div class="entity-box">REPORT_EXPORTS</div>
+        <div class="attrs">
+            <span class="attr pk">id PK</span>
+            <span class="attr">report_type</span>
+            <span class="attr">date_from</span>
+            <span class="attr">date_to</span>
+            <span class="attr fk">generated_by FK</span>
+            <span class="attr">file_path</span>
+            <span class="attr">format</span>
+            <span class="attr">parameters JSON</span>
+            <span class="attr">created_at</span>
+            <span class="attr">updated_at</span>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="page">
+        <h2>Figure 4 — Relationship Table</h2>
+        <table>
+            <tr><th>ID</th><th>Relationship</th><th>From</th><th>To</th><th>FK / Link</th><th>Card.</th><th>Type</th></tr>
+            <tr><td><strong>R15</strong></td><td>generates_export</td><td>USERS (admin/staff)</td><td>REPORT_EXPORTS</td><td>generated_by</td><td>1 : N</td><td><strong>Physical FK</strong></td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>ORDERS</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>USERS</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>CATALOG_DESIGNS</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>PRODUCTION_LOGS</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>METAL_PRICES</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>INVOICES</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>PAYMENTS</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+            <tr><td>—</td><td>reads</td><td>REPORT_ENGINE</td><td>CATEGORIES</td><td>SQL query</td><td>M : N</td><td>Logical</td></tr>
+        </table>
+
+        <h2 style="margin-top:16px">Report Type → Entity Sources</h2>
+        <table>
+            <tr><th>report_type</th><th>Entities read (logical)</th></tr>
+            <tr><td>order_summary</td><td>orders, users, catalog_designs</td></tr>
+            <tr><td>sales_revenue</td><td>orders, invoices, payments</td></tr>
+            <tr><td>customer</td><td>users, orders</td></tr>
+            <tr><td>production</td><td>orders, production_logs, users</td></tr>
+            <tr><td>delivery</td><td>orders</td></tr>
+            <tr><td>inventory</td><td>catalog_designs, categories</td></tr>
+            <tr><td>billing_collection</td><td>invoices, payments, users</td></tr>
+            <tr><td>daily_summary</td><td>all tables</td></tr>
+        </table>
+    </div>
+
+    <div class="note">
+        <strong>Only one physical FK:</strong> R15 — <code>report_exports.generated_by</code> → <code>users.id</code><br>
+        <strong>Print → PDF</strong> for project report · Source: <code>docs/REPORTS_ER.md</code>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Wireframe Diagrams</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #e2e8f0; margin: 0; padding: 24px; color: #334155; font-size: 12px; }
+        h1 { text-align: center; font-size: 1.2rem; margin: 0 0 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 20px; font-size: 0.85rem; }
+        .legend { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; font-size: 0.78rem; }
+        .legend span { display: flex; align-items: center; gap: 6px; }
+        .swatch { width: 14px; height: 14px; border: 2px solid #64748b; border-radius: 2px; background: #f8fafc; }
+        .swatch.planned { border-style: dashed; border-color: #db2777; }
+        .swatch.btn { background: #cbd5e1; border-radius: 4px; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 20px; margin-bottom: 24px; page-break-inside: avoid; }
+        .page h2 { font-size: 0.95rem; margin: 0 0 4px; }
+        .page .meta { font-size: 0.72rem; color: #64748b; margin-bottom: 16px; }
+        .page.planned { border-style: dashed; border-color: #f9a8d4; }
+        .page.planned h2::after { content: ' 🔜'; color: #db2777; font-size: 0.8rem; }
+
+        /* Wireframe frame */
+        .wf { border: 2px solid #475569; border-radius: 8px; overflow: hidden; background: #fafafa; max-width: 900px; margin: 0 auto; }
+        .wf-bar { background: #94a3b8; height: 28px; display: flex; align-items: center; padding: 0 12px; gap: 6px; }
+        .wf-dot { width: 10px; height: 10px; border-radius: 50%; background: #e2e8f0; border: 1px solid #64748b; }
+        .wf-url { flex: 1; background: #f1f5f9; border: 1px solid #64748b; border-radius: 4px; height: 16px; margin-left: 8px; font-size: 9px; line-height: 16px; padding: 0 8px; color: #475569; }
+
+        /* Layout shells */
+        .wf-public-nav { background: #64748b; color: #fff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; }
+        .wf-public-nav .links { display: flex; gap: 12px; font-weight: 400; font-size: 10px; }
+        .wf-admin { display: flex; min-height: 420px; }
+        .wf-sidebar { width: 160px; background: #475569; color: #e2e8f0; padding: 12px 0; flex-shrink: 0; font-size: 10px; }
+        .wf-sidebar .logo { padding: 8px 12px 16px; font-weight: 700; color: #fff; border-bottom: 1px solid #64748b; margin-bottom: 8px; }
+        .wf-sidebar .nav-item { padding: 7px 12px; border-left: 3px solid transparent; }
+        .wf-sidebar .nav-item.active { background: #64748b; border-left-color: #fbbf24; color: #fff; }
+        .wf-main { flex: 1; display: flex; flex-direction: column; }
+        .wf-topbar { background: #fff; border-bottom: 2px solid #cbd5e1; padding: 10px 16px; font-weight: 600; font-size: 11px; }
+        .wf-body { padding: 16px; flex: 1; }
+
+        /* Components */
+        .wf-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .wf-col { flex: 1; min-width: 80px; }
+        .wf-box { border: 2px dashed #94a3b8; background: #f8fafc; border-radius: 4px; padding: 10px; text-align: center; color: #64748b; font-size: 10px; min-height: 48px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; }
+        .wf-box.tall { min-height: 100px; }
+        .wf-box.hero { min-height: 140px; background: #e2e8f0; border-style: solid; }
+        .wf-box.img { min-height: 80px; aspect-ratio: 1; }
+        .wf-box.card { min-height: 120px; border-style: solid; }
+        .wf-kpi { border: 2px solid #64748b; border-radius: 6px; padding: 12px; background: #fff; flex: 1; min-width: 100px; }
+        .wf-kpi .num { font-size: 1.4rem; font-weight: 700; color: #475569; }
+        .wf-kpi .lbl { font-size: 9px; text-transform: uppercase; color: #94a3b8; margin-top: 4px; }
+        .wf-btn { display: inline-block; background: #94a3b8; color: #fff; border: 2px solid #64748b; border-radius: 4px; padding: 6px 14px; font-size: 10px; font-weight: 600; }
+        .wf-btn.outline { background: #f8fafc; color: #475569; }
+        .wf-input { border: 2px solid #64748b; border-radius: 4px; height: 28px; background: #fff; flex: 1; min-width: 120px; position: relative; }
+        .wf-input::after { content: 'input field'; position: absolute; left: 8px; top: 5px; font-size: 9px; color: #94a3b8; }
+        .wf-select { border: 2px solid #64748b; border-radius: 4px; height: 28px; background: #fff; width: 120px; }
+        .wf-label { font-size: 9px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
+        .wf-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .wf-table th, .wf-table td { border: 1px solid #94a3b8; padding: 6px 8px; text-align: left; }
+        .wf-table th { background: #e2e8f0; font-weight: 600; }
+        .wf-table td { background: #fff; color: #64748b; }
+        .wf-badge { display: inline-block; border: 1px solid #64748b; border-radius: 10px; padding: 2px 8px; font-size: 9px; background: #e2e8f0; }
+        .wf-section { border: 2px solid #cbd5e1; border-radius: 6px; padding: 12px; margin-bottom: 12px; background: #fff; }
+        .wf-section-title { font-weight: 700; font-size: 11px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dashed #cbd5e1; }
+        .wf-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .wf-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .wf-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .wf-auth { max-width: 360px; margin: 0 auto; padding: 24px; }
+        .wf-note { font-size: 9px; color: #94a3b8; font-style: italic; margin-top: 8px; }
+        .wf-sitemap { font-family: monospace; font-size: 10px; line-height: 1.8; background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 6px; }
+        .wf-split { display: grid; grid-template-columns: 1fr 280px; gap: 12px; }
+        @media print { body { background: #fff; padding: 10px; } .page { break-inside: avoid; } }
+        @media (max-width: 700px) { .wf-admin { flex-direction: column; } .wf-sidebar { width: 100%; } .wf-split { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <h1>Rajabharana Jewellery System — Wireframe Diagrams</h1>
+    <p class="sub">22 screens · 4 panels · ✅ Implemented · 🔜 Planned</p>
+    <div class="legend">
+        <span><i class="swatch"></i> Content area</span>
+        <span><i class="swatch btn"></i> Button</span>
+        <span><i class="swatch planned"></i> Planned screen</span>
+    </div>
+
+    <!-- SITE MAP -->
+    <div class="page">
+        <h2>Figure 0 — Site Map</h2>
+        <p class="meta">Navigation structure · All routes</p>
+        <div class="wf-sitemap">
+Rajabharana Jewellery System<br>
+├── <strong>Public</strong> (Guest)<br>
+│   ├── / ────────────── Home / Welcome<br>
+│   ├── /catalog ─────── Browse jewellery designs<br>
+│   └── /catalog/{id} ── Design detail + Register to Order<br>
+├── <strong>Auth</strong><br>
+│   ├── /login · /register · /forgot-password<br>
+├── <strong>Customer Portal</strong> (/dashboard, /orders)<br>
+│   ├── Dashboard (stats, metal rates, recent orders)<br>
+│   ├── My Orders → Order Detail → Cancel<br>
+│   └── Place Order (catalog or custom design)<br>
+├── <strong>Admin Panel</strong> (/admin/*)<br>
+│   ├── Dashboard · Orders · Workshop · Customers<br>
+│   ├── Inventory · Metal Prices · Staff Accounts<br>
+│   └── Workshop → Technicians → Workload<br>
+├── <strong>Workshop Panel</strong> (/technician/*)<br>
+│   ├── My Jobs · Job Detail · Update Status<br>
+└── <strong>Planned 🔜</strong><br>
+    ├── Billing / Invoice · Payment · Reports
+        </div>
+    </div>
+
+    <!-- W1 HOME -->
+    <div class="page">
+        <h2>W1 — Home Page</h2>
+        <p class="meta">Route: / · Actor: Guest · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><span class="wf-dot"></span><span class="wf-dot"></span><span class="wf-dot"></span><div class="wf-url">rajabharana.com/</div></div>
+            <div class="wf-public-nav"><span>◆ Rajabharana</span><span class="links">Catalog · Login · Register</span></div>
+            <div class="wf-body">
+                <div class="wf-box hero">Hero — Brand tagline "With you forever"<br>CTA: Browse Catalogue · Register</div>
+                <div class="wf-row" style="margin-top:12px">
+                    <div class="wf-box card" style="flex:1">About — Introduction</div>
+                    <div class="wf-box card" style="flex:1">Our History</div>
+                </div>
+                <div class="wf-section-title" style="margin-top:12px">Featured Designs (grid)</div>
+                <div class="wf-grid-4">
+                    <div class="wf-box img">Design 1</div>
+                    <div class="wf-box img">Design 2</div>
+                    <div class="wf-box img">Design 3</div>
+                    <div class="wf-box img">Design 4</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W2 CATALOG -->
+    <div class="page">
+        <h2>W2 — Public Catalogue</h2>
+        <p class="meta">Route: /catalog · Actor: Guest, Customer · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/catalog</div></div>
+            <div class="wf-public-nav"><span>◆ Rajabharana</span><span class="links">Home · Catalog · Login</span></div>
+            <div class="wf-body">
+                <div class="wf-row">
+                    <div class="wf-input" style="flex:2"></div>
+                    <div class="wf-select"></div>
+                    <span class="wf-btn">Search</span>
+                </div>
+                <div class="wf-grid-3">
+                    <div class="wf-box card"><div class="wf-box img" style="width:100%;margin-bottom:6px">Photo</div>Ring · RJ-001<br>LKR 45,000</div>
+                    <div class="wf-box card"><div class="wf-box img" style="width:100%;margin-bottom:6px">Photo</div>Necklace · RJ-002<br>LKR 82,000</div>
+                    <div class="wf-box card"><div class="wf-box img" style="width:100%;margin-bottom:6px">Photo</div>Bangle · RJ-003<br>LKR 38,000</div>
+                </div>
+                <div class="wf-note">Pagination · In stock badge</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W3 DESIGN DETAIL -->
+    <div class="page">
+        <h2>W3 — Design Detail</h2>
+        <p class="meta">Route: /catalog/{id} · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/catalog/5</div></div>
+            <div class="wf-public-nav"><span>◆ Rajabharana</span><span class="links">← Back to Catalog</span></div>
+            <div class="wf-body">
+                <div class="wf-split">
+                    <div>
+                        <div class="wf-box tall" style="min-height:200px">Main image + thumbnail gallery</div>
+                    </div>
+                    <div>
+                        <strong style="font-size:14px">Gold Wedding Ring</strong><br>
+                        <span class="wf-badge">In Stock</span>
+                        <div class="wf-section" style="margin-top:10px">
+                            Code · Category · Gold 22K · Weight · Price LKR
+                        </div>
+                        <span class="wf-btn" style="margin-top:10px;display:block;text-align:center">Register to Order</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W4 LOGIN -->
+    <div class="page">
+        <h2>W4 — Login</h2>
+        <p class="meta">Route: /login · All users · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/login</div></div>
+            <div class="wf-body wf-auth">
+                <div style="text-align:center;margin-bottom:16px;font-weight:700">◆ Rajabharana — Sign In</div>
+                <div class="wf-label">Email</div><div class="wf-input" style="width:100%;margin-bottom:10px"></div>
+                <div class="wf-label">Password</div><div class="wf-input" style="width:100%;margin-bottom:10px"></div>
+                <div class="wf-row"><label style="font-size:10px">☐ Remember me</label><a style="font-size:10px;margin-left:auto">Forgot password?</a></div>
+                <span class="wf-btn" style="width:100%;text-align:center;display:block;margin:12px 0">Log In</span>
+                <div style="text-align:center;font-size:10px">No account? Register</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W5 REGISTER -->
+    <div class="page">
+        <h2>W5 — Register</h2>
+        <p class="meta">Route: /register · Customer · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/register</div></div>
+            <div class="wf-body wf-auth">
+                <div style="text-align:center;margin-bottom:16px;font-weight:700">Create Account</div>
+                <div class="wf-label">Name · Email · Phone · Address · City · Password · Confirm</div>
+                <div class="wf-input" style="width:100%;margin-bottom:8px"></div>
+                <div class="wf-input" style="width:100%;margin-bottom:8px"></div>
+                <div class="wf-input" style="width:100%;margin-bottom:8px"></div>
+                <span class="wf-btn" style="width:100%;text-align:center;display:block;margin-top:12px">Register</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- W6 CUSTOMER DASHBOARD -->
+    <div class="page">
+        <h2>W6 — Customer Dashboard</h2>
+        <p class="meta">Route: /dashboard · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/dashboard</div></div>
+            <div class="wf-public-nav"><span>◆ Rajabharana</span><span class="links">Dashboard · Orders · Catalog · Profile · Logout</span></div>
+            <div class="wf-body">
+                <div class="wf-row" style="justify-content:space-between;align-items:center">
+                    <strong>Welcome, Customer Name</strong>
+                    <span class="wf-btn">+ Place New Order</span>
+                </div>
+                <div class="wf-grid-2" style="margin:12px 0">
+                    <div class="wf-kpi"><div class="lbl">Gold Today</div><div class="num">LKR 18,500/g</div></div>
+                    <div class="wf-kpi"><div class="lbl">Silver Today</div><div class="num">LKR 220/g</div></div>
+                </div>
+                <div class="wf-grid-4">
+                    <div class="wf-kpi"><div class="num">5</div><div class="lbl">Total Orders</div></div>
+                    <div class="wf-kpi"><div class="num">1</div><div class="lbl">Pending</div></div>
+                    <div class="wf-kpi"><div class="num">2</div><div class="lbl">In Progress</div></div>
+                    <div class="wf-kpi"><div class="num">1</div><div class="lbl">Ready</div></div>
+                </div>
+                <div class="wf-section" style="margin-top:12px">
+                    <div class="wf-section-title">Recent Orders</div>
+                    <table class="wf-table"><tr><th>Order #</th><th>Item</th><th>Status</th><th>Date</th></tr>
+                    <tr><td>RJ-20260307-ABCD</td><td>Ring</td><td><span class="wf-badge">In Production</span></td><td>View →</td></tr></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W7 MY ORDERS -->
+    <div class="page">
+        <h2>W7 — My Orders</h2>
+        <p class="meta">Route: /orders · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/orders</div></div>
+            <div class="wf-public-nav"><span>◆ Rajabharana</span><span class="links">Dashboard · Orders · Catalog</span></div>
+            <div class="wf-body">
+                <div class="wf-row" style="justify-content:space-between"><strong>My Orders</strong><span class="wf-btn">+ New Order</span></div>
+                <table class="wf-table" style="margin-top:12px">
+                    <tr><th>Order #</th><th>Design</th><th>Status</th><th>Price</th><th>Delivery</th><th></th></tr>
+                    <tr><td>RJ-…</td><td>Catalog Ring</td><td><span class="wf-badge">Confirmed</span></td><td>45,000</td><td>Mar 15</td><td>View</td></tr>
+                    <tr><td>RJ-…</td><td>Custom Necklace</td><td><span class="wf-badge">Pending</span></td><td>—</td><td>—</td><td>View · Cancel</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- W8 PLACE ORDER -->
+    <div class="page">
+        <h2>W8 — Place Order</h2>
+        <p class="meta">Route: /orders/create · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/orders/create</div></div>
+            <div class="wf-public-nav"><span>◆ Rajabharana</span><span class="links">← Back</span></div>
+            <div class="wf-body">
+                <div class="wf-section">
+                    <div class="wf-section-title">1. Design Choice</div>
+                    <div class="wf-grid-2">
+                        <div class="wf-box" style="border-style:solid">◉ From Catalogue</div>
+                        <div class="wf-box">○ Custom Design</div>
+                    </div>
+                </div>
+                <div class="wf-section">
+                    <div class="wf-section-title">2. Select Design / Specifications</div>
+                    <div class="wf-row"><span class="wf-badge">All</span><span class="wf-badge">Rings</span><span class="wf-badge">Necklaces</span></div>
+                    <div class="wf-grid-3" style="margin-top:8px">
+                        <div class="wf-box">Design card (radio select)</div>
+                        <div class="wf-box">Design card</div>
+                        <div class="wf-box">Design card</div>
+                    </div>
+                </div>
+                <div class="wf-section">
+                    <div class="wf-section-title">3. Item Details & Delivery</div>
+                    Item type · Gold quality · Weight · Quantity · Phone · Address · Reference image upload
+                </div>
+                <span class="wf-btn">Submit Order</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- W9 ORDER DETAIL CUSTOMER -->
+    <div class="page">
+        <h2>W9 — Customer Order Detail</h2>
+        <p class="meta">Route: /orders/{id} · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/orders/12</div></div>
+            <div class="wf-body">
+                <div class="wf-row" style="justify-content:space-between">
+                    <div><strong>Order RJ-20260307-ABCD</strong><br><span class="wf-badge">In Production</span></div>
+                    <span class="wf-btn outline">Cancel Order</span>
+                </div>
+                <div class="wf-split" style="margin-top:12px">
+                    <div class="wf-section">
+                        <div class="wf-section-title">Order Details</div>
+                        Design · Item type · Gold · Weight · Specs · Reference image<br>
+                        Estimated price · Expected delivery date
+                    </div>
+                    <div class="wf-section">
+                        <div class="wf-section-title">Delivery Info</div>
+                        Phone · Address · City
+                    </div>
+                </div>
+                <div class="wf-box" style="margin-top:8px;border-color:#fbbf24">⚠ Delivery alert (if overdue)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN SHELL + W10 DASHBOARD -->
+    <div class="page">
+        <h2>W10 — Admin Dashboard</h2>
+        <p class="meta">Route: /admin · Actor: Admin, Staff · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar">
+                    <div class="logo">◆ Rajabharana<br><small>Admin Panel</small></div>
+                    <div class="nav-item active">Dashboard</div>
+                    <div class="nav-item">Orders</div>
+                    <div class="nav-item">Workshop</div>
+                    <div class="nav-item">Customers</div>
+                    <div class="nav-item">Inventory</div>
+                    <div class="nav-item">Metal Prices</div>
+                    <div class="nav-item">Staff Accounts</div>
+                    <div style="padding:12px;border-top:1px solid #64748b;margin-top:20px;font-size:9px">Profile · Sign Out</div>
+                </div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Good morning, Admin · Business overview · [Pending orders] [All orders]</div>
+                    <div class="wf-body">
+                        <div class="wf-box" style="margin-bottom:12px;border-style:solid">Today's metal rates — Gold · Silver · Update rates →</div>
+                        <div class="wf-grid-4">
+                            <div class="wf-kpi"><div class="num">48</div><div class="lbl">Total Orders</div></div>
+                            <div class="wf-kpi"><div class="num">12</div><div class="lbl">In Production</div></div>
+                            <div class="wf-kpi"><div class="num">5</div><div class="lbl">Ready</div></div>
+                            <div class="wf-kpi"><div class="num">3</div><div class="lbl">Overdue</div></div>
+                        </div>
+                        <div class="wf-grid-2" style="margin-top:12px">
+                            <div class="wf-section"><div class="wf-section-title">Recent Orders</div><table class="wf-table"><tr><th>#</th><th>Customer</th><th>Status</th></tr><tr><td>…</td><td>…</td><td>…</td></tr></table></div>
+                            <div class="wf-section"><div class="wf-section-title">Delivery Alerts</div>Overdue list · Due soon list</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W11 ORDERS LIST -->
+    <div class="page">
+        <h2>W11 — Admin Orders List</h2>
+        <p class="meta">Route: /admin/orders · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/orders</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item">Dashboard</div><div class="nav-item active">Orders</div><div class="nav-item">Workshop</div><div class="nav-item">Customers</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Orders · [Due orders (3)]</div>
+                    <div class="wf-body">
+                        <div class="wf-row"><div class="wf-input" style="flex:2"></div><div class="wf-select"></div><span class="wf-btn">Filter</span></div>
+                        <table class="wf-table" style="margin-top:12px">
+                            <tr><th>Order #</th><th>Customer</th><th>Item</th><th>Status</th><th>Price</th><th>Delivery</th><th></th></tr>
+                            <tr><td>RJ-…</td><td>John</td><td>Ring</td><td><span class="wf-badge">Pending</span></td><td>—</td><td>Mar 20</td><td>View</td></tr>
+                            <tr style="background:#fef3c7"><td>RJ-…</td><td>Jane</td><td>Necklace</td><td><span class="wf-badge">In Production</span></td><td>82k</td><td>⚠ Overdue</td><td>View</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W12 ORDER DETAIL ADMIN -->
+    <div class="page">
+        <h2>W12 — Admin Order Detail</h2>
+        <p class="meta">Route: /admin/orders/{id} · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/orders/12</div></div>
+            <div class="wf-body">
+                <div class="wf-split">
+                    <div>
+                        <div class="wf-section"><div class="wf-section-title">Customer & Order Info</div>Customer name · email · phone · Order # · Design · Specs · Status badge</div>
+                        <div class="wf-section"><div class="wf-section-title">Workshop Assignment</div>Technician dropdown · Update Assignment · Assigned since date</div>
+                        <div class="wf-section"><div class="wf-section-title">Production Log</div>Timeline — status changes · assignment notes</div>
+                    </div>
+                    <div>
+                        <div class="wf-section"><div class="wf-section-title">Manage Order</div>
+                            Status dropdown · Delivery date · Price LKR · Admin notes textarea<br><br>
+                            <span class="wf-btn">Save Changes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W13 CUSTOMERS -->
+    <div class="page">
+        <h2>W13 — Customers List</h2>
+        <p class="meta">Route: /admin/customers · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/customers</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item active">Customers</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Customers</div>
+                    <div class="wf-body">
+                        <div class="wf-row"><div class="wf-input" style="flex:2"></div><span class="wf-btn">Search</span></div>
+                        <table class="wf-table" style="margin-top:12px">
+                            <tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Orders</th><th></th></tr>
+                            <tr><td>John Doe</td><td>john@…</td><td>077…</td><td>Colombo</td><td>3</td><td>View</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W14 INVENTORY -->
+    <div class="page">
+        <h2>W14 — Inventory / Catalog</h2>
+        <p class="meta">Route: /admin/catalog · Manager, Admin · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/catalog</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item active">Inventory</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Inventory · [+ Add Item]</div>
+                    <div class="wf-body">
+                        <div class="wf-row"><div class="wf-input" style="flex:2"></div><div class="wf-select"></div><div class="wf-select"></div><span class="wf-btn">Search</span></div>
+                        <table class="wf-table" style="margin-top:12px">
+                            <tr><th>Image</th><th>Code</th><th>Name</th><th>Category</th><th>Gold</th><th>Weight</th><th>Price</th><th>Status</th><th></th></tr>
+                            <tr><td>□</td><td>RJ-001</td><td>Wedding Ring</td><td>Rings</td><td>22K</td><td>8g</td><td>45,000</td><td><span class="wf-badge">In Stock</span></td><td>Edit · Delete</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W15 WORKSHOP -->
+    <div class="page">
+        <h2>W15 — Workshop Queue</h2>
+        <p class="meta">Route: /admin/workshop · Admin · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/workshop</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item active">Workshop</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Workshop · [Technicians] [+ Add Technician]</div>
+                    <div class="wf-body">
+                        <div class="wf-grid-5 wf-row" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+                            <div class="wf-kpi"><div class="num">15</div><div class="lbl">In Queue</div></div>
+                            <div class="wf-kpi"><div class="num">4</div><div class="lbl">Unassigned</div></div>
+                            <div class="wf-kpi"><div class="num">8</div><div class="lbl">In Production</div></div>
+                            <div class="wf-kpi"><div class="num">2</div><div class="lbl">QC</div></div>
+                            <div class="wf-kpi"><div class="num">5</div><div class="lbl">Ready</div></div>
+                        </div>
+                        <div class="wf-row" style="margin-top:12px"><div class="wf-input" style="flex:2"></div><div class="wf-select"></div><div class="wf-select"></div><span class="wf-btn">Filter</span></div>
+                        <table class="wf-table" style="margin-top:12px">
+                            <tr><th>Order</th><th>Customer</th><th>Item</th><th>Due</th><th>Status</th><th>Technician ▼</th><th></th></tr>
+                            <tr><td>RJ-…</td><td>John</td><td>Ring</td><td>Mar 10</td><td><span class="wf-badge">In Production</span></td><td><div class="wf-select" style="width:100px"></div></td><td>View</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W16 TECHNICIANS -->
+    <div class="page">
+        <h2>W16 — Technicians Roster</h2>
+        <p class="meta">Route: /admin/workshop/technicians · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/workshop/technicians</div></div>
+            <div class="wf-body">
+                <div class="wf-topbar" style="border:none;padding:0 0 12px">← Back to workshop · Technicians · [+ Add Technician]</div>
+                <table class="wf-table">
+                    <tr><th>Name</th><th>Email</th><th>Active Jobs</th><th>Ready</th><th>Overdue</th><th></th></tr>
+                    <tr><td>Kamal Perera</td><td>tech@…</td><td>3</td><td>2</td><td>1</td><td>View workload · Edit</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- W17 METAL PRICES -->
+    <div class="page">
+        <h2>W17 — Metal Prices</h2>
+        <p class="meta">Route: /admin/metal-prices · Admin · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/metal-prices</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item active">Metal Prices</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Gold & Silver Prices — Today</div>
+                    <div class="wf-body" style="max-width:400px">
+                        <div class="wf-label">Gold price per gram (LKR)</div><div class="wf-input" style="width:100%;margin-bottom:12px"></div>
+                        <div class="wf-label">Silver price per gram (LKR)</div><div class="wf-input" style="width:100%;margin-bottom:12px"></div>
+                        <div class="wf-note">Last updated by Admin · Date</div>
+                        <span class="wf-btn" style="margin-top:12px">Update Prices</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W18 STAFF -->
+    <div class="page">
+        <h2>W18 — Staff Accounts</h2>
+        <p class="meta">Route: /admin/users · Admin · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/admin/users</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item active">Staff Accounts</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Staff Accounts · [+ Create Staff]</div>
+                    <div class="wf-body">
+                        <table class="wf-table">
+                            <tr><th>Name</th><th>Email</th><th>Role</th><th>Created</th><th></th></tr>
+                            <tr><td>Admin User</td><td>admin@…</td><td><span class="wf-badge">Administrator</span></td><td>…</td><td>Edit · Delete</td></tr>
+                            <tr><td>Staff User</td><td>staff@…</td><td><span class="wf-badge">Sales Staff</span></td><td>…</td><td>Edit · Delete</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W19 TECHNICIAN DASHBOARD -->
+    <div class="page">
+        <h2>W19 — Technician Dashboard</h2>
+        <p class="meta">Route: /technician · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/technician</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar" style="width:140px">
+                    <div class="logo">Workshop<br><small>Technician</small></div>
+                    <div class="nav-item active">My Jobs</div>
+                    <div style="padding:12px;margin-top:40px;font-size:9px">Profile · Sign Out</div>
+                </div>
+                <div class="wf-main">
+                    <div class="wf-topbar">My Jobs — Production work assigned to you</div>
+                    <div class="wf-body">
+                        <div class="wf-grid-4">
+                            <div class="wf-kpi"><div class="num">4</div><div class="lbl">Active</div></div>
+                            <div class="wf-kpi"><div class="num">2</div><div class="lbl">In Production</div></div>
+                            <div class="wf-kpi"><div class="num">1</div><div class="lbl">QC</div></div>
+                            <div class="wf-kpi"><div class="num">1</div><div class="lbl">Due Soon</div></div>
+                        </div>
+                        <div class="wf-section" style="margin-top:12px">
+                            <div class="wf-section-title">Active Production (no customer PII)</div>
+                            <table class="wf-table"><tr><th>Order</th><th>Item</th><th>Status</th><th>Due</th><th></th></tr>
+                            <tr><td>RJ-…</td><td>Ring · 22K · 8g</td><td><span class="wf-badge">In Production</span></td><td>Mar 12</td><td>Open →</td></tr></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W20 JOB DETAIL -->
+    <div class="page">
+        <h2>W20 — Technician Job Detail</h2>
+        <p class="meta">Route: /technician/jobs/{id} · ✅</p>
+        <div class="wf">
+            <div class="wf-bar"><div class="wf-url">/technician/jobs/12</div></div>
+            <div class="wf-body">
+                <div class="wf-row" style="justify-content:space-between"><strong>Order RJ-… · Ring</strong><span class="wf-badge">In Production</span></div>
+                <div class="wf-box" style="margin:12px 0;border-color:#fbbf24">⚠ Overdue warning (no customer name/phone shown)</div>
+                <div class="wf-split">
+                    <div class="wf-section"><div class="wf-section-title">Specifications</div>Item type · Gold quality · Weight · Design specs · Reference image · Catalog design</div>
+                    <div class="wf-section"><div class="wf-section-title">Update Status</div>
+                        Status dropdown (In Production / QC / Ready)<br>Workshop note textarea<br><span class="wf-btn">Save Update</span>
+                    </div>
+                </div>
+                <div class="wf-section"><div class="wf-section-title">Production Log History</div>Timeline of status changes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W21 INVOICE PLANNED -->
+    <div class="page planned">
+        <h2>W21 — Generate Invoice</h2>
+        <p class="meta">Route: /admin/invoices/* · 🔜 Planned</p>
+        <div class="wf" style="border-style:dashed;border-color:#db2777">
+            <div class="wf-bar"><div class="wf-url">/admin/invoices/create?order=12</div></div>
+            <div class="wf-body">
+                <div class="wf-section"><div class="wf-section-title">Invoice from Order</div>
+                    Order # · Customer · Line items table · Subtotal · Tax · Total<br>
+                    <span class="wf-btn">Generate Invoice</span> · <span class="wf-btn outline">Print PDF</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- W22 REPORTS PLANNED -->
+    <div class="page planned">
+        <h2>W22 — Reports Dashboard</h2>
+        <p class="meta">Route: /admin/reports · 🔜 Planned</p>
+        <div class="wf" style="border-style:dashed;border-color:#db2777">
+            <div class="wf-bar"><div class="wf-url">/admin/reports</div></div>
+            <div class="wf-admin">
+                <div class="wf-sidebar"><div class="logo">Admin</div><div class="nav-item active">Reports</div></div>
+                <div class="wf-main">
+                    <div class="wf-topbar">Reports & Analytics</div>
+                    <div class="wf-body">
+                        <div class="wf-grid-2">
+                            <div class="wf-box card">Order Summary Report</div>
+                            <div class="wf-box card">Sales & Revenue Report</div>
+                            <div class="wf-box card">Production Report</div>
+                            <div class="wf-box card">Inventory Report</div>
+                        </div>
+                        <div class="wf-row" style="margin-top:12px"><div class="wf-select"></div><div class="wf-input"></div><span class="wf-btn">Generate</span><span class="wf-btn outline">Export PDF</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" style="border:none;background:transparent;box-shadow:none">
+        <p style="text-align:center;font-size:0.8rem;color:#64748b">
+            <strong>22 wireframes</strong> · Public (3) · Auth (2) · Customer (4) · Admin (9) · Technician (2) · Planned (2)<br>
+            Print → PDF for Word report · Source: <code>docs/WIREFRAME.md</code>
+        </p>
+    </div>
+</body>
+</html>

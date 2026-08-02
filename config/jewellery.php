@@ -63,4 +63,15 @@ return [
 
     'delivery_reminder_days' => 3,
 
+    'invoice_due_days' => 14,
+
+    'invoice_statuses' => [
+        'draft' => 'Draft',
+        'issued' => 'Issued',
+        'partial' => 'Partially Paid',
+        'paid' => 'Paid',
+        'cancelled' => 'Cancelled',
+        'overdue' => 'Overdue',
+    ],
+
 ];
