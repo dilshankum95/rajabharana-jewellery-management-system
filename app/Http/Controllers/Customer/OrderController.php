@@ -109,7 +109,7 @@ class OrderController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id, 403);
 
-        $order->load('catalogDesign', 'invoice');
+        $order->load(['catalogDesign', 'invoice', 'assignedTechnician']);
 
         return view('customer.orders.show', compact('order'));
     }
@@ -118,11 +118,11 @@ class OrderController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id, 403);
 
-        if (! in_array($order->status, [OrderStatus::Pending, OrderStatus::Confirmed])) {
+        if ($order->status !== OrderStatus::Pending) {
             return back()->with('error', 'This order can no longer be cancelled.');
         }
 
-        $order->update(['status' => OrderStatus::Cancelled]);
+        $order->update(['status' => OrderStatus::Rejected]);
 
         return redirect()
             ->route('orders.show', $order)

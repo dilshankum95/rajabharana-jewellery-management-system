@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Laravel Project Setup</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; font-size: 13px; line-height: 1.55; }
+        h1 { text-align: center; font-size: 1.35rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 24px; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; max-width: 960px; margin-left: auto; margin-right: auto; }
+        h2 { font-size: 1rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; color: #0f172a; }
+        h3 { font-size: 0.9rem; margin: 14px 0 8px; color: #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 16px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 600; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 12px 14px; border-radius: 6px; font-size: 0.78rem; overflow-x: auto; line-height: 1.45; margin: 8px 0 14px; }
+        code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+        pre code { background: none; padding: 0; color: inherit; }
+        .report-text { background: #f8fafc; border-left: 4px solid #b8860b; padding: 14px 16px; font-size: 0.88rem; line-height: 1.7; }
+        .step { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; }
+        .step-num { display: inline-block; background: #b8860b; color: #fff; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; font-size: 0.75rem; font-weight: 700; margin-right: 8px; }
+        .wrap { overflow: auto; }
+        @media print { body { background: #fff; padding: 0; } .page { border: none; } }
+    </style>
+</head>
+<body>
+    <h1>Laravel Project Setup Instructions</h1>
+    <p class="sub">Rajabharana Jewellery Management System · Environment &amp; Installation</p>
+
+    <div class="page">
+        <h2>1. Software Prerequisites</h2>
+        <table>
+            <tr><th>Software</th><th>Version</th><th>Purpose</th></tr>
+            <tr><td>PHP</td><td>8.2+</td><td>Laravel runtime</td></tr>
+            <tr><td>Composer</td><td>2.x</td><td>PHP dependencies</td></tr>
+            <tr><td>Node.js / NPM</td><td>18+ / 9+</td><td>Frontend build (Vite, Tailwind)</td></tr>
+            <tr><td>MySQL</td><td>8.x</td><td>Database</td></tr>
+        </table>
+        <pre><code>php -v
+composer --version
+node -v
+npm -v</code></pre>
+    </div>
+
+    <div class="page">
+        <h2>2. Project Creation</h2>
+        <div class="step"><span class="step-num">1</span> Create Laravel project</div>
+        <pre><code>composer create-project laravel/laravel jewellery-system
+cd jewellery-system</code></pre>
+        <div class="step"><span class="step-num">2</span> Install Laravel Breeze (authentication)</div>
+        <pre><code>composer require laravel/breeze --dev
+php artisan breeze:install blade</code></pre>
+        <div class="step"><span class="step-num">3</span> Install dependencies</div>
+        <pre><code>composer install
+npm install</code></pre>
+    </div>
+
+    <div class="page">
+        <h2>3. Environment Configuration (.env)</h2>
+        <pre><code>copy .env.example .env
+php artisan key:generate</code></pre>
+        <h3>Application settings</h3>
+        <pre><code>APP_NAME="Rajabharana Jewellery"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000</code></pre>
+        <h3>MySQL database</h3>
+        <pre><code>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=rajabharana_jewellery
+DB_USERNAME=root
+DB_PASSWORD=
+
+SESSION_DRIVER=database
+QUEUE_CONNECTION=database</code></pre>
+        <p>Create database first:</p>
+        <pre><code>CREATE DATABASE rajabharana_jewellery
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</code></pre>
+    </div>
+
+    <div class="page">
+        <h2>4. Database Setup</h2>
+        <pre><code>php artisan migrate
+php artisan db:seed</code></pre>
+        <h3>Test accounts (after seeding)</h3>
+        <table>
+            <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+            <tr><td>Customer</td><td>customer@rajabharana.com</td><td>password</td></tr>
+            <tr><td>Administrator</td><td>admin@rajabharana.com</td><td>password</td></tr>
+            <tr><td>Sales Staff</td><td>staff@rajabharana.com</td><td>Password1</td></tr>
+            <tr><td>Inventory Manager</td><td>manager@rajabharana.com</td><td>Password1</td></tr>
+            <tr><td>Technician</td><td>technician@rajabharana.com</td><td>Password1</td></tr>
+        </table>
+    </div>
+
+    <div class="page">
+        <h2>5. Storage &amp; Frontend Build</h2>
+        <pre><code>php artisan storage:link
+npm run build</code></pre>
+        <p>Development with hot reload: <code>npm run dev</code></p>
+        <h3>vite.config.js</h3>
+        <pre><code>export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});</code></pre>
+    </div>
+
+    <div class="page">
+        <h2>6. Run Application</h2>
+        <pre><code>php artisan serve</code></pre>
+        <p>Open: <strong>http://127.0.0.1:8000</strong></p>
+        <p>Or use combined dev mode: <code>composer run dev</code></p>
+        <p>One-shot first setup: <code>composer run setup</code></p>
+    </div>
+
+    <div class="page wrap">
+        <h2>7. Setup Flow</h2>
+        <div class="mermaid">
+flowchart TD
+    A[Install Prerequisites] --> B[composer install]
+    B --> C[Configure .env]
+    C --> D[key:generate]
+    D --> E[Create MySQL DB]
+    E --> F[migrate]
+    F --> G[db:seed]
+    G --> H[storage:link]
+    H --> I[npm install + build]
+    I --> J[php artisan serve]
+    J --> K[localhost:8000]
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>8. Project Structure</h2>
+        <pre><code>jewellery-system/
+├── app/Http/Controllers/   Admin, Customer, Auth
+├── app/Http/Middleware/      RBAC middleware
+├── app/Http/Requests/        Form validation
+├── app/Models/               Eloquent models
+├── app/Services/             Business logic
+├── config/rbac.php           Permissions
+├── database/migrations/      Table schemas
+├── database/seeders/         Sample data
+├── resources/views/          Blade templates
+├── routes/web.php            Main routes
+├── routes/auth.php           Login/register
+├── composer.json             PHP deps
+├── package.json              JS deps
+└── vite.config.js            Asset build</code></pre>
+    </div>
+
+    <div class="page">
+        <h2>9. Report Paragraph</h2>
+        <div class="report-text">
+            The Rajabharana Jewellery Management System was developed on Laravel 12 with PHP 8.2, using Composer for backend dependencies and NPM for frontend tooling. The project was initialized with the Laravel installer and Laravel Breeze for authentication. Environment variables were configured in the .env file for MySQL and database-backed sessions. Schema was created using migrations (php artisan migrate) and sample data inserted using seeders (php artisan db:seed). Frontend assets were compiled with Vite and Tailwind CSS. The application was served locally using php artisan serve at http://127.0.0.1:8000.
+        </div>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</body>
+</html>

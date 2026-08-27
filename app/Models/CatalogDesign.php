@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\AvailabilityStatus;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -18,6 +19,7 @@ class CatalogDesign extends Model
         'weight_grams',
         'selling_price',
         'availability_status',
+        'stock_quantity',
     ];
 
     protected function casts(): array
@@ -26,6 +28,7 @@ class CatalogDesign extends Model
             'weight_grams' => 'decimal:2',
             'selling_price' => 'decimal:2',
             'availability_status' => AvailabilityStatus::class,
+            'stock_quantity' => 'integer',
         ];
     }
 
@@ -55,6 +58,24 @@ class CatalogDesign extends Model
     public function images(): HasMany
     {
         return $this->hasMany(CatalogImage::class)->orderBy('sort_order');
+    }
+
+    public function stockMovements(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(StockMovement::class, 'stockable')->latest();
+    }
+
+    public function rawMaterials(): BelongsToMany
+    {
+        return $this->belongsToMany(RawMaterial::class, 'catalog_design_raw_material')
+            ->withPivot('quantity_required')
+            ->withTimestamps();
+    }
+
+    public function hasStock(int $quantity = 1): bool
+    {
+        return $this->availability_status === AvailabilityStatus::Available
+            && (int) $this->stock_quantity >= $quantity;
     }
 
     public function primaryImage()

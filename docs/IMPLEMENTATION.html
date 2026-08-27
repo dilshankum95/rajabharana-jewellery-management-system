@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — 6.3 Implementation of the Program</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; font-size: 13px; line-height: 1.5; }
+        h1 { text-align: center; font-size: 1.35rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 24px; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; max-width: 960px; margin-left: auto; margin-right: auto; }
+        h2 { font-size: 1rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; color: #0f172a; }
+        h3 { font-size: 0.9rem; margin: 14px 0 8px; color: #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 16px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 600; }
+        ul { margin: 6px 0 12px; padding-left: 20px; }
+        li { margin-bottom: 4px; }
+        code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+        .report-text { background: #f8fafc; border-left: 4px solid #b8860b; padding: 14px 16px; font-size: 0.88rem; line-height: 1.7; margin-top: 8px; }
+        .module-tag { display: inline-block; background: #b8860b; color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; margin-right: 6px; }
+        pre { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 4px; font-size: 0.8rem; overflow-x: auto; }
+        @media print { body { background: #fff; padding: 0; } .page { border: none; box-shadow: none; page-break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>6.3 Implementation of the Program</h1>
+    <p class="sub">Rajabharana Jewellery Management System · Module-by-Module · Laravel 12 MVC</p>
+
+    <div class="page">
+        <h2>Introduction</h2>
+        <p>The system is implemented as a web application using Laravel's <strong>Model–View–Controller (MVC)</strong> architecture. Functionality is divided into <strong>11 modules</strong>, each covering a distinct business area. Every module consists of Eloquent models, controllers, form requests, Blade views, and protected routes.</p>
+    </div>
+
+    <!-- M1 -->
+    <div class="page">
+        <h2><span class="module-tag">M1</span> Authentication and User Management</h2>
+        <table>
+            <tr><th>Purpose</th><td>Register users, authenticate login, manage sessions, recover passwords</td></tr>
+            <tr><th>Users</th><td>Guest (register/login), all authenticated users</td></tr>
+            <tr><th>Tables</th><td><code>users</code>, <code>password_reset_tokens</code>, <code>sessions</code></td></tr>
+            <tr><th>Package</th><td>Laravel Breeze</td></tr>
+        </table>
+        <h3>Key components</h3>
+        <table>
+            <tr><th>Layer</th><th>Files</th></tr>
+            <tr><td>Controllers</td><td><code>Auth\RegisteredUserController</code>, <code>AuthenticatedSessionController</code>, <code>PasswordResetLinkController</code>, <code>NewPasswordController</code>, <code>VerifyEmailController</code>, <code>ProfileController</code></td></tr>
+            <tr><td>Model</td><td><code>User</code> (role, phone, address, city, profile photo)</td></tr>
+            <tr><td>Views</td><td><code>auth/login</code>, <code>auth/register</code>, <code>auth/forgot-password</code>, <code>profile/edit</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Customer self-registration with email verification</li>
+            <li>Session-based login and logout</li>
+            <li>Forgot / reset password flow</li>
+            <li>Profile update (name, email, phone, address, profile photo)</li>
+            <li>Password change with strength rules; Bcrypt hashing; CSRF protection</li>
+        </ul>
+    </div>
+
+    <!-- M2 -->
+    <div class="page">
+        <h2><span class="module-tag">M2</span> Customer Portal</h2>
+        <table>
+            <tr><th>Purpose</th><td>Dashboard, order management, invoice viewing, notifications</td></tr>
+            <tr><th>Users</th><td>Customer role only</td></tr>
+            <tr><th>Middleware</th><td><code>EnsureCustomer</code></td></tr>
+            <tr><th>Routes</th><td><code>/dashboard</code>, <code>/orders/*</code>, <code>/notifications/*</code></td></tr>
+        </table>
+        <h3>Key components</h3>
+        <table>
+            <tr><th>Controllers</th><td><code>Customer\DashboardController</code>, <code>OrderController</code>, <code>InvoiceController</code>, <code>NotificationController</code></td></tr>
+            <tr><th>Views</th><td><code>customer/dashboard</code>, <code>customer/orders/*</code>, <code>customer/invoices/show</code>, <code>customer/notifications/index</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Dashboard with order stats, metal prices, overdue alerts</li>
+            <li>Place catalog or custom design orders with image upload</li>
+            <li>View order list and detail; cancel pending/confirmed orders</li>
+            <li>View issued invoices with line items, tax, discount, payment history</li>
+            <li>In-app notifications when invoice issued or payment recorded</li>
+        </ul>
+        <h3>Business rules</h3>
+        <ul>
+            <li>Phone and address required before first order</li>
+            <li>Customer sees only own orders and issued invoices</li>
+        </ul>
+    </div>
+
+    <!-- M3 -->
+    <div class="page">
+        <h2><span class="module-tag">M3</span> Public Catalogue and Jewellery Design</h2>
+        <table>
+            <tr><th>Purpose</th><td>Display jewellery designs; drive order placement</td></tr>
+            <tr><th>Users</th><td>Guest (browse), Customer (order)</td></tr>
+            <tr><th>Tables</th><td><code>catalog_designs</code>, <code>catalog_images</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Public home page and catalog browse by category</li>
+            <li>Design detail with image gallery and specifications</li>
+            <li>"Order this design" links to customer order form</li>
+            <li>Only available designs shown (<code>scopeAvailable</code>)</li>
+            <li>Auto-generated item codes (<code>RJ-YYYYMMDD-XXXX</code>)</li>
+        </ul>
+    </div>
+
+    <!-- M4 -->
+    <div class="page">
+        <h2><span class="module-tag">M4</span> Order Management</h2>
+        <table>
+            <tr><th>Purpose</th><td>Full order lifecycle from submission to delivery</td></tr>
+            <tr><th>Users</th><td>Customer (place/view), Staff/Admin (manage)</td></tr>
+            <tr><th>Table</th><td><code>orders</code></td></tr>
+            <tr><th>Statuses</th><td>Pending → Confirmed → In Production → Quality Check → Ready → Delivered / Cancelled</td></tr>
+        </table>
+        <h3>Key components</h3>
+        <table>
+            <tr><th>Customer</th><td><code>Customer\OrderController</code>, <code>StoreOrderRequest</code></td></tr>
+            <tr><th>Admin</th><td><code>Admin\OrderController</code>, <code>UpdateOrderRequest</code>, <code>FilterOrdersRequest</code></td></tr>
+            <tr><th>Components</th><td><code>order-status-badge</code>, <code>delivery-alert</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Catalog orders auto-priced; custom orders accept reference image</li>
+            <li>Admin search, filter, status update, delivery date, quoted price, notes</li>
+            <li>Overdue and due-soon delivery alerts on dashboards</li>
+            <li>Auto order number <code>RJ-YYYYMMDD-XXXX</code></li>
+        </ul>
+    </div>
+
+    <!-- M5 -->
+    <div class="page">
+        <h2><span class="module-tag">M5</span> Workshop and Technician</h2>
+        <table>
+            <tr><th>Purpose</th><td>Production queue, technician assignment, progress tracking</td></tr>
+            <tr><th>Users</th><td>Admin/Staff (assign), Technician (update jobs)</td></tr>
+            <tr><th>Tables</th><td><code>orders</code> (assignment), <code>production_logs</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Workshop queue and technician workload view (admin)</li>
+            <li>Assign/unassign technician from order detail</li>
+            <li>Technician dashboard shows only assigned jobs</li>
+            <li>Status updates: In Production → Quality Check → Ready</li>
+            <li>Production log audit trail (user, timestamp, note)</li>
+        </ul>
+    </div>
+
+    <!-- M6 -->
+    <div class="page">
+        <h2><span class="module-tag">M6</span> Inventory (Catalog Management)</h2>
+        <table>
+            <tr><th>Purpose</th><td>Admin CRUD for catalog designs, images, pricing, stock</td></tr>
+            <tr><th>Users</th><td>Administrator, Inventory Manager</td></tr>
+            <tr><th>Permissions</th><td><code>catalog.view</code>, <code>catalog.manage</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>List, create, edit, delete catalog designs with multiple images</li>
+            <li>Availability: Available / Out of Stock</li>
+            <li>Categories from <code>config/jewellery.php</code></li>
+            <li>Out-of-stock designs hidden from public catalog</li>
+        </ul>
+    </div>
+
+    <!-- M7 -->
+    <div class="page">
+        <h2><span class="module-tag">M7</span> Metal Price Management</h2>
+        <table>
+            <tr><th>Purpose</th><td>Publish daily gold and silver gram prices</td></tr>
+            <tr><th>Users</th><td>Administrator</td></tr>
+            <tr><th>Table</th><td><code>metal_prices</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Admin form to set gold/silver price per gram</li>
+            <li><code>MetalPrice::current()</code> for dashboards</li>
+            <li>Same-day updates overwrite; tracks <code>updated_by</code></li>
+        </ul>
+    </div>
+
+    <!-- M8 -->
+    <div class="page">
+        <h2><span class="module-tag">M8</span> Billing (Invoicing)</h2>
+        <table>
+            <tr><th>Purpose</th><td>Generate, edit, issue, and print invoices</td></tr>
+            <tr><th>Users</th><td>Staff/Admin (manage); Customer (view issued)</td></tr>
+            <tr><th>Permissions</th><td><code>billing.view</code>, <code>billing.manage</code>, <code>billing.settings</code></td></tr>
+            <tr><th>Tables</th><td><code>invoices</code>, <code>invoice_items</code>, <code>billing_settings</code>, <code>category_discounts</code></td></tr>
+        </table>
+        <h3>Services</h3>
+        <ul>
+            <li><code>InvoiceService</code> — draft/create/issue/cancel</li>
+            <li><code>InvoiceCalculator</code> — auto tax and category discount</li>
+        </ul>
+        <h3>Features</h3>
+        <ul>
+            <li>Billing settings: global tax rate and per-category discount</li>
+            <li>Create draft from billable order; edit before issue</li>
+            <li>Issue invoice → customer notified; printable layout</li>
+            <li>One order → one invoice (unique <code>order_id</code>)</li>
+        </ul>
+        <h3>Calculation</h3>
+        <pre>grand_total = subtotal + making_charge + tax − discount
+tax = (subtotal + making_charge − discount) × tax_rate / 100
+discount = subtotal × category_discount_percent / 100</pre>
+    </div>
+
+    <!-- M9 -->
+    <div class="page">
+        <h2><span class="module-tag">M9</span> Payment</h2>
+        <table>
+            <tr><th>Purpose</th><td>Record partial and full payments against invoices</td></tr>
+            <tr><th>Tables</th><td><code>payments</code>, <code>payment_methods</code></td></tr>
+            <tr><th>Service</th><td><code>PaymentService</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li>Partial payments until balance cleared</li>
+            <li>Methods: Cash, Card, Bank Transfer</li>
+            <li>Auto-update invoice: Issued → Partial → Paid</li>
+            <li>Customer notified on each payment</li>
+        </ul>
+        <h3>Business rules</h3>
+        <ul>
+            <li>Amount &gt; 0 and ≤ balance due</li>
+            <li>Cannot cancel invoice once partial or paid</li>
+        </ul>
+    </div>
+
+    <!-- M10 -->
+    <div class="page">
+        <h2><span class="module-tag">M10</span> Notification</h2>
+        <table>
+            <tr><th>Purpose</th><td>Inform customers of billing events</td></tr>
+            <tr><th>Channel</th><td>Database (in-app)</td></tr>
+            <tr><th>Table</th><td><code>notifications</code></td></tr>
+        </table>
+        <h3>Features</h3>
+        <ul>
+            <li><code>InvoiceIssuedNotification</code> on invoice issue</li>
+            <li><code>PaymentReceivedNotification</code> on payment record</li>
+            <li>Notification page with read/unread; bell badge in navigation</li>
+        </ul>
+    </div>
+
+    <!-- M11 -->
+    <div class="page">
+        <h2><span class="module-tag">M11</span> Role-Based Access Control (RBAC)</h2>
+        <table>
+            <tr><th>Config</th><td><code>config/rbac.php</code></td></tr>
+            <tr><th>Support</th><td><code>App\Support\Rbac</code></td></tr>
+            <tr><th>Enums</th><td><code>UserRole</code>, <code>Permission</code></td></tr>
+        </table>
+        <h3>Roles</h3>
+        <table>
+            <tr><th>Role</th><th>Panel</th><th>Access</th></tr>
+            <tr><td>Customer</td><td>Customer portal</td><td>Own orders, invoices, notifications</td></tr>
+            <tr><td>Sales Staff</td><td>Admin</td><td>Orders, customers, billing, catalog view</td></tr>
+            <tr><td>Inventory Manager</td><td>Admin</td><td>Catalog CRUD only</td></tr>
+            <tr><td>Administrator</td><td>Admin</td><td>Full access including staff and billing settings</td></tr>
+            <tr><td>Technician</td><td>Workshop</td><td>Assigned production jobs only</td></tr>
+        </table>
+        <h3>Middleware chain</h3>
+        <pre>HTTP Request → auth → verified → EnsureAdmin/EnsureCustomer/EnsureTechnician → EnsurePermission → Controller</pre>
+    </div>
+
+    <!-- Summary -->
+    <div class="page">
+        <h2>Module Implementation Summary</h2>
+        <table>
+            <tr><th>Module</th><th>Status</th><th>Models</th><th>Services</th></tr>
+            <tr><td>M1 Authentication</td><td>✅</td><td>User</td><td>—</td></tr>
+            <tr><td>M2 Customer Portal</td><td>✅</td><td>User, Order</td><td>—</td></tr>
+            <tr><td>M3 Public Catalogue</td><td>✅</td><td>CatalogDesign, CatalogImage</td><td>—</td></tr>
+            <tr><td>M4 Order Management</td><td>✅</td><td>Order</td><td>—</td></tr>
+            <tr><td>M5 Workshop</td><td>✅</td><td>Order, ProductionLog</td><td>—</td></tr>
+            <tr><td>M6 Inventory</td><td>✅</td><td>CatalogDesign, CatalogImage</td><td>—</td></tr>
+            <tr><td>M7 Metal Price</td><td>✅</td><td>MetalPrice</td><td>—</td></tr>
+            <tr><td>M8 Billing</td><td>✅</td><td>Invoice, InvoiceItem, BillingSetting, CategoryDiscount</td><td>InvoiceService, InvoiceCalculator</td></tr>
+            <tr><td>M9 Payment</td><td>✅</td><td>Payment, PaymentMethod</td><td>PaymentService</td></tr>
+            <tr><td>M10 Notification</td><td>✅</td><td>notifications</td><td>InvoiceIssuedNotification, PaymentReceivedNotification</td></tr>
+            <tr><td>M11 RBAC</td><td>✅</td><td>User</td><td>Rbac</td></tr>
+        </table>
+    </div>
+
+    <div class="page">
+        <h2>Report Paragraph (Copy-Paste)</h2>
+        <div class="report-text">
+            The program was implemented module-by-module using Laravel MVC architecture. The <strong>Authentication module</strong> (Laravel Breeze) handles registration, login, and profile management. The <strong>Customer Portal</strong> provides dashboard, order placement, and invoice viewing. The <strong>Public Catalogue module</strong> displays jewellery designs to guests. <strong>Order Management</strong> covers the full order lifecycle with admin status and pricing controls. The <strong>Workshop module</strong> manages technician assignment and production logging. <strong>Inventory Management</strong> provides admin CRUD for catalog designs and images. <strong>Metal Price Management</strong> publishes daily gold and silver rates. The <strong>Billing module</strong> generates invoices with automatic tax and category discount calculation via a Service Layer. The <strong>Payment module</strong> supports partial and full payments with status synchronization. The <strong>Notification module</strong> alerts customers on billing events. All modules are protected by <strong>Role-Based Access Control</strong> using middleware and a permission configuration file. Each module follows a consistent structure of Models, Controllers, Form Requests, and Blade views, ensuring maintainability and clear separation of concerns.
+        </div>
+    </div>
+</body>
+</html>

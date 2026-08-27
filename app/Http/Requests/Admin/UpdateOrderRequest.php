@@ -19,23 +19,34 @@ class UpdateOrderRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->trimStrings(['admin_notes', 'estimated_price'], ['admin_notes', 'estimated_price']);
+        $fields = ['admin_notes'];
+
+        if ($this->user()?->isAdmin()) {
+            $fields[] = 'estimated_price';
+        }
+
+        $this->trimStrings($fields, ['admin_notes', 'estimated_price']);
     }
 
     public function rules(): array
     {
         $order = $this->route('order');
 
-        return [
-            'status' => ['required', Rule::enum(OrderStatus::class)],
+        $rules = [
             'expected_delivery_date' => ValidationRules::deliveryDate(
                 required: true,
                 minDate: $order->created_at->format('Y-m-d'),
                 maxDate: now()->addYear()->format('Y-m-d'),
             ),
-            'estimated_price' => ValidationRules::money(required: false),
             'admin_notes' => ValidationRules::longText(max: 2000),
         ];
+
+        if ($this->user()?->isAdmin()) {
+            $rules['status'] = ['required', Rule::enum(OrderStatus::class)];
+            $rules['estimated_price'] = ValidationRules::money(required: false);
+        }
+
+        return $rules;
     }
 
     public function messages(): array

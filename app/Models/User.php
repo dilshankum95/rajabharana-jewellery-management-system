@@ -95,6 +95,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'assigned_technician_id');
     }
 
+    public function reportExports(): HasMany
+    {
+        return $this->hasMany(ReportExport::class, 'generated_by');
+    }
+
     public function hasPermission(string $permission): bool
     {
         return Rbac::userHasPermission($this, $permission);

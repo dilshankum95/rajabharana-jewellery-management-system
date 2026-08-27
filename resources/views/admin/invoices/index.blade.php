@@ -75,7 +75,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-12 text-center text-gray-400">
-                                No invoices yet. Generate one from a confirmed order with a set price.
+                                No invoices yet. Generate one from an accepted order with a set price.
                             </td>
                         </tr>
                     @endforelse

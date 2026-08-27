@@ -26,7 +26,7 @@ enum UserRole: string
         return match ($this) {
             self::Customer => 'Places and tracks jewellery orders online.',
             self::Admin => 'Full system access including staff account management.',
-            self::Manager => 'Manages jewellery inventory (catalog items, stock status, and product images).',
+            self::Manager => 'Manages the jewellery catalog (items, stock status, and product images).',
             self::Staff => 'Processes orders and views customer and catalog information.',
             self::Technician => 'Works on assigned production jobs and updates workshop progress.',
         };

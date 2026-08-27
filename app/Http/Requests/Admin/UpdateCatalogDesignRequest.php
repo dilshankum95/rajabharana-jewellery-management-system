@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\AvailabilityStatus;
+use App\Http\Requests\Admin\Concerns\ValidatesCatalogMaterials;
 use App\Http\Requests\Concerns\SanitizesInput;
 use App\Support\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
@@ -11,7 +12,7 @@ use Illuminate\Validation\Validator;
 
 class UpdateCatalogDesignRequest extends FormRequest
 {
-    use SanitizesInput;
+    use SanitizesInput, ValidatesCatalogMaterials;
 
     public function authorize(): bool
     {
@@ -21,6 +22,7 @@ class UpdateCatalogDesignRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->trimStrings(['name', 'description'], ['description']);
+        $this->filterEmptyCatalogMaterialRows();
     }
 
     public function rules(): array
@@ -35,14 +37,18 @@ class UpdateCatalogDesignRequest extends FormRequest
             'weight_grams' => ValidationRules::weight(required: true),
             'description' => ValidationRules::orderNotes(max: 2000),
             'selling_price' => ValidationRules::money(),
+            'stock_quantity' => ['required', 'integer', 'min:0', 'max:99999'],
             'availability_status' => ['required', Rule::enum(AvailabilityStatus::class)],
             'images' => [$hasExistingImages ? 'nullable' : 'required', 'array', 'max:10'],
-            'images.*' => ValidationRules::imageFile(required: true),
+            'images.*' => ValidationRules::imageFile(required: false),
+            ...$this->catalogMaterialRules(),
         ];
     }
 
     public function withValidator(Validator $validator): void
     {
+        $this->validateCatalogMaterialRows($validator);
+
         $validator->after(function (Validator $validator) {
             $catalog = $this->route('catalog');
 
@@ -51,13 +57,11 @@ class UpdateCatalogDesignRequest extends FormRequest
             }
 
             $newImages = $this->file('images') ?? [];
-            $newCount = is_array($newImages) ? count($newImages) : 0;
+            $newCount = is_array($newImages) ? count(array_filter($newImages)) : 0;
             $existingCount = $catalog->images()->count();
 
             if ($existingCount === 0 && $newCount === 0) {
                 $validator->errors()->add('images', 'Please upload at least one product image.');
-
-                return;
             }
 
             if ($existingCount + $newCount > 10) {

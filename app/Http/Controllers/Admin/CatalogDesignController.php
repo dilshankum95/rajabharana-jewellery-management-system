@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\StoreCatalogDesignRequest;
 use App\Http\Requests\Admin\UpdateCatalogDesignRequest;
 use App\Models\CatalogDesign;
 use App\Models\CatalogImage;
+use App\Models\RawMaterial;
+use App\Services\InventoryService;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Admin\FilterCatalogDesignRequest;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +16,10 @@ use Illuminate\View\View;
 
 class CatalogDesignController extends Controller
 {
+    public function __construct(
+        private InventoryService $inventoryService
+    ) {}
+
     public function index(FilterCatalogDesignRequest $request): View
     {
         $validated = $request->validated();
@@ -53,7 +59,9 @@ class CatalogDesignController extends Controller
 
     public function store(StoreCatalogDesignRequest $request): RedirectResponse
     {
-        $design = CatalogDesign::create($request->safe()->except('images'));
+        $design = CatalogDesign::create($request->safe()->except(['images', 'materials']));
+        $this->inventoryService->syncCatalogAvailability($design->fresh());
+        $this->inventoryService->syncCatalogMaterials($design, $request->validated('materials'));
 
         $this->storeImages($design, $request->file('images', []));
 
@@ -64,7 +72,7 @@ class CatalogDesignController extends Controller
 
     public function edit(CatalogDesign $catalog): View
     {
-        $catalog->load('images');
+        $catalog->load(['images', 'rawMaterials']);
 
         return view('admin.catalog.edit', array_merge($this->formOptions(), [
             'design' => $catalog,
@@ -73,7 +81,9 @@ class CatalogDesignController extends Controller
 
     public function update(UpdateCatalogDesignRequest $request, CatalogDesign $catalog): RedirectResponse
     {
-        $catalog->update($request->safe()->except('images'));
+        $catalog->update($request->safe()->except(['images', 'materials']));
+        $this->inventoryService->syncCatalogAvailability($catalog->fresh());
+        $this->inventoryService->syncCatalogMaterials($catalog, $request->validated('materials'));
 
         if ($request->hasFile('images')) {
             $this->storeImages($catalog, $request->file('images'));
@@ -134,6 +144,7 @@ class CatalogDesignController extends Controller
             'categories' => config('jewellery.catalog_categories'),
             'goldQualities' => config('jewellery.catalog_gold_qualities'),
             'availabilityStatuses' => config('jewellery.availability_statuses'),
+            'rawMaterials' => RawMaterial::active()->orderBy('name')->get(),
         ];
     }
 

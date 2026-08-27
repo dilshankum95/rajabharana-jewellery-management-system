@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\OrderStatus;
+use App\Casts\NullableOrderStatusCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -19,8 +19,8 @@ class ProductionLog extends Model
     protected function casts(): array
     {
         return [
-            'from_status' => OrderStatus::class,
-            'to_status' => OrderStatus::class,
+            'from_status' => NullableOrderStatusCast::class,
+            'to_status' => NullableOrderStatusCast::class,
         ];
     }
 

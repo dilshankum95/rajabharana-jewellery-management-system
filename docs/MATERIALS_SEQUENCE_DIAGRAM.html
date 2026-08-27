@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Materials Module Sequence Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            sequence: { useMaxWidth: true, diagramMarginX: 8, diagramMarginY: 8, actorMargin: 40, messageMargin: 30 }
+        });
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; font-size: 11px; }
+        .cover { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 48px 32px; margin-bottom: 24px; text-align: center; }
+        .cover h1 { font-size: 1.5rem; margin: 0 0 8px; color: #0f172a; }
+        .cover h2 { font-size: 1rem; font-weight: 600; color: #b45309; margin: 0 0 16px; }
+        .cover p { color: #64748b; margin: 4px 0; font-size: 0.9rem; }
+        .meta { margin-top: 24px; font-size: 0.82rem; color: #475569; }
+        h1.doc-title { display: none; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 18px; margin-bottom: 20px; }
+        .page h2 { font-size: 0.95rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #fde68a; color: #92400e; }
+        .page .desc { font-size: 0.78rem; color: #64748b; margin-bottom: 10px; line-height: 1.5; }
+        .wrap { overflow: auto; }
+        .mermaid { text-align: center; }
+        .legend { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 18px; font-size: 0.78rem; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .page { break-inside: avoid; page-break-inside: avoid; border: none; border-radius: 0; margin-bottom: 12px; }
+            .cover { page-break-after: always; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cover">
+    <h1>Rajabharana Jewellery Management System</h1>
+    <h2>Materials &amp; Inventory Module — Sequence Diagrams</h2>
+    <p>Raw Materials · Bill of Materials · Stock Movements · Order Stock Deduction</p>
+    <p class="meta">
+        <strong>Status:</strong> Implemented ✅ &nbsp;|&nbsp;
+        <strong>Stack:</strong> Laravel 12 · Blade · MySQL · InventoryService<br>
+        <strong>Document:</strong> MATERIALS_SEQUENCE_DIAGRAM.pdf
+    </p>
+</div>
+
+<div class="legend">
+    <span style="color:#2563eb">■ All flows implemented ✅</span>
+    <span>Actor → Controller → Service → Model → Database</span>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 1 — Add Raw Material (UC-M02)</h2>
+    <p class="desc">Inventory Manager creates a new workshop material. Code is auto-generated as RM-YYYYMMDD-XXXX.</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Manager as Inventory Manager
+    participant UI as Raw Materials UI
+    participant RC as RawMaterialController
+    participant Req as StoreRawMaterialRequest
+    participant RM as RawMaterial
+    participant DB as Database
+
+    Manager->>UI: Fill material form and Submit
+    UI->>RC: POST /admin/raw-materials
+    RC->>Req: validate and authorize
+    Req-->>RC: validated data
+    RC->>RM: create(material data)
+    RM->>DB: INSERT raw_materials
+    DB-->>RM: new row with auto code
+    RM-->>RC: RawMaterial
+    RC-->>UI: redirect with success
+    UI-->>Manager: Raw material added successfully
+    </div>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 2 — Adjust Raw Material Stock (UC-M05)</h2>
+    <p class="desc">Manual stock increase or decrease. Creates a stock_movements audit record with reason material_received or workshop_usage.</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Manager as Inventory Manager
+    participant UI as Material Edit UI
+    participant RC as RawMaterialController
+    participant Req as AdjustRawMaterialStockRequest
+    participant IS as InventoryService
+    participant RM as RawMaterial
+    participant SM as StockMovement
+    participant DB as Database
+
+    Manager->>UI: Enter quantity delta and note
+    UI->>RC: POST /admin/raw-materials/id/adjust-stock
+    RC->>Req: validate and authorize
+    Req-->>RC: quantity_delta, note
+    RC->>IS: adjustRawMaterialStock(material, delta, reason, user)
+    IS->>DB: BEGIN TRANSACTION
+    IS->>RM: lockForUpdate()
+    IS->>IS: calculate quantity_after
+
+    alt Insufficient stock
+        IS-->>RC: InvalidArgumentException
+        RC-->>UI: redirect with error
+        UI-->>Manager: Insufficient stock message
+    else Stock OK
+        IS->>RM: update stock_quantity
+        IS->>SM: recordMovement()
+        SM->>DB: INSERT stock_movements
+        IS->>DB: COMMIT
+        RC-->>UI: redirect with success
+        UI-->>Manager: Stock adjusted successfully
+    end
+    </div>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 3 — Link Materials to Catalog Item (UC-M06 + UC-M07)</h2>
+    <p class="desc">Manager sets catalog stock quantity and Bill of Materials (quantity_required per material per 1 catalog unit).</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Manager as Inventory Manager
+    participant UI as Catalog Edit UI
+    participant CC as CatalogDesignController
+    participant Req as UpdateCatalogDesignRequest
+    participant CD as CatalogDesign
+    participant IS as InventoryService
+    participant DB as Database
+
+    Manager->>UI: Edit catalog stock and linked materials
+    UI->>CC: PATCH /admin/catalog/id
+    CC->>Req: validate fields and materials array
+    Req->>Req: filter empty material rows
+    Req-->>CC: validated data
+    CC->>CD: update catalog fields including stock_quantity
+    CD->>DB: UPDATE catalog_designs
+    CC->>IS: syncCatalogAvailability(design)
+    Note over IS: stock=0 sets OutOfStock
+    CC->>IS: syncCatalogMaterials(design, materials)
+    IS->>DB: SYNC catalog_design_raw_material
+    CC-->>UI: redirect with success
+    UI-->>Manager: Catalog item updated successfully
+    </div>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 4 — Customer Places Catalog Order (UC-M11)</h2>
+    <p class="desc">Stock is validated at order time but not deducted. Order is saved as Pending.</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Customer
+    participant UI as Order Form
+    participant OC as OrderController
+    participant Req as StoreOrderRequest
+    participant CD as CatalogDesign
+    participant DB as Database
+
+    Customer->>UI: Select catalog item and quantity
+    UI->>OC: POST /orders
+    OC->>Req: validate order data
+    Req->>CD: load catalogDesign and rawMaterials
+    Req->>Req: check catalog stock_quantity >= quantity
+
+    loop Each linked raw material
+        Req->>Req: required = quantity_required x order_qty
+        Req->>Req: check material stock >= required
+    end
+
+    alt Stock insufficient
+        Req-->>OC: validation errors
+        OC-->>UI: redirect back with errors
+        UI-->>Customer: Only X units or insufficient workshop stock
+    else Stock sufficient
+        Req-->>OC: validated
+        OC->>DB: INSERT orders status Pending
+        Note over DB: No stock deducted yet
+        OC-->>UI: redirect success
+        UI-->>Customer: Order placed awaiting acceptance
+    end
+    </div>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 5 — Accept Catalog Order — Auto Deduct Stock (UC-M09)</h2>
+    <p class="desc">Admin accepts order. InventoryService deducts catalog stock and all linked raw materials. Audit logged in stock_movements.</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UI as Order Detail UI
+    participant OC as OrderController
+    participant IS as InventoryService
+    participant Order as Order
+    participant CD as CatalogDesign
+    participant RM as RawMaterial
+    participant SM as StockMovement
+    participant DB as Database
+
+    Admin->>UI: Change status Pending to Accepted
+    UI->>OC: PATCH /admin/orders/id
+    OC->>IS: deductForAcceptedOrder(order, admin)
+    IS->>DB: BEGIN TRANSACTION
+    IS->>Order: load catalogDesign.rawMaterials
+    IS->>IS: assertCatalogStockAvailable()
+    IS->>IS: assertRawMaterialStockAvailable()
+
+    alt Insufficient stock at accept time
+        IS-->>OC: InvalidArgumentException
+        OC-->>UI: redirect with error
+        UI-->>Admin: Cannot accept order error
+    else Stock OK
+        opt Catalog deduction not yet recorded
+            IS->>IS: adjustCatalogStock design minus orderQty
+            IS->>SM: INSERT stock_movements CatalogDesign
+            IS->>IS: syncCatalogAvailability()
+        end
+        loop Each linked raw material
+            opt Material deduction not yet recorded
+                IS->>IS: adjustRawMaterialStock minus required
+                IS->>SM: INSERT stock_movements RawMaterial
+            end
+        end
+        IS->>DB: COMMIT
+        OC->>Order: update status Accepted
+        OC->>DB: INSERT production_log
+        OC-->>UI: Order updated successfully
+    end
+    </div>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 6 — Reject Accepted Order — Restore Stock (UC-M10)</h2>
+    <p class="desc">If an accepted order is rejected, catalog stock and linked materials are restored with audit records.</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UI as Order Detail UI
+    participant OC as OrderController
+    participant IS as InventoryService
+    participant Order as Order
+    participant SM as StockMovement
+    participant DB as Database
+
+    Admin->>UI: Change status Accepted to Rejected
+    UI->>OC: PATCH /admin/orders/id
+    OC->>IS: restoreForRejectedOrder(order, admin)
+    IS->>DB: BEGIN TRANSACTION
+    IS->>Order: load catalogDesign.rawMaterials
+
+    opt Catalog deduction exists
+        IS->>IS: adjustCatalogStock design plus orderQty
+        IS->>SM: INSERT stock_movements CatalogDesign
+        IS->>IS: syncCatalogAvailability()
+    end
+
+    loop Each linked raw material
+        opt Material deduction exists
+            IS->>IS: adjustRawMaterialStock plus required
+            IS->>SM: INSERT stock_movements RawMaterial
+        end
+    end
+
+    IS->>DB: COMMIT
+    OC->>Order: update status Rejected
+    OC-->>UI: Stock restored
+    UI-->>Admin: Order rejected stock restored
+    </div>
+</div>
+
+<div class="page wrap">
+    <h2>Figure 7 — Generate Inventory Report (UC-M12)</h2>
+    <p class="desc">Inventory Manager views category-wise catalog stock KPIs and raw materials summary including low-stock count.</p>
+    <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Manager as Inventory Manager
+    participant UI as Reports UI
+    participant RC as ReportController
+    participant RE as ReportEngine
+    participant CD as CatalogDesign
+    participant RM as RawMaterial
+    participant DB as Database
+
+    Manager->>UI: Select Inventory Report
+    UI->>RC: GET /admin/reports type=inventory
+    RC->>RE: inventoryReport()
+    RE->>CD: load designs and order counts
+    CD->>DB: SELECT catalog_designs
+    RE->>RM: load active materials
+    RM->>DB: SELECT raw_materials WHERE is_active
+    RE->>RE: compute KPIs stock units value low stock
+    RE->>RE: group by category and material rows
+    RE-->>RC: report data
+    RC-->>UI: render report
+    UI-->>Manager: Category catalog stock and raw materials section
+    </div>
+</div>
+
+</body>
+</html>

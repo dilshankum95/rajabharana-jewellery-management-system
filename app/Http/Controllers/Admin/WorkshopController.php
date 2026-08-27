@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\OrderStatus;
+use App\Enums\ProductionStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\FilterProductionRequest;
@@ -21,7 +21,7 @@ class WorkshopController extends Controller
             ->orderBy('expected_delivery_date');
 
         if (! empty($validated['status'])) {
-            $query->where('status', $validated['status']);
+            $query->where('production_status', $validated['status']);
         }
 
         if (! empty($validated['technician_id'])) {
@@ -51,13 +51,11 @@ class WorkshopController extends Controller
             'stats' => [
                 'queue_total' => (clone $queueBase)->count(),
                 'unassigned' => Order::needsTechnicianAssignment()->count(),
-                'in_production' => (clone $queueBase)->where('status', OrderStatus::InProduction)->count(),
-                'quality_check' => (clone $queueBase)->where('status', OrderStatus::QualityCheck)->count(),
-                'ready' => (clone $queueBase)->where('status', OrderStatus::Ready)->count(),
+                'in_production' => (clone $queueBase)->where('production_status', ProductionStatus::InProduction)->count(),
+                'quality_check' => (clone $queueBase)->where('production_status', ProductionStatus::QualityCheck)->count(),
+                'ready' => (clone $queueBase)->where('production_status', ProductionStatus::ReadyToPickup)->count(),
             ],
-            'statuses' => collect(config('jewellery.order_statuses'))
-                ->only(['confirmed', 'in_production', 'quality_check', 'ready'])
-                ->all(),
+            'statuses' => config('jewellery.production_statuses'),
         ]);
     }
 
@@ -66,7 +64,7 @@ class WorkshopController extends Controller
         $technicians = User::technicians()
             ->withCount([
                 'assignedOrders as active_jobs_count' => fn ($query) => $query->activeProduction(),
-                'assignedOrders as ready_jobs_count' => fn ($query) => $query->where('status', OrderStatus::Ready),
+                'assignedOrders as ready_jobs_count' => fn ($query) => $query->where('production_status', ProductionStatus::ReadyToPickup),
                 'assignedOrders as overdue_jobs_count' => fn ($query) => $query->activeProduction()->deliveryOverdue(),
             ])
             ->orderBy('name')
@@ -85,11 +83,12 @@ class WorkshopController extends Controller
             ->assignedToTechnician($technician->id)
             ->inProductionQueue()
             ->orderBy('expected_delivery_date')
-            ->get();
+            ->get()
+            ->filter(fn (Order $order) => $order->production_status !== ProductionStatus::ReadyToPickup);
 
         $recentReady = Order::with(['catalogDesign'])
             ->assignedToTechnician($technician->id)
-            ->where('status', OrderStatus::Ready)
+            ->where('production_status', ProductionStatus::ReadyToPickup)
             ->latest('updated_at')
             ->limit(10)
             ->get();
@@ -100,8 +99,8 @@ class WorkshopController extends Controller
             'recentReady' => $recentReady,
             'stats' => [
                 'active' => $activeJobs->count(),
-                'in_production' => $activeJobs->where('status', OrderStatus::InProduction)->count(),
-                'quality_check' => $activeJobs->where('status', OrderStatus::QualityCheck)->count(),
+                'in_production' => $activeJobs->where('production_status', ProductionStatus::InProduction)->count(),
+                'quality_check' => $activeJobs->where('production_status', ProductionStatus::QualityCheck)->count(),
                 'overdue' => $activeJobs->filter(fn (Order $order) => $order->isDeliveryOverdue())->count(),
             ],
         ]);

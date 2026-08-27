@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\TaskStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AssignTechnicianRequest;
 use App\Models\Order;
@@ -16,6 +17,8 @@ class OrderAssignmentController extends Controller
             $order->update([
                 'assigned_technician_id' => null,
                 'assigned_at' => null,
+                'task_status' => TaskStatus::Pending,
+                'production_status' => null,
             ]);
 
             ProductionLog::create([
@@ -29,17 +32,29 @@ class OrderAssignmentController extends Controller
             return back()->with('success', 'Technician unassigned from this order.');
         }
 
-        if (! $order->isAssignableToTechnician()) {
-            return back()->with('error', 'This order cannot be assigned — it must be confirmed and in active production.');
+        if (! $order->isAssignableToTechnician() && ! $order->assigned_technician_id) {
+            return back()->with('error', 'Only accepted orders can be assigned to a technician.');
         }
 
         $technicianId = (int) $request->validated('assigned_technician_id');
+
+        if ($technicianId <= 0) {
+            return back()->with('error', 'Please select a technician to assign.');
+        }
+
         $wasAssigned = $order->assigned_technician_id === $technicianId;
 
-        $order->update([
+        $updates = [
             'assigned_technician_id' => $technicianId,
             'assigned_at' => $wasAssigned ? $order->assigned_at : now(),
-        ]);
+        ];
+
+        if (! $wasAssigned) {
+            $updates['task_status'] = TaskStatus::Pending;
+            $updates['production_status'] = null;
+        }
+
+        $order->update($updates);
 
         if (! $wasAssigned) {
             $technician = \App\Models\User::find($technicianId);

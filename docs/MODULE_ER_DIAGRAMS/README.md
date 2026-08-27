@@ -1,6 +1,6 @@
 # Module ER Diagrams — Rajabharana Jewellery System
 
-Separate Entity-Relationship documentation for **11 modules**.
+Separate Entity-Relationship documentation for **12 modules**.
 
 | # | Module | File | Status |
 |---|--------|------|--------|
@@ -15,6 +15,9 @@ Separate Entity-Relationship documentation for **11 modules**.
 | 9 | Payment | [09-payment.md](09-payment.md) | 🔜 Sprint 9 |
 | 10 | Notification | [10-notification.md](10-notification.md) | 🔜 Planned |
 | 11 | Role-Based Access Control (RBAC) | [11-rbac.md](11-rbac.md) | ✅ Implemented (config + role column) |
+| 12 | Raw Materials & Stock | [12-raw-materials-inventory.md](12-raw-materials-inventory.md) | ✅ Implemented |
+
+**Materials full diagram doc (ER + Use Case + Sequence):** [../MATERIALS_INVENTORY_DIAGRAMS.md](../MATERIALS_INVENTORY_DIAGRAMS.md)
 
 **Visual browser index:** [index.html](index.html)
 

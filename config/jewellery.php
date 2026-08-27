@@ -34,6 +34,21 @@ return [
         'out_of_stock' => 'Out of Stock',
     ],
 
+    'raw_material_types' => [
+        'gold' => 'Gold',
+        'silver' => 'Silver',
+        'gemstone' => 'Gemstone',
+        'finding' => 'Finding / Component',
+        'alloy' => 'Alloy / Solder',
+        'other' => 'Other',
+    ],
+
+    'stock_units' => [
+        'grams' => 'Grams (g)',
+        'pieces' => 'Pieces (pcs)',
+        'carats' => 'Carats (ct)',
+    ],
+
     'item_types' => [
         'ring' => 'Ring',
         'necklace' => 'Necklace',
@@ -52,13 +67,22 @@ return [
     ],
 
     'order_statuses' => [
-        'pending' => 'Pending Review',
-        'confirmed' => 'Confirmed',
+        'pending' => 'Pending',
+        'accepted' => 'Accepted',
+        'rejected' => 'Rejected',
+    ],
+
+    'task_statuses' => [
+        'pending' => 'Pending',
+        'accepted' => 'Accepted',
+        'rejected' => 'Rejected',
+    ],
+
+    'production_statuses' => [
+        'production_confirm' => 'Production Confirm',
         'in_production' => 'In Production',
         'quality_check' => 'Quality Check',
-        'ready' => 'Ready for Pickup',
-        'delivered' => 'Delivered',
-        'cancelled' => 'Cancelled',
+        'ready_to_pickup' => 'Ready to Pickup',
     ],
 
     'delivery_reminder_days' => 3,

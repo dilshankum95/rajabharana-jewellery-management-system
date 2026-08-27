@@ -10,7 +10,7 @@
         @csrf @method('patch')
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-5 pb-5 border-b border-jewel-gold/10">
-            <x-user-avatar :user="$user" size="xl" id="profile-avatar-preview" />
+            <x-user-avatar :user="$user" size="lg" id="profile-avatar-preview" />
             <div class="flex-1 space-y-3">
                 <div>
                     <x-input-label for="profile_photo" :value="__('Profile Photo')" />
@@ -87,17 +87,28 @@
             const preview = document.getElementById('profile-avatar-preview');
             if (!preview || !input.files?.[0]) return;
 
-            if (preview.tagName === 'IMG') {
-                preview.src = URL.createObjectURL(input.files[0]);
+            const url = URL.createObjectURL(input.files[0]);
+            const wrapperClasses = 'w-16 h-16 rounded-full overflow-hidden ring-2 ring-jewel-gold/30 shrink-0';
+            const existingImg = preview.tagName === 'IMG'
+                ? preview
+                : preview.querySelector('img');
+
+            if (existingImg) {
+                existingImg.src = url;
                 return;
             }
 
+            const wrapper = document.createElement('div');
+            wrapper.id = 'profile-avatar-preview';
+            wrapper.className = wrapperClasses;
+
             const img = document.createElement('img');
-            img.id = 'profile-avatar-preview';
-            img.className = preview.className;
+            img.className = 'h-full w-full object-cover';
             img.alt = @json($user->name);
-            img.src = URL.createObjectURL(input.files[0]);
-            preview.replaceWith(img);
+            img.src = url;
+
+            wrapper.appendChild(img);
+            preview.replaceWith(wrapper);
         }
     </script>
 </section>

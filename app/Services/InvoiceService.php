@@ -22,11 +22,7 @@ class InvoiceService
     public static function billableOrderStatuses(): array
     {
         return [
-            OrderStatus::Confirmed,
-            OrderStatus::InProduction,
-            OrderStatus::QualityCheck,
-            OrderStatus::Ready,
-            OrderStatus::Delivered,
+            OrderStatus::Accepted,
         ];
     }
 
@@ -36,11 +32,7 @@ class InvoiceService
             return false;
         }
 
-        if ($order->status === OrderStatus::Cancelled || $order->status === OrderStatus::Pending) {
-            return false;
-        }
-
-        if (! in_array($order->status, self::billableOrderStatuses(), true)) {
+        if ($order->status !== OrderStatus::Accepted) {
             return false;
         }
 

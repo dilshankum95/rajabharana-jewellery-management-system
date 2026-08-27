@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Enums\OrderStatus;
+use App\Enums\ProductionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\MetalPrice;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class DashboardController extends Controller
         $user = $request->user();
 
         $orders = $user->orders()
-            ->with('catalogDesign')
+            ->with(['catalogDesign', 'assignedTechnician'])
             ->latest()
             ->limit(5)
             ->get();
@@ -23,12 +24,16 @@ class DashboardController extends Controller
         $stats = [
             'total' => $user->orders()->count(),
             'pending' => $user->orders()->where('status', OrderStatus::Pending)->count(),
-            'in_progress' => $user->orders()->whereIn('status', [
-                OrderStatus::Confirmed,
-                OrderStatus::InProduction,
-                OrderStatus::QualityCheck,
-            ])->count(),
-            'ready' => $user->orders()->where('status', OrderStatus::Ready)->count(),
+            'in_progress' => $user->orders()
+                ->where('status', OrderStatus::Accepted)
+                ->where(function ($query) {
+                    $query->whereNull('production_status')
+                        ->orWhere('production_status', '!=', ProductionStatus::ReadyToPickup->value);
+                })
+                ->count(),
+            'ready' => $user->orders()
+                ->where('production_status', ProductionStatus::ReadyToPickup)
+                ->count(),
         ];
 
         return view('customer.dashboard', [

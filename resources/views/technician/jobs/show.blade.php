@@ -4,9 +4,12 @@
             <div>
                 <a href="{{ route('technician.dashboard') }}" class="text-sm font-medium text-jewel-gold-dark hover:text-jewel-gold transition">&larr; Back to my jobs</a>
                 <h1 class="jewel-page-title text-xl mt-1">{{ $order->order_number }}</h1>
-                <p class="jewel-page-subtitle">Workshop job details — specifications only</p>
+                <p class="jewel-page-subtitle">Workshop job details</p>
             </div>
-            <x-order-status-badge :status="$order->status" class="text-sm" />
+            <div class="flex flex-wrap items-center gap-2">
+                <x-task-status-badge :status="$order->task_status" />
+                <x-production-status-badge :status="$order->production_status" />
+            </div>
         </div>
     </x-slot>
 
@@ -90,22 +93,47 @@
         </div>
 
         <div class="space-y-6">
-            @if($order->technicianCanUpdate(auth()->user()))
+            @if($order->technicianCanRespondToTask(auth()->user()))
                 <section class="jewel-card jewel-card-body sticky top-24">
-                    <h2 class="jewel-section-title mb-4">Update Progress</h2>
+                    <h2 class="jewel-section-title mb-4">Respond to Task</h2>
+                    <p class="text-sm text-slate-500 mb-4">This order has been assigned to you. Accept to begin production or reject if you cannot take it.</p>
+                    <div class="flex flex-col gap-3">
+                        <form method="POST" action="{{ route('technician.jobs.task', $order) }}">
+                            @csrf
+                            <input type="hidden" name="action" value="accept">
+                            <button type="submit" class="jewel-btn w-full">Accept Task</button>
+                        </form>
+                        <form method="POST" action="{{ route('technician.jobs.task', $order) }}"
+                            onsubmit="return confirm('Reject this task? The administrator will need to reassign it.')">
+                            @csrf
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="jewel-btn-danger w-full">Reject Task</button>
+                        </form>
+                    </div>
+                </section>
+            @elseif($order->task_status === \App\Enums\TaskStatus::Rejected)
+                <section class="jewel-card jewel-card-body sticky top-24">
+                    <h2 class="jewel-section-title mb-4">Task Rejected</h2>
+                    <p class="text-sm text-slate-500">You rejected this task. Contact the administrator if reassignment is needed.</p>
+                    <div class="mt-4"><x-task-status-badge :status="$order->task_status" /></div>
+                </section>
+            @elseif($order->technicianCanUpdateProduction(auth()->user()))
+                <section class="jewel-card jewel-card-body sticky top-24">
+                    <h2 class="jewel-section-title mb-4">Update Production</h2>
 
-                    <form method="POST" action="{{ route('technician.jobs.update', $order) }}" class="space-y-4">
+                    <form method="POST" action="{{ route('technician.jobs.production', $order) }}" class="space-y-4">
                         @csrf
                         @method('PATCH')
 
                         <div>
-                            <label for="status" class="jewel-label">Status *</label>
-                            <select id="status" name="status" required class="jewel-input mt-1.5">
-                                @foreach($statusOptions as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('status', $order->status->value) === $value)>{{ $label }}</option>
+                            <label for="production_status" class="jewel-label">Production Status *</label>
+                            <select id="production_status" name="production_status" required class="jewel-input mt-1.5">
+                                @foreach($productionOptions as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('production_status', $order->production_status?->value) === $value)>{{ $label }}</option>
                                 @endforeach
                             </select>
-                            <x-input-error :messages="$errors->get('status')" class="mt-1" />
+                            <p class="mt-1 text-xs text-gray-400">Status can only move forward one step at a time.</p>
+                            <x-input-error :messages="$errors->get('production_status')" class="mt-1" />
                         </div>
 
                         <div>
@@ -119,18 +147,22 @@
                         <button type="submit" class="jewel-btn w-full">Save Update</button>
                     </form>
                 </section>
+            @elseif($order->production_status === \App\Enums\ProductionStatus::ReadyToPickup)
+                <section class="jewel-card jewel-card-body sticky top-24">
+                    <h2 class="jewel-section-title mb-4">Production Complete</h2>
+                    <p class="text-sm text-slate-500">This order is ready for customer pickup. No further production updates are needed.</p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <x-task-status-badge :status="$order->task_status" />
+                        <x-production-status-badge :status="$order->production_status" />
+                    </div>
+                </section>
             @else
                 <section class="jewel-card jewel-card-body sticky top-24">
                     <h2 class="jewel-section-title mb-4">Job Status</h2>
-                    <p class="text-sm text-slate-500">
-                        @if($order->status === \App\Enums\OrderStatus::Ready)
-                            This job is marked ready. No further workshop updates are needed.
-                        @else
-                            This job is no longer open for workshop updates.
-                        @endif
-                    </p>
-                    <div class="mt-4">
-                        <x-order-status-badge :status="$order->status" />
+                    <p class="text-sm text-slate-500">This job is not open for updates at the moment.</p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <x-task-status-badge :status="$order->task_status" />
+                        <x-production-status-badge :status="$order->production_status" />
                     </div>
                 </section>
             @endif

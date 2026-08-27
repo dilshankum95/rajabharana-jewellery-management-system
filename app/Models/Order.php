@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\DesignType;
 use App\Enums\OrderStatus;
+use App\Enums\ProductionStatus;
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,6 +34,8 @@ class Order extends Model
         'contact_phone',
         'delivery_address',
         'status',
+        'task_status',
+        'production_status',
         'estimated_price',
         'admin_notes',
         'assigned_technician_id',
@@ -43,6 +47,8 @@ class Order extends Model
         return [
             'design_type' => DesignType::class,
             'status' => OrderStatus::class,
+            'task_status' => TaskStatus::class,
+            'production_status' => ProductionStatus::class,
             'expected_delivery_date' => 'date',
             'weight_grams' => 'decimal:2',
             'estimated_price' => 'decimal:2',
@@ -56,6 +62,14 @@ class Order extends Model
         static::creating(function (Order $order) {
             if (empty($order->order_number)) {
                 $order->order_number = self::generateOrderNumber();
+            }
+
+            if (empty($order->status)) {
+                $order->status = OrderStatus::Pending;
+            }
+
+            if (empty($order->task_status)) {
+                $order->task_status = TaskStatus::Pending;
             }
         });
     }
@@ -105,21 +119,99 @@ class Order extends Model
             return false;
         }
 
-        if (in_array($this->status, [OrderStatus::Cancelled, OrderStatus::Pending], true)) {
-            return false;
-        }
-
-        if (! in_array($this->status, [
-            OrderStatus::Confirmed,
-            OrderStatus::InProduction,
-            OrderStatus::QualityCheck,
-            OrderStatus::Ready,
-            OrderStatus::Delivered,
-        ], true)) {
+        if ($this->status !== OrderStatus::Accepted) {
             return false;
         }
 
         return $this->hasPrice();
+    }
+
+    public function isAssignableToTechnician(): bool
+    {
+        return $this->status === OrderStatus::Accepted;
+    }
+
+    public function isAssignedTo(User $technician): bool
+    {
+        return $this->assigned_technician_id === $technician->id;
+    }
+
+    public function technicianCanRespondToTask(User $technician): bool
+    {
+        return $this->isAssignedTo($technician)
+            && $this->status === OrderStatus::Accepted
+            && $this->task_status === TaskStatus::Pending;
+    }
+
+    public function technicianCanUpdateProduction(User $technician): bool
+    {
+        return $this->isAssignedTo($technician)
+            && $this->isProductionUpdatable();
+    }
+
+    public function adminCanUpdateProduction(): bool
+    {
+        return $this->status === OrderStatus::Accepted
+            && $this->task_status === TaskStatus::Accepted;
+    }
+
+    public function isProductionUpdatable(): bool
+    {
+        return $this->status === OrderStatus::Accepted
+            && $this->task_status === TaskStatus::Accepted
+            && $this->production_status !== ProductionStatus::ReadyToPickup;
+    }
+
+    public function isValidProductionTransition(?ProductionStatus $newStatus): bool
+    {
+        if ($newStatus === null) {
+            return false;
+        }
+
+        if ($this->production_status === null) {
+            return $newStatus === ProductionStatus::ProductionConfirm;
+        }
+
+        return $this->production_status->next() === $newStatus;
+    }
+
+    /** @return array<string, string> */
+    public function availableProductionStatusOptions(): array
+    {
+        if ($this->production_status === null) {
+            return [
+                ProductionStatus::ProductionConfirm->value => ProductionStatus::ProductionConfirm->label(),
+            ];
+        }
+
+        if ($this->production_status === ProductionStatus::ReadyToPickup) {
+            return [
+                ProductionStatus::ReadyToPickup->value => ProductionStatus::ReadyToPickup->label(),
+            ];
+        }
+
+        $options = [
+            $this->production_status->value => $this->production_status->label(),
+        ];
+
+        $next = $this->production_status->next();
+        if ($next) {
+            $options[$next->value] = $next->label();
+        }
+
+        return $options;
+    }
+
+    /** @return array<string, string> */
+    public function adminAvailableProductionStatusOptions(): array
+    {
+        $options = [];
+
+        foreach (ProductionStatus::orderedSteps() as $step) {
+            $options[$step->value] = $step->label();
+        }
+
+        return $options;
     }
 
     public function getReferenceImageUrlAttribute(): ?string
@@ -151,20 +243,10 @@ class Order extends Model
         return $this->estimated_price !== null;
     }
 
-    /** @return array<int, OrderStatus> */
-    public static function activeDeliveryStatuses(): array
-    {
-        return [
-            OrderStatus::Confirmed,
-            OrderStatus::InProduction,
-            OrderStatus::QualityCheck,
-            OrderStatus::Ready,
-        ];
-    }
-
     public function isActiveForDeliveryTracking(): bool
     {
-        return in_array($this->status, self::activeDeliveryStatuses(), true);
+        return $this->status === OrderStatus::Accepted
+            && $this->production_status !== ProductionStatus::ReadyToPickup;
     }
 
     public function isDeliveryOverdue(): bool
@@ -211,10 +293,11 @@ class Order extends Model
 
     public function scopeActiveForDelivery($query)
     {
-        return $query->whereIn('status', array_map(
-            fn (OrderStatus $status) => $status->value,
-            self::activeDeliveryStatuses()
-        ));
+        return $query->where('status', OrderStatus::Accepted->value)
+            ->where(function ($q) {
+                $q->whereNull('production_status')
+                    ->orWhere('production_status', '!=', ProductionStatus::ReadyToPickup->value);
+            });
     }
 
     public function scopeDeliveryOverdue($query)
@@ -240,108 +323,33 @@ class Order extends Model
             ->whereDate('expected_delivery_date', '<=', today()->addDays($withinDays));
     }
 
-    /** @return array<int, OrderStatus> */
-    public static function technicianAssignableStatuses(): array
-    {
-        return [
-            OrderStatus::Confirmed,
-            OrderStatus::InProduction,
-            OrderStatus::QualityCheck,
-        ];
-    }
-
-    /** @return array<int, OrderStatus> */
-    public static function technicianUpdatableStatuses(): array
-    {
-        return [
-            OrderStatus::InProduction,
-            OrderStatus::QualityCheck,
-            OrderStatus::Ready,
-        ];
-    }
-
-    public function isAssignableToTechnician(): bool
-    {
-        return in_array($this->status, self::technicianAssignableStatuses(), true);
-    }
-
-    public function isAssignedTo(User $technician): bool
-    {
-        return $this->assigned_technician_id === $technician->id;
-    }
-
-    public function technicianCanUpdate(User $technician): bool
-    {
-        return $this->isAssignedTo($technician)
-            && in_array($this->status, [
-                OrderStatus::Confirmed,
-                OrderStatus::InProduction,
-                OrderStatus::QualityCheck,
-            ], true);
-    }
-
-    public function isValidTechnicianStatusTransition(OrderStatus $newStatus): bool
-    {
-        if (! in_array($newStatus, self::technicianUpdatableStatuses(), true)) {
-            return false;
-        }
-
-        $allowed = match ($this->status) {
-            OrderStatus::Confirmed => [
-                OrderStatus::InProduction,
-                OrderStatus::QualityCheck,
-                OrderStatus::Ready,
-            ],
-            OrderStatus::InProduction => [
-                OrderStatus::QualityCheck,
-                OrderStatus::Ready,
-            ],
-            OrderStatus::QualityCheck => [
-                OrderStatus::InProduction,
-                OrderStatus::Ready,
-            ],
-            default => [],
-        };
-
-        return in_array($newStatus, $allowed, true);
-    }
-
     public function scopeAssignedToTechnician($query, int $technicianId)
     {
         return $query->where('assigned_technician_id', $technicianId);
     }
 
-    public function scopeActiveProduction($query)
+    public function scopeOpenTechnicianJobs($query)
     {
-        return $query->whereIn('status', array_map(
-            fn (OrderStatus $status) => $status->value,
-            [
-                OrderStatus::Confirmed,
-                OrderStatus::InProduction,
-                OrderStatus::QualityCheck,
-            ]
-        ));
+        return $query->where('status', OrderStatus::Accepted->value)
+            ->where('task_status', '!=', TaskStatus::Rejected->value);
     }
 
     public function scopeInProductionQueue($query)
     {
-        return $query->whereIn('status', array_map(
-            fn (OrderStatus $status) => $status->value,
-            [
-                OrderStatus::Confirmed,
-                OrderStatus::InProduction,
-                OrderStatus::QualityCheck,
-                OrderStatus::Ready,
-            ]
-        ));
+        return $query->where('status', OrderStatus::Accepted->value);
     }
 
     public function scopeNeedsTechnicianAssignment($query)
     {
-        return $query->whereNull('assigned_technician_id')
-            ->whereIn('status', array_map(
-                fn (OrderStatus $status) => $status->value,
-                self::technicianAssignableStatuses()
-            ));
+        return $query->where('status', OrderStatus::Accepted->value)
+            ->whereNull('assigned_technician_id');
+    }
+
+    public function scopeActiveProduction($query)
+    {
+        return $query->where('status', OrderStatus::Accepted->value)
+            ->where('task_status', TaskStatus::Accepted->value)
+            ->whereNotNull('production_status')
+            ->where('production_status', '!=', ProductionStatus::ReadyToPickup->value);
     }
 }

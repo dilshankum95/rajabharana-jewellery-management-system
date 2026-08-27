@@ -58,7 +58,7 @@
             <div class="min-w-0">
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">In production</p>
                 <p class="mt-1 font-display text-3xl font-semibold text-slate-900">{{ number_format($stats['in_progress']) }}</p>
-                <p class="mt-1 text-xs text-slate-500">Confirmed through quality check</p>
+                <p class="mt-1 text-xs text-slate-500">Accepted orders in production</p>
             </div>
         </div>
 
@@ -67,7 +67,7 @@
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div class="min-w-0">
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Ready for delivery</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Ready to pickup</p>
                 <p class="mt-1 font-display text-3xl font-semibold text-slate-900">{{ number_format($stats['ready_orders']) }}</p>
                 <p class="mt-1 text-xs text-slate-500">Awaiting customer pickup</p>
             </div>

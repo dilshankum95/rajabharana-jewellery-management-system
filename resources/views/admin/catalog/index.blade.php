@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="jewel-page-title text-xl">Inventory</h1>
+                <h1 class="jewel-page-title text-xl">Catalog</h1>
                 <p class="jewel-page-subtitle">Manage catalog items, stock status, and product images</p>
             </div>
             @can('permission', 'catalog.manage')
@@ -49,6 +49,7 @@
                         <th>Gold</th>
                         <th>Weight</th>
                         <th>Price (LKR)</th>
+                        <th>Stock</th>
                         <th>Status</th>
                         <th></th>
                     </tr>
@@ -77,6 +78,11 @@
                             <td>{{ number_format($design->weight_grams, 2) }}g</td>
                             <td class="font-medium">{{ number_format($design->selling_price, 2) }}</td>
                             <td>
+                                <span @class(['font-semibold', 'text-rose-600' => $design->stock_quantity <= 0, 'text-emerald-700' => $design->stock_quantity > 0])>
+                                    {{ $design->stock_quantity }}
+                                </span>
+                            </td>
+                            <td>
                                 <span class="{{ $design->availability_status->badgeClass() }}">
                                     {{ $design->availability_status->label() }}
                                 </span>
@@ -98,7 +104,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center py-12 text-stone-400">
+                            <td colspan="10" class="text-center py-12 text-stone-400">
                                 No catalog items found.
                                 <a href="{{ route('admin.catalog.create') }}" class="jewel-link ml-1">Add the first item</a>
                             </td>

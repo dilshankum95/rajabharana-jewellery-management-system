@@ -1,500 +1,443 @@
 # Whole System Class Diagram — Rajabharana Jewellery System
 
-**Stack:** Laravel 12 · Eloquent ORM · Blade
+**Stack:** Laravel 12 · Eloquent ORM · Blade · MySQL  
+**Mermaid:** 10.9.8 compatible syntax
 
 | Resource | File |
 |----------|------|
 | **Visual (browser)** | [`CLASS_DIAGRAM.html`](CLASS_DIAGRAM.html) |
 | **Architecture overview** | [`SYSTEM_ARCHITECTURE.md`](SYSTEM_ARCHITECTURE.md) |
 
-**Legend:** ✅ Implemented · 🔜 Planned (Sprint 9–10)
+**Legend:** `#field` = computed accessor (not stored in DB)
 
 ---
 
-## Layer overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Presentation — Controllers + Form Requests + Middleware    │
-├─────────────────────────────────────────────────────────────┤
-│  Domain — Eloquent Models + Enums                           │
-├─────────────────────────────────────────────────────────────┤
-│  Support — Rbac, ValidationRules, Rules                     │
-├─────────────────────────────────────────────────────────────┤
-│  Database — MySQL tables (8 implemented, 7 planned)         │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Figure 1 — Domain model (Models + relationships) ✅
+## Figure 1 — User and Authentication
 
 ```mermaid
 classDiagram
     direction TB
-
     class User {
-        <<Model ✅>>
-        +bigint id
-        +string name
-        +string email
-        +UserRole role
-        +string phone
-        +string address
-        +string city
+        <<Model>>
+        +id bigint
+        +name string
+        +email string
+        +email_verified_at timestamp
+        +password string
+        +remember_token string
+        +role UserRole
+        +phone string
+        +address string
+        +city string
+        +profile_photo_path string
+        +created_at timestamp
+        +updated_at timestamp
+        #profile_photo_url string
+        #initials string
         +orders() HasMany
+        +invoices() HasMany
         +assignedOrders() HasMany
-        +hasPermission(string) bool
-        +isCustomer() bool
-        +isTechnician() bool
+        +hasPermission() bool
     }
+    class UserRole {
+        <<enum>>
+        +Customer
+        +Admin
+        +Manager
+        +Staff
+        +Technician
+    }
+    User --> UserRole : role
+```
 
+---
+
+## Figure 2 — Catalog and Inventory
+
+```mermaid
+classDiagram
+    direction TB
     class CatalogDesign {
-        <<Model ✅>>
-        +bigint id
-        +string name
-        +string code
-        +string category
-        +AvailabilityStatus availability_status
-        +decimal selling_price
+        <<Model>>
+        +id bigint
+        +name string
+        +code string
+        +description text
+        +category string
+        +gold_quality string
+        +weight_grams decimal
+        +selling_price decimal
+        +availability_status AvailabilityStatus
+        +created_at timestamp
+        +updated_at timestamp
+        #image_url string
         +images() HasMany
         +orders() HasMany
-        +isAvailable() bool
     }
-
     class CatalogImage {
-        <<Model ✅>>
-        +bigint id
-        +bigint catalog_design_id
-        +string image_path
-        +bool is_primary
+        <<Model>>
+        +id bigint
+        +catalog_design_id bigint
+        +image_path string
+        +sort_order int
+        +is_primary bool
+        +created_at timestamp
+        +updated_at timestamp
+        #url string
         +catalogDesign() BelongsTo
     }
+    class AvailabilityStatus {
+        <<enum>>
+        +Available
+        +OutOfStock
+    }
+    CatalogDesign "1" --> "*" CatalogImage
+    CatalogDesign --> AvailabilityStatus
+```
 
+---
+
+## Figure 3 — Order and Production
+
+```mermaid
+classDiagram
+    direction TB
     class Order {
-        <<Model ✅>>
-        +bigint id
-        +string order_number
-        +bigint user_id
-        +bigint catalog_design_id
-        +DesignType design_type
-        +OrderStatus status
-        +bigint assigned_technician_id
+        <<Model>>
+        +id bigint
+        +order_number string
+        +user_id bigint
+        +design_type DesignType
+        +catalog_design_id bigint
+        +reference_image_path string
+        +item_type string
+        +item_name string
+        +size string
+        +weight_grams decimal
+        +specifications text
+        +gold_quality string
+        +gemstone_type string
+        +gemstone_details text
+        +quantity int
+        +special_instructions text
+        +expected_delivery_date date
+        +contact_phone string
+        +delivery_address text
+        +status OrderStatus
+        +estimated_price decimal
+        +admin_notes text
+        +assigned_technician_id bigint
+        +assigned_at datetime
+        +created_at timestamp
+        +updated_at timestamp
         +user() BelongsTo
         +catalogDesign() BelongsTo
         +assignedTechnician() BelongsTo
         +productionLogs() HasMany
-        +generateOrderNumber() string
+        +invoice() HasOne
     }
-
     class ProductionLog {
-        <<Model ✅>>
-        +bigint id
-        +bigint order_id
-        +bigint user_id
-        +OrderStatus from_status
-        +OrderStatus to_status
+        <<Model>>
+        +id bigint
+        +order_id bigint
+        +user_id bigint
+        +from_status OrderStatus
+        +to_status OrderStatus
+        +note text
+        +created_at timestamp
+        +updated_at timestamp
         +order() BelongsTo
         +user() BelongsTo
     }
-
-    class MetalPrice {
-        <<Model ✅>>
-        +bigint id
-        +decimal gold_price_per_gram
-        +decimal silver_price_per_gram
-        +date price_date
-        +bigint updated_by
-        +updatedBy() BelongsTo
-        +current() MetalPrice
-        +upsertCurrent() MetalPrice
+    class DesignType {
+        <<enum>>
+        +Catalog
+        +Custom
     }
-
+    class OrderStatus {
+        <<enum>>
+        +Pending
+        +Confirmed
+        +InProduction
+        +QualityCheck
+        +Ready
+        +Delivered
+        +Cancelled
+    }
     User "1" --> "*" Order : places
     User "1" --> "*" Order : assigned_to
-    User "1" --> "*" ProductionLog : records
-    User "1" --> "*" MetalPrice : updates
-    CatalogDesign "1" --> "*" CatalogImage : has
-    CatalogDesign "1" --> "*" Order : referenced_by
-    Order "1" --> "*" ProductionLog : has_logs
+    CatalogDesign "1" --> "*" Order
+    Order "1" --> "*" ProductionLog
+    Order --> DesignType
+    Order --> OrderStatus
 ```
 
 ---
 
-## Figure 2 — Enums ✅
+## Figure 4 — Billing and Payment
+
+```mermaid
+classDiagram
+    direction TB
+    class Invoice {
+        <<Model>>
+        +id bigint
+        +invoice_number string
+        +order_id bigint
+        +customer_id bigint
+        +subtotal decimal
+        +making_charge decimal
+        +discount decimal
+        +discount_percent decimal
+        +tax decimal
+        +tax_rate_percent decimal
+        +grand_total decimal
+        +invoice_status InvoiceStatus
+        +issue_date date
+        +due_date date
+        +notes text
+        +created_by bigint
+        +created_at timestamp
+        +updated_at timestamp
+        #amount_paid float
+        #balance_due float
+        +items() HasMany
+        +payments() HasMany
+    }
+    class InvoiceItem {
+        <<Model>>
+        +id bigint
+        +invoice_id bigint
+        +order_id bigint
+        +description string
+        +quantity int
+        +unit_price decimal
+        +line_total decimal
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class Payment {
+        <<Model>>
+        +id bigint
+        +invoice_id bigint
+        +payment_method string
+        +payment_amount decimal
+        +payment_status PaymentStatus
+        +payment_date date
+        +transaction_reference string
+        +notes text
+        +recorded_by bigint
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class PaymentMethod {
+        <<Model>>
+        +id bigint
+        +code string
+        +label string
+        +is_active bool
+        +requires_reference bool
+        +sort_order int
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class InvoiceStatus {
+        <<enum>>
+        +Draft
+        +Issued
+        +Partial
+        +Paid
+        +Cancelled
+        +Overdue
+    }
+    class PaymentStatus {
+        <<enum>>
+        +Completed
+        +Pending
+        +Failed
+        +Refunded
+    }
+    Order "1" --> "0..1" Invoice
+    Invoice "1" --> "*" InvoiceItem
+    Invoice "1" --> "*" Payment
+    PaymentMethod "1" --> "*" Payment
+    User "1" --> "*" Invoice : customer
+    User "1" --> "*" Payment : recorded_by
+    Invoice --> InvoiceStatus
+    Payment --> PaymentStatus
+```
+
+---
+
+## Figure 5 — Settings and Services
+
+```mermaid
+classDiagram
+    direction TB
+    class MetalPrice {
+        <<Model>>
+        +id bigint
+        +gold_price_per_gram decimal
+        +silver_price_per_gram decimal
+        +price_date date
+        +updated_by bigint
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class BillingSetting {
+        <<Model>>
+        +id bigint
+        +tax_rate_percent decimal
+        +updated_by bigint
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class CategoryDiscount {
+        <<Model>>
+        +id bigint
+        +category_code string
+        +discount_percent decimal
+        +is_active bool
+        +updated_by bigint
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class InvoiceService {
+        <<Service>>
+        +createDraftFromOrder()
+        +updateDraft()
+        +issue()
+        +cancel()
+    }
+    class InvoiceCalculator {
+        <<Service>>
+        +calculate()
+        +applyToInvoice()
+    }
+    class PaymentService {
+        <<Service>>
+        +recordPayment()
+        +syncInvoiceStatus()
+    }
+    class Rbac {
+        <<Support>>
+        +userHasPermission() bool
+        +permissionsForRole() array
+    }
+    User "1" --> "*" MetalPrice
+    User "1" --> "*" BillingSetting
+    User "1" --> "*" CategoryDiscount
+    InvoiceService ..> InvoiceCalculator
+    InvoiceCalculator ..> BillingSetting
+    InvoiceCalculator ..> CategoryDiscount
+    PaymentService ..> Payment
+```
+
+---
+
+## Figure 6 — Notifications
+
+```mermaid
+classDiagram
+    direction TB
+    class DatabaseNotification {
+        <<Table>>
+        +id uuid
+        +type string
+        +notifiable_type string
+        +notifiable_id bigint
+        +data json
+        +read_at timestamp
+        +created_at timestamp
+        +updated_at timestamp
+    }
+    class InvoiceIssuedNotification {
+        <<Notification>>
+        +invoice Invoice
+        +toArray() array
+    }
+    class PaymentReceivedNotification {
+        <<Notification>>
+        +invoice Invoice
+        +payment Payment
+        +toArray() array
+    }
+    User "1" --> "*" DatabaseNotification
+    InvoiceIssuedNotification ..> Invoice
+    PaymentReceivedNotification ..> Payment
+```
+
+---
+
+## Figure 7 — RBAC Permission Enum
 
 ```mermaid
 classDiagram
     direction LR
-
-    class UserRole {
-        <<enum ✅>>
-        Customer
-        Admin
-        Manager
-        Staff
-        Technician
-        +label() string
-        +isPanelRole() bool
-    }
-
     class Permission {
-        <<enum ✅>>
-        DashboardView
-        OrdersView
-        OrdersManage
-        CustomersView
-        CatalogView
-        CatalogManage
-        MetalPricesManage
-        UsersManage
-        ProductionView
-        ProductionAssign
-        ProductionManage
-        +label() string
+        <<enum>>
+        +DashboardView
+        +OrdersView
+        +OrdersManage
+        +CustomersView
+        +CatalogView
+        +CatalogManage
+        +MetalPricesManage
+        +UsersManage
+        +ProductionView
+        +ProductionAssign
+        +ProductionManage
+        +BillingView
+        +BillingManage
+        +BillingSettings
     }
-
-    class OrderStatus {
-        <<enum ✅>>
-        Pending
-        Confirmed
-        InProduction
-        QualityCheck
-        Ready
-        Delivered
-        Cancelled
-        +label() string
-    }
-
-    class DesignType {
-        <<enum ✅>>
-        Catalog
-        Custom
-    }
-
-    class AvailabilityStatus {
-        <<enum ✅>>
-        Available
-        OutOfStock
-    }
-
-    User --> UserRole : role
-    Order --> OrderStatus : status
-    Order --> DesignType : design_type
-    CatalogDesign --> AvailabilityStatus : availability_status
-    User ..> Permission : checked via Rbac
+    User ..> Permission
+    Rbac ..> Permission
 ```
 
 ---
 
-## Figure 3 — Controllers by module ✅
+## Figure 8 — Domain Overview
 
 ```mermaid
 classDiagram
     direction TB
-
-    class Controller {
-        <<abstract>>
-    }
-
-    class AuthenticatedSessionController {
-        <<Auth ✅>>
-        +create() View
-        +store() RedirectResponse
-        +destroy() RedirectResponse
-    }
-
-    class RegisteredUserController {
-        <<Auth ✅>>
-        +create() View
-        +store() RedirectResponse
-    }
-
-    class CatalogController {
-        <<Public ✅>>
-        +index() View
-        +show() View
-        +purchase() View
-    }
-
-    class OrderController {
-        <<Customer ✅>>
-        +index() View
-        +create() View
-        +store() RedirectResponse
-        +show() View
-        +cancel() RedirectResponse
-    }
-
-    class DashboardController {
-        <<Customer ✅>>
-        +__invoke() View
-    }
-
-    class AdminDashboardController {
-        <<Admin ✅>>
-        +__invoke() View
-    }
-
-    class AdminOrderController {
-        <<Admin ✅>>
-        +index() View
-        +show() View
-        +update() RedirectResponse
-    }
-
-    class OrderAssignmentController {
-        <<Admin ✅>>
-        +update() RedirectResponse
-    }
-
-    class CatalogDesignController {
-        <<Admin ✅>>
-        +index() create() store()
-        +edit() update() destroy()
-    }
-
-    class CustomerController {
-        <<Admin ✅>>
-        +index() View
-        +show() View
-    }
-
-    class WorkshopController {
-        <<Admin ✅>>
-        +index() View
-        +technicians() View
-    }
-
-    class MetalPriceController {
-        <<Admin ✅>>
-        +edit() View
-        +update() RedirectResponse
-    }
-
-    class StaffUserController {
-        <<Admin ✅>>
-        +index() create() store()
-        +edit() update() destroy()
-    }
-
-    class TechnicianDashboardController {
-        <<Technician ✅>>
-        +__invoke() View
-    }
-
-    class TechnicianJobController {
-        <<Technician ✅>>
-        +show() View
-        +update() RedirectResponse
-    }
-
-    class ProfileController {
-        <<Shared ✅>>
-        +edit() update() destroy()
-    }
-
-    Controller <|-- AuthenticatedSessionController
-    Controller <|-- RegisteredUserController
-    Controller <|-- CatalogController
-    Controller <|-- OrderController
-    Controller <|-- DashboardController
-    Controller <|-- AdminDashboardController
-    Controller <|-- AdminOrderController
-    Controller <|-- OrderAssignmentController
-    Controller <|-- CatalogDesignController
-    Controller <|-- CustomerController
-    Controller <|-- WorkshopController
-    Controller <|-- MetalPriceController
-    Controller <|-- StaffUserController
-    Controller <|-- TechnicianDashboardController
-    Controller <|-- TechnicianJobController
-    Controller <|-- ProfileController
-
-    OrderController ..> Order : uses
-    OrderController ..> CatalogDesign : uses
-    AdminOrderController ..> Order : uses
-    OrderAssignmentController ..> Order : uses
-    OrderAssignmentController ..> ProductionLog : creates
-    TechnicianJobController ..> Order : uses
-    TechnicianJobController ..> ProductionLog : creates
-    CatalogDesignController ..> CatalogDesign : uses
-    CatalogDesignController ..> CatalogImage : uses
-    MetalPriceController ..> MetalPrice : uses
-    StaffUserController ..> User : uses
+    User --> Order
+    User --> Invoice
+    User --> Payment
+    User --> ProductionLog
+    User --> MetalPrice
+    User --> BillingSetting
+    User --> CategoryDiscount
+    CatalogDesign --> CatalogImage
+    CatalogDesign --> Order
+    Order --> ProductionLog
+    Order --> Invoice
+    Invoice --> InvoiceItem
+    Invoice --> Payment
+    PaymentMethod --> Payment
 ```
 
 ---
 
-## Figure 4 — Security & RBAC ✅
+## Entity attribute summary (all tables)
 
-```mermaid
-classDiagram
-    direction TB
-
-    class EnsureCustomer {
-        <<Middleware ✅>>
-        +handle(Request, Closure) Response
-    }
-
-    class EnsureAdmin {
-        <<Middleware ✅>>
-        +handle(Request, Closure) Response
-    }
-
-    class EnsureTechnician {
-        <<Middleware ✅>>
-        +handle(Request, Closure) Response
-    }
-
-    class EnsurePermission {
-        <<Middleware ✅>>
-        +handle(Request, Closure, permissions) Response
-    }
-
-    class Rbac {
-        <<Support ✅>>
-        +permissionsForRole(UserRole) array
-        +userHasPermission(User, string) bool
-        +userHasAnyPermission(User, array) bool
-    }
-
-    class User {
-        <<Model>>
-        +hasPermission(string) bool
-        +hasAnyPermission(array) bool
-    }
-
-    EnsurePermission ..> User : checks
-    EnsurePermission ..> Rbac : uses
-    User ..> Rbac : delegates
-    Rbac ..> Permission : maps via config/rbac.php
-    User --> UserRole : role
-```
+| Entity | Attributes |
+|--------|------------|
+| **users** | id, name, email, email_verified_at, password, remember_token, role, phone, address, city, profile_photo_path, created_at, updated_at |
+| **catalog_designs** | id, name, code, description, category, gold_quality, weight_grams, selling_price, availability_status, created_at, updated_at |
+| **catalog_images** | id, catalog_design_id, image_path, sort_order, is_primary, created_at, updated_at |
+| **orders** | id, order_number, user_id, design_type, catalog_design_id, reference_image_path, item_type, item_name, size, weight_grams, specifications, gold_quality, gemstone_type, gemstone_details, quantity, special_instructions, expected_delivery_date, contact_phone, delivery_address, status, estimated_price, admin_notes, assigned_technician_id, assigned_at, created_at, updated_at |
+| **production_logs** | id, order_id, user_id, from_status, to_status, note, created_at, updated_at |
+| **metal_prices** | id, gold_price_per_gram, silver_price_per_gram, price_date, updated_by, created_at, updated_at |
+| **invoices** | id, invoice_number, order_id, customer_id, subtotal, making_charge, discount, discount_percent, tax, tax_rate_percent, grand_total, invoice_status, issue_date, due_date, notes, created_by, created_at, updated_at |
+| **invoice_items** | id, invoice_id, order_id, description, quantity, unit_price, line_total, created_at, updated_at |
+| **payments** | id, invoice_id, payment_method, payment_amount, payment_status, payment_date, transaction_reference, notes, recorded_by, created_at, updated_at |
+| **payment_methods** | id, code, label, is_active, requires_reference, sort_order, created_at, updated_at |
+| **billing_settings** | id, tax_rate_percent, updated_by, created_at, updated_at |
+| **category_discounts** | id, category_code, discount_percent, is_active, updated_by, created_at, updated_at |
+| **notifications** | id, type, notifiable_type, notifiable_id, data, read_at, created_at, updated_at |
 
 ---
 
-## Figure 5 — Planned domain classes 🔜
-
-```mermaid
-classDiagram
-    direction TB
-
-    class Invoice {
-        <<Model 🔜>>
-        +bigint id
-        +string invoice_number
-        +bigint order_id
-        +bigint user_id
-        +decimal grand_total
-        +order() BelongsTo
-        +user() BelongsTo
-        +items() HasMany
-        +payments() HasMany
-    }
-
-    class InvoiceItem {
-        <<Model 🔜>>
-        +bigint id
-        +bigint invoice_id
-        +bigint order_id
-        +decimal line_total
-        +invoice() BelongsTo
-    }
-
-    class Payment {
-        <<Model 🔜>>
-        +bigint id
-        +bigint invoice_id
-        +bigint payment_method_id
-        +decimal amount
-        +invoice() BelongsTo
-        +paymentMethod() BelongsTo
-    }
-
-    class PaymentMethod {
-        <<Model 🔜>>
-        +bigint id
-        +string code
-        +string label
-        +payments() HasMany
-    }
-
-    class Notification {
-        <<Model 🔜>>
-        +uuid id
-        +bigint user_id
-        +string type
-        +json data
-        +user() BelongsTo
-    }
-
-    class Category {
-        <<Model 🔜>>
-        +bigint id
-        +string name
-        +string slug
-        +catalogDesigns() HasMany
-    }
-
-    class ReportExport {
-        <<Model 🔜>>
-        +bigint id
-        +string report_type
-        +bigint generated_by
-        +generatedBy() BelongsTo
-    }
-
-    Order "1" --> "0..1" Invoice : generates
-    User "1" --> "*" Invoice : billed_to
-    Invoice "1" --> "*" InvoiceItem : contains
-    Invoice "1" --> "*" Payment : receives
-    PaymentMethod "1" --> "*" Payment : uses
-    User "1" --> "*" Notification : receives
-    Category "1" --> "*" CatalogDesign : categorizes
-    User "1" --> "*" ReportExport : generates
-```
-
----
-
-## Module → classes map
-
-| Module | Models ✅ | Controllers ✅ | Planned 🔜 |
-|--------|-----------|----------------|------------|
-| M1 Auth | User | Auth/*, ProfileController | — |
-| M2 Customer | User, Order | Customer/* | — |
-| M3 Catalogue | CatalogDesign, CatalogImage | CatalogController, Admin\CatalogDesignController | Category |
-| M4 Orders | Order | Customer\OrderController, Admin\OrderController | — |
-| M5 Workshop | Order, ProductionLog | WorkshopController, OrderAssignmentController, Technician/* | — |
-| M6 Inventory | CatalogDesign | CatalogDesignController | Category |
-| M7 Metal Price | MetalPrice | MetalPriceController | — |
-| M8 Billing | — | — | Invoice, InvoiceItem |
-| M9 Payment | — | — | Payment, PaymentMethod |
-| M10 Notification | — | — | Notification |
-| M11 RBAC | User + Rbac + Enums | Middleware | — |
-| M12 Reports | — | — | ReportExport, ReportService |
-
----
-
-## Form Request classes (validation layer) ✅
-
-| Request | Used by |
-|---------|---------|
-| `LoginRequest`, `RegisterRequest` | Auth |
-| `StoreOrderRequest` | Customer orders |
-| `UpdateOrderRequest`, `AssignTechnicianRequest` | Admin orders |
-| `StoreCatalogDesignRequest`, `UpdateCatalogDesignRequest` | Admin catalog |
-| `UpdateMetalPriceRequest` | Metal prices |
-| `StoreStaffUserRequest`, `UpdateStaffUserRequest` | Staff users |
-| `UpdateProductionJobRequest` | Technician jobs |
-| `ProfileUpdateRequest`, `DeleteAccountRequest` | Profile |
-
----
-
-## Viva one-liner
-
-> **The system uses a layered Laravel architecture: Controllers call Form Requests for validation, Eloquent Models represent 6 implemented domain entities (User, Order, CatalogDesign, CatalogImage, ProductionLog, MetalPrice), Enums define statuses and roles, and Rbac + Middleware enforce permissions. Billing, Payment, Notification, and Reports classes are planned but not yet coded.**
-
----
-
-*Open [`CLASS_DIAGRAM.html`](CLASS_DIAGRAM.html) for printable diagrams.*
+*Open [`CLASS_DIAGRAM.html`](CLASS_DIAGRAM.html) for printable browser view.*

@@ -12,6 +12,8 @@
 
     <x-delivery-alert :order="$order" class="mb-6" />
 
+    @include('admin.orders.partials.workflow-panel')
+
     <div class="grid lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             {{-- Customer --}}
@@ -161,7 +163,7 @@
                         @elseif(! $order->hasPrice())
                             Set an order price before generating an invoice.
                         @elseif($order->status === \App\Enums\OrderStatus::Pending)
-                            Confirm the order before generating an invoice.
+                            Accept the order before generating an invoice.
                         @else
                             Invoice not available for this order status.
                         @endif
@@ -177,15 +179,24 @@
                     @csrf
                     @method('PATCH')
 
-                    <div>
-                        <label for="status" class="jewel-label">Status *</label>
-                        <select id="status" name="status" required class="jewel-input mt-1.5">
-                            @foreach($statuses as $value => $label)
-                                <option value="{{ $value }}" @selected(old('status', $order->status->value) === $value)>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('status')" class="mt-1" />
-                    </div>
+                    @if(auth()->user()->isAdmin())
+                        <div>
+                            <label for="status" class="jewel-label">Order Status *</label>
+                            <select id="status" name="status" required class="jewel-input mt-1.5">
+                                @foreach($statuses as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('status', $order->status->value) === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-400">Only administrators can change order status.</p>
+                            <x-input-error :messages="$errors->get('status')" class="mt-1" />
+                        </div>
+                    @else
+                        <div>
+                            <label class="jewel-label">Order Status</label>
+                            <div class="mt-1.5"><x-order-status-badge :status="$order->status" /></div>
+                            <p class="mt-1 text-xs text-gray-400">Contact an administrator to accept or reject this order.</p>
+                        </div>
+                    @endif
 
                     <div>
                         <label for="expected_delivery_date" class="jewel-label">Expected Delivery Date *</label>
@@ -198,15 +209,29 @@
                         <x-input-error :messages="$errors->get('expected_delivery_date')" class="mt-1" />
                     </div>
 
-                    <div>
-                        <label for="estimated_price" class="jewel-label">Order Price (LKR)</label>
-                        <input id="estimated_price" name="estimated_price" type="number" step="0.01" min="0.01" max="99999999.99"
-                            value="{{ old('estimated_price', $order->estimated_price) }}"
-                            placeholder="Enter or adjust order price"
-                            class="jewel-input mt-1.5">
-                        <p class="mt-1 text-xs text-gray-400">Adjust if specifications differ from catalog. Customer sees this total on their order.</p>
-                        <x-input-error :messages="$errors->get('estimated_price')" class="mt-1" />
-                    </div>
+                    @if(auth()->user()->isAdmin())
+                        <div>
+                            <label for="estimated_price" class="jewel-label">Order Price (LKR)</label>
+                            <input id="estimated_price" name="estimated_price" type="number" step="0.01" min="0.01" max="99999999.99"
+                                value="{{ old('estimated_price', $order->estimated_price) }}"
+                                placeholder="Enter or adjust order price"
+                                class="jewel-input mt-1.5">
+                            <p class="mt-1 text-xs text-gray-400">Adjust if specifications differ from catalog. Customer sees this total on their order.</p>
+                            <x-input-error :messages="$errors->get('estimated_price')" class="mt-1" />
+                        </div>
+                    @else
+                        <div>
+                            <label class="jewel-label">Order Price (LKR)</label>
+                            @if($order->hasPrice())
+                                <p class="mt-1.5 font-display text-xl font-semibold text-jewel-gold-dark">
+                                    LKR {{ number_format($order->estimated_price, 2) }}
+                                </p>
+                            @else
+                                <p class="mt-1.5 text-sm text-amber-600 font-medium">No price set yet</p>
+                            @endif
+                            <p class="mt-1 text-xs text-gray-400">Contact an administrator to set or change the order price.</p>
+                        </div>
+                    @endif
 
                     <div>
                         <label for="admin_notes" class="jewel-label">Internal Notes</label>
@@ -222,75 +247,12 @@
             @else
             <section class="jewel-card jewel-card-body sticky top-24">
                 <h2 class="jewel-section-title mb-4">Order Status</h2>
-                <p class="text-sm text-slate-500">You have view-only access to this order. Contact a manager or administrator to update status or pricing.</p>
+                <p class="text-sm text-slate-500">You have view-only access to this order. Contact an administrator to update status or pricing.</p>
                 <div class="mt-4">
                     <x-order-status-badge :status="$order->status" />
                 </div>
             </section>
             @endcan
-
-            @can('permission', 'production.assign')
-            <section class="jewel-card jewel-card-body">
-                <h2 class="jewel-section-title mb-4">Workshop Assignment</h2>
-
-                @if($order->assignedTechnician)
-                    <p class="text-sm text-slate-600 mb-4">
-                        Currently assigned to
-                        <span class="font-medium">{{ $order->assignedTechnician->name }}</span>
-                        @if($order->assigned_at)
-                            <span class="text-slate-400">since {{ $order->assigned_at->format('M d, Y') }}</span>
-                        @endif
-                    </p>
-                @elseif(! $order->isAssignableToTechnician())
-                    <p class="text-sm text-slate-500 mb-4">Assign a technician once the order is confirmed and in active production.</p>
-                @else
-                    <p class="text-sm text-slate-500 mb-4">No technician assigned yet.</p>
-                @endif
-
-                @if($technicians->isEmpty())
-                    <x-alert type="warning">No technician accounts exist. Create one under Staff Accounts first.</x-alert>
-                @elseif($order->isAssignableToTechnician() || $order->assignedTechnician)
-                    <form method="POST" action="{{ route('admin.orders.assign-technician', $order) }}" class="space-y-3">
-                        @csrf
-                        @method('PATCH')
-                        <div>
-                            <label for="assigned_technician_id" class="jewel-label">Technician</label>
-                            <select id="assigned_technician_id" name="assigned_technician_id" class="jewel-input mt-1.5">
-                                <option value="">— Unassigned —</option>
-                                @foreach($technicians as $technician)
-                                    <option value="{{ $technician->id }}" @selected(old('assigned_technician_id', $order->assigned_technician_id) == $technician->id)>
-                                        {{ $technician->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('assigned_technician_id')" class="mt-1" />
-                        </div>
-                        <button type="submit" class="jewel-btn-outline w-full">Update Assignment</button>
-                    </form>
-                @endif
-            </section>
-            @endcan
-
-            @if($order->productionLogs->isNotEmpty())
-            <section class="jewel-card jewel-card-body">
-                <h2 class="jewel-section-title mb-4">Production Log</h2>
-                <ol class="space-y-3 text-sm max-h-64 overflow-y-auto">
-                    @foreach($order->productionLogs as $log)
-                        <li class="border-l-2 border-jewel-gold/30 pl-3">
-                            <p class="font-medium text-slate-700">
-                                {{ $log->created_at->format('M d, h:i A') }}
-                                @if($log->from_status && $log->to_status && $log->from_status !== $log->to_status)
-                                    · {{ $log->from_status->label() }} → {{ $log->to_status->label() }}
-                                @endif
-                            </p>
-                            @if($log->note)
-                                <p class="mt-0.5 text-slate-500">{{ $log->note }}</p>
-                            @endif
-                        </li>
-                    @endforeach
-                </ol>
-            </section>
-            @endif
         </div>
     </div>
 </x-admin-layout>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Registration Module Implementation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; font-size: 13px; line-height: 1.55; }
+        h1 { text-align: center; font-size: 1.35rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 24px; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; max-width: 960px; margin-left: auto; margin-right: auto; }
+        h2 { font-size: 1rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; color: #0f172a; }
+        h3 { font-size: 0.9rem; margin: 14px 0 8px; color: #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 16px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 600; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 12px 14px; border-radius: 6px; font-size: 0.78rem; overflow-x: auto; line-height: 1.45; }
+        code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; }
+        pre code { background: none; padding: 0; color: inherit; }
+        .report-text { background: #f8fafc; border-left: 4px solid #b8860b; padding: 14px 16px; font-size: 0.88rem; line-height: 1.7; }
+        .wrap { overflow: auto; }
+        .mvc-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; white-space: pre; line-height: 1.6; }
+        @media print { body { background: #fff; padding: 0; } .page { border: none; } }
+    </style>
+</head>
+<body>
+    <h1>Registration (Sign Up) Module — Implementation</h1>
+    <p class="sub">MVC Flow · Form Request · Middleware · RBAC · Database · Section 6.3</p>
+
+    <div class="page">
+        <h2>1. MVC Layers in Registration</h2>
+        <table>
+            <tr><th>Layer</th><th>File</th><th>Role</th></tr>
+            <tr><td><strong>View</strong></td><td><code>resources/views/auth/register.blade.php</code></td><td>HTML form with CSRF, fields, error display</td></tr>
+            <tr><td><strong>Form Request</strong></td><td><code>app/Http/Requests/Auth/RegisterRequest.php</code></td><td>Validates input <em>before</em> controller runs</td></tr>
+            <tr><td><strong>Controller</strong></td><td><code>app/Http/Controllers/Auth/RegisteredUserController.php</code></td><td>Show form; create user; login; redirect</td></tr>
+            <tr><td><strong>Model</strong></td><td><code>app/Models/User.php</code></td><td>Eloquent ORM → INSERT into <code>users</code></td></tr>
+            <tr><td><strong>Database</strong></td><td>MySQL tables <code>users</code>, <code>sessions</code></td><td>Persistent storage</td></tr>
+        </table>
+    </div>
+
+    <div class="page wrap">
+        <h2>2. Complete Request Flow</h2>
+        <div class="mermaid">
+sequenceDiagram
+    participant Browser
+    participant Router
+    participant GuestMW as guest middleware
+    participant Controller as RegisteredUserController
+    participant FormReq as RegisterRequest
+    participant Model as User Model
+    participant DB as MySQL users table
+
+    Browser->>Router: GET /register
+    Router->>GuestMW: Check not logged in
+    GuestMW->>Controller: create()
+    Controller->>Browser: View auth/register
+
+    Browser->>Router: POST /register + CSRF
+    Router->>GuestMW: Check not logged in
+    GuestMW->>Controller: store(RegisterRequest)
+    Controller->>FormReq: Auto-validate first
+    FormReq->>FormReq: trim + rules + unique email query
+    alt Validation fails
+        FormReq->>Browser: Redirect back with errors
+    else Validation passes
+        Controller->>Model: User::create(role=customer)
+        Model->>DB: INSERT INTO users
+        Controller->>Browser: Auth::login → redirect /dashboard
+    end
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>3. Routes &amp; Middleware (Registration)</h2>
+        <pre><code>// routes/auth.php
+Route::middleware('guest')->group(function () {
+    Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('register', [RegisteredUserController::class, 'store']);
+});</code></pre>
+        <table>
+            <tr><th>Middleware</th><th>When</th><th>Action</th></tr>
+            <tr><td><code>guest</code></td><td>GET/POST /register</td><td>Only unauthenticated users; redirect if already logged in</td></tr>
+            <tr><td><code>auth</code></td><td>After login (/dashboard)</td><td>Must be logged in</td></tr>
+            <tr><td><code>verified</code></td><td>After login</td><td>Email must be verified</td></tr>
+            <tr><td><code>customer</code></td><td>Customer routes</td><td>Role must be Customer</td></tr>
+        </table>
+    </div>
+
+    <div class="page">
+        <h2>4. Form Request — Validation Before Controller</h2>
+        <pre><code>class RegisterRequest extends FormRequest
+{
+    public function authorize(): bool { return true; }
+
+    protected function prepareForValidation(): void
+    {
+        $this->trimStrings(['name', 'email', 'phone', 'address', 'city']);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'name'     => ValidationRules::personName(),
+            'email'    => ValidationRules::uniqueEmail(),  // queries users table
+            'phone'    => ValidationRules::phone(required: true),
+            'address'  => ValidationRules::address(required: true),
+            'city'     => ValidationRules::city(required: true),
+            'password' => ValidationRules::password(),
+        ];
+    }
+}</code></pre>
+        <p>When controller method is <code>store(RegisterRequest $request)</code>, Laravel runs validation <strong>automatically</strong>. If any rule fails, the controller never executes — user is redirected back with error messages.</p>
+    </div>
+
+    <div class="page">
+        <h2>5. Controller — Business Logic</h2>
+        <pre><code>public function store(RegisterRequest $request): RedirectResponse
+{
+    $validated = $request->validated();
+
+    $user = User::create([
+        'name'     => $validated['name'],
+        'email'    => $validated['email'],
+        'phone'    => $validated['phone'],
+        'address'  => $validated['address'],
+        'city'     => $validated['city'],
+        'password' => Hash::make($validated['password']),
+        'role'     => 'customer',   // RBAC role assignment
+    ]);
+
+    event(new Registered($user));
+    Auth::login($user);
+
+    return redirect()->intended(route('dashboard'));
+}</code></pre>
+    </div>
+
+    <div class="page">
+        <h2>6. Model &amp; Database Query</h2>
+        <p><code>User::create()</code> generates SQL via Eloquent ORM:</p>
+        <pre><code>INSERT INTO users (name, email, phone, address, city, password, role, created_at, updated_at)
+VALUES ('John Doe', 'john@example.com', '0771234567', '123 Main St', 'Colombo',
+        '$2y$12$...bcrypt...', 'customer', NOW(), NOW());</code></pre>
+        <h3>users table columns (registration)</h3>
+        <table>
+            <tr><th>Column</th><th>Source</th></tr>
+            <tr><td>id</td><td>Auto increment</td></tr>
+            <tr><td>name, email, phone, address, city</td><td>Form input (validated)</td></tr>
+            <tr><td>password</td><td>Bcrypt hashed</td></tr>
+            <tr><td>role</td><td>Hardcoded <code>customer</code></td></tr>
+            <tr><td>email_verified_at</td><td>NULL until verified</td></tr>
+        </table>
+    </div>
+
+    <div class="page wrap">
+        <h2>7. RBAC After Registration</h2>
+        <div class="mermaid">
+flowchart LR
+    A[POST /register] --> B[role = customer]
+    B --> C[Auth::login]
+    C --> D[GET /dashboard]
+    D --> E[auth middleware]
+    E --> F[verified middleware]
+    F --> G[customer middleware]
+    G --> H[DashboardController]
+        </div>
+        <h3>EnsureCustomer middleware</h3>
+        <pre><code>if ($user->role !== UserRole::Customer) {
+    // Staff → admin dashboard; Technician → workshop dashboard
+    return redirect(...);
+}
+return $next($request);  // Customer allowed</code></pre>
+        <p><strong>Important:</strong> Public registration always creates <code>customer</code> role. Staff/admin accounts are created only by Administrator via staff management — not via public signup.</p>
+    </div>
+
+    <div class="page">
+        <h2>8. MVC Diagram</h2>
+        <div class="mvc-box">VIEW          auth/register.blade.php  →  POST /register
+FORM REQUEST  RegisterRequest.php      →  Validate + unique email query
+CONTROLLER    RegisteredUserController →  User::create() + Auth::login()
+MODEL         User.php (Eloquent)      →  INSERT INTO users
+DATABASE      MySQL users, sessions</div>
+    </div>
+
+    <div class="page">
+        <h2>9. Report Paragraph</h2>
+        <div class="report-text">
+            The customer registration module was implemented using Laravel MVC architecture. The View layer presents a form with CSRF protection. The Form Request class validates input before the controller executes — checking formats, password strength, and email uniqueness against the users table. The Controller creates a User record via Eloquent ORM, assigns the Customer role, hashes the password, and logs the user in. Data is persisted in MySQL with a unique email constraint. After login, access to the dashboard passes through auth, verified, and customer middleware. RBAC ensures public registration cannot create staff accounts.
+        </div>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</body>
+</html>

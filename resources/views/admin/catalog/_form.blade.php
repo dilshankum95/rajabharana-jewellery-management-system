@@ -23,7 +23,6 @@
     <div class="{{ $design ? '' : 'sm:col-span-1' }}">
         <label for="name" class="jewel-label">Item Name *</label>
         <input id="name" name="name" type="text" required minlength="2" maxlength="255"
-            pattern="[A-Za-z0-9\s'\-&.,()]+"
             value="{{ old('name', $design?->name) }}"
             placeholder="e.g. Classic Temple Ring"
             class="jewel-input mt-1.5">
@@ -74,6 +73,16 @@
     </div>
 
     <div>
+        <label for="stock_quantity" class="jewel-label">Stock Quantity *</label>
+        <input id="stock_quantity" name="stock_quantity" type="number" min="0" max="99999" required
+            value="{{ old('stock_quantity', $design?->stock_quantity ?? 1) }}"
+            placeholder="e.g. 5"
+            class="jewel-input mt-1.5">
+        <x-form-hint>Number of units available. Set to 0 to mark out of stock.</x-form-hint>
+        <x-input-error :messages="$errors->get('stock_quantity')" />
+    </div>
+
+    <div>
         <label for="availability_status" class="jewel-label">Availability Status *</label>
         <select id="availability_status" name="availability_status" required class="jewel-input mt-1.5">
             @foreach($availabilityStatuses as $value => $label)
@@ -112,31 +121,4 @@
     </div>
 </div>
 
-@if($design && $design->images->isNotEmpty())
-    <div class="mt-8 pt-6 border-t border-stone-100">
-        <h3 class="jewel-section-title mb-4">Manage Images ({{ $design->images->count() }})</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            @foreach($design->images as $image)
-                <div class="relative group rounded-xl overflow-hidden border border-stone-200 bg-stone-50">
-                    <img src="{{ $image->url }}" alt="" class="w-full h-32 object-cover">
-                    @if($image->is_primary)
-                        <span class="absolute top-2 left-2 text-[10px] uppercase tracking-wider bg-jewel-gold/90 text-white px-2 py-0.5 rounded-full">Primary</span>
-                    @endif
-                    <div class="p-2 flex gap-1">
-                        @if(!$image->is_primary)
-                            <form method="POST" action="{{ route('admin.catalog.images.primary', [$design, $image]) }}" class="flex-1">
-                                @csrf @method('PATCH')
-                                <button type="submit" class="w-full text-xs py-1.5 rounded-lg border border-stone-200 text-stone-600 hover:bg-stone-100 transition">Set Primary</button>
-                            </form>
-                        @endif
-                        <form method="POST" action="{{ route('admin.catalog.images.destroy', [$design, $image]) }}"
-                            onsubmit="return confirm('Remove this image?')" class="{{ $image->is_primary ? 'flex-1' : '' }}">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="w-full text-xs py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 transition">Delete</button>
-                        </form>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-@endif
+@include('admin.catalog._materials', ['design' => $design ?? null, 'rawMaterials' => $rawMaterials ?? collect()])

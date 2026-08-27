@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Technology Stack</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; font-size: 13px; line-height: 1.5; }
+        h1 { text-align: center; font-size: 1.35rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 24px; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; max-width: 960px; margin-left: auto; margin-right: auto; }
+        h2 { font-size: 1rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; color: #0f172a; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 16px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 600; }
+        .report-text { background: #f8fafc; border-left: 4px solid #b8860b; padding: 14px 16px; font-size: 0.88rem; line-height: 1.7; margin-top: 8px; }
+        .wrap { overflow: auto; }
+        @media print { body { background: #fff; padding: 0; } .page { border: none; box-shadow: none; } }
+    </style>
+</head>
+<body>
+    <h1>Technology Stack</h1>
+    <p class="sub">Rajabharana Jewellery Management System · 3-Tier MVC Web Application</p>
+
+    <div class="page">
+        <h2>1. Stack Summary</h2>
+        <table>
+            <tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+            <tr><td>Language</td><td>PHP</td><td>8.2+</td><td>Server-side logic</td></tr>
+            <tr><td>Framework</td><td>Laravel</td><td>12.x</td><td>MVC, routing, ORM, validation</td></tr>
+            <tr><td>Authentication</td><td>Laravel Breeze</td><td>2.x</td><td>Login, register, password reset</td></tr>
+            <tr><td>Views</td><td>Blade</td><td>Laravel</td><td>Server-rendered HTML</td></tr>
+            <tr><td>CSS</td><td>Tailwind CSS</td><td>3.x</td><td>Responsive UI design</td></tr>
+            <tr><td>JavaScript</td><td>Alpine.js</td><td>3.x</td><td>UI interactivity</td></tr>
+            <tr><td>Build tool</td><td>Vite</td><td>7.x</td><td>Asset compilation</td></tr>
+            <tr><td>Database</td><td>MySQL</td><td>8.x</td><td>Relational data storage</td></tr>
+            <tr><td>ORM</td><td>Eloquent</td><td>Laravel</td><td>Database models</td></tr>
+            <tr><td>Testing</td><td>PHPUnit</td><td>11.x</td><td>Automated tests</td></tr>
+            <tr><td>Package managers</td><td>Composer, NPM</td><td>—</td><td>Dependency management</td></tr>
+        </table>
+    </div>
+
+    <div class="page wrap">
+        <h2>2. Architecture Diagram</h2>
+        <div class="mermaid">
+flowchart TB
+    subgraph Client["Client Tier"]
+        Browser["Web Browser"]
+        Blade["Blade Templates"]
+        Tailwind["Tailwind CSS"]
+        Alpine["Alpine.js"]
+    end
+    subgraph Server["Application Tier"]
+        Laravel["Laravel 12"]
+        Breeze["Laravel Breeze"]
+        RBAC["RBAC Middleware"]
+        Controllers["Controllers"]
+        Services["Services"]
+        Eloquent["Eloquent ORM"]
+    end
+    subgraph Data["Data Tier"]
+        MySQL["MySQL"]
+        Files["File Storage"]
+    end
+    Browser --> Blade
+    Blade --> Tailwind
+    Blade --> Alpine
+    Blade --> Laravel
+    Laravel --> Breeze
+    Laravel --> RBAC
+    Laravel --> Controllers
+    Controllers --> Services
+    Controllers --> Eloquent
+    Eloquent --> MySQL
+    Controllers --> Files
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>3. Security</h2>
+        <table>
+            <tr><th>Feature</th><th>Implementation</th></tr>
+            <tr><td>Authentication</td><td>Laravel Breeze (session-based)</td></tr>
+            <tr><td>Password storage</td><td>Bcrypt hashing</td></tr>
+            <tr><td>Authorization</td><td>RBAC — 6 roles, permission middleware</td></tr>
+            <tr><td>CSRF</td><td>Laravel built-in token protection</td></tr>
+            <tr><td>Validation</td><td>Form Request classes</td></tr>
+        </table>
+    </div>
+
+    <div class="page">
+        <h2>4. Report Paragraph (copy-paste)</h2>
+        <div class="report-text">
+            The Rajabharana Jewellery Management System was developed as a web-based application using a <strong>3-tier architecture</strong>. The <strong>presentation tier</strong> consists of HTML rendered through <strong>Laravel Blade</strong> templates, styled with <strong>Tailwind CSS</strong>, and enhanced with <strong>Alpine.js</strong> for interactive components. The <strong>application tier</strong> is built on <strong>PHP 8.2</strong> and the <strong>Laravel 12</strong> framework, which provides routing, authentication (<strong>Laravel Breeze</strong>), role-based access control, form validation, and a service-oriented business logic layer. The <strong>data tier</strong> uses a <strong>MySQL</strong> relational database accessed through <strong>Eloquent ORM</strong>, with Laravel migrations for schema management. File uploads are stored using Laravel's filesystem abstraction. Frontend assets are compiled using <strong>Vite</strong>. The system supports six user roles across separate web panels with session-based authentication and permission middleware.
+        </div>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });</script>
+</body>
+</html>

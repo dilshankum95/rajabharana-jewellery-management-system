@@ -36,14 +36,14 @@
             <p class="font-display text-3xl font-semibold text-indigo-700 mt-1">{{ $stats['quality_check'] }}</p>
         </div>
         <div class="jewel-card p-5">
-            <p class="text-xs uppercase tracking-wider text-emerald-600/80 font-semibold">Ready</p>
+            <p class="text-xs uppercase tracking-wider text-emerald-600/80 font-semibold">Ready to Pickup</p>
             <p class="font-display text-3xl font-semibold text-emerald-700 mt-1">{{ $stats['ready'] }}</p>
         </div>
     </div>
 
     @if($filters['unassigned'] ?? false)
         <x-alert type="warning" class="mb-6">
-            Showing unassigned jobs only — confirmed orders waiting for a technician.
+            Showing unassigned jobs only — accepted orders waiting for a technician.
             <a href="{{ route('admin.workshop.index') }}" class="underline font-medium ml-1">Show full queue</a>
         </x-alert>
     @endif
@@ -95,7 +95,7 @@
                         <th>Customer</th>
                         <th>Item</th>
                         <th>Due</th>
-                        <th>Status</th>
+                        <th>Production</th>
                         <th>Technician</th>
                         <th></th>
                     </tr>
@@ -120,10 +120,11 @@
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $order->item_type_label }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $order->expected_delivery_date->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <x-order-status-badge :status="$order->status" />
+                                <x-production-status-badge :status="$order->production_status" />
+                                <div class="mt-1"><x-task-status-badge :status="$order->task_status" /></div>
                             </td>
                             <td class="px-6 py-4">
-                                @can('permission', 'production.assign')
+                                @if(auth()->user()->isAdmin())
                                     @if($order->isAssignableToTechnician() || $order->assignedTechnician)
                                         <form method="POST" action="{{ route('admin.orders.assign-technician', $order) }}" class="flex items-center gap-2 min-w-[12rem]">
                                             @csrf
@@ -148,7 +149,7 @@
                                     @else
                                         <span class="text-sm text-slate-400">Unassigned</span>
                                     @endif
-                                @endcan
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="text-sm font-medium text-jewel-gold-dark hover:text-jewel-gold">View</a>

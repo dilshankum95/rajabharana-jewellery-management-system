@@ -22,16 +22,9 @@ class FilterProductionRequest extends FormRequest
 
     public function rules(): array
     {
-        $productionStatuses = [
-            'confirmed',
-            'in_production',
-            'quality_check',
-            'ready',
-        ];
-
         return [
             'search' => ValidationRules::searchQuery(),
-            'status' => ['nullable', 'string', Rule::in($productionStatuses)],
+            'status' => ['nullable', 'string', Rule::in(array_keys(config('jewellery.production_statuses', [])))],
             'technician_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where('role', 'technician')],
             'unassigned' => ['nullable', 'boolean'],
         ];

@@ -62,7 +62,7 @@
                     ['label' => 'Total Orders', 'value' => $stats['total'], 'color' => 'text-stone-700'],
                     ['label' => 'Pending Review', 'value' => $stats['pending'], 'color' => 'text-amber-700/80'],
                     ['label' => 'In Progress', 'value' => $stats['in_progress'], 'color' => 'text-violet-700/80'],
-                    ['label' => 'Ready', 'value' => $stats['ready'], 'color' => 'text-emerald-700/80'],
+                    ['label' => 'Ready to Pickup', 'value' => $stats['ready'], 'color' => 'text-emerald-700/80'],
                 ] as $stat)
                     <div class="jewel-stat">
                         <p class="text-xs uppercase tracking-wider text-gray-400">{{ $stat['label'] }}</p>
@@ -86,20 +86,31 @@
                 @else
                     <div class="divide-y divide-jewel-gold/10">
                         @foreach($orders as $order)
-                            <a href="{{ route('orders.show', $order) }}" class="flex items-center justify-between gap-4 px-6 py-4 hover:bg-jewel-cream/50 transition group">
-                                <div>
-                                    <p class="font-semibold text-jewel-dark group-hover:text-jewel-gold-dark transition">{{ $order->order_number }}</p>
-                                    <p class="text-sm text-gray-500">{{ $order->item_type_label }} @if($order->item_name)— {{ $order->item_name }}@endif</p>
+                            <a href="{{ route('orders.show', $order) }}" class="block px-6 py-4 hover:bg-jewel-cream/50 transition group">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="font-semibold text-jewel-dark group-hover:text-jewel-gold-dark transition">{{ $order->order_number }}</p>
+                                        <p class="text-sm text-gray-500">{{ $order->item_type_label }} @if($order->item_name)— {{ $order->item_name }}@endif</p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        @if($order->hasPrice())
+                                            <span class="text-sm font-semibold text-jewel-gold-dark hidden sm:block">
+                                                LKR {{ number_format($order->estimated_price, 0) }}
+                                            </span>
+                                        @endif
+                                        <span class="text-xs text-gray-400 hidden sm:block">{{ $order->created_at->format('M d, Y') }}</span>
+                                        <x-order-status-badge :status="$order->status" />
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-4">
-                                    @if($order->hasPrice())
-                                        <span class="text-sm font-semibold text-jewel-gold-dark hidden sm:block">
-                                            LKR {{ number_format($order->estimated_price, 0) }}
-                                        </span>
-                                    @endif
-                                    <span class="text-xs text-gray-400 hidden sm:block">{{ $order->created_at->format('M d, Y') }}</span>
-                                    <x-order-status-badge :status="$order->status" />
-                                </div>
+                                @if($order->status === \App\Enums\OrderStatus::Accepted)
+                                    <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                                        @if($order->assignedTechnician)
+                                            <span class="text-slate-500">Technician: <span class="font-medium text-slate-700">{{ $order->assignedTechnician->name }}</span></span>
+                                        @endif
+                                        <x-task-status-badge :status="$order->task_status" />
+                                        <x-production-status-badge :status="$order->production_status" />
+                                    </div>
+                                @endif
                             </a>
                         @endforeach
                     </div>

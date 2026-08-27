@@ -140,6 +140,8 @@
                     </section>
                     @endif
 
+                    <x-order-workflow-status :order="$order" />
+
                     <section class="jewel-card jewel-card-body">
                         <h3 class="jewel-section-title mb-4">Delivery</h3>
                         <dl class="space-y-3 text-sm">
@@ -165,7 +167,7 @@
                             &larr; Back to My Orders
                         </a>
 
-                        @if(in_array($order->status, [\App\Enums\OrderStatus::Pending, \App\Enums\OrderStatus::Confirmed]))
+                        @if($order->status === \App\Enums\OrderStatus::Pending)
                             <form method="POST" action="{{ route('orders.cancel', $order) }}"
                                 onsubmit="return confirm('Are you sure you want to cancel this order?')">
                                 @csrf

@@ -153,6 +153,7 @@ class CatalogDesignSeeder extends Seeder
                         'weight_grams' => $weight,
                         'selling_price' => $price,
                         'availability_status' => AvailabilityStatus::Available,
+                        'stock_quantity' => 3,
                     ]
                 );
             }

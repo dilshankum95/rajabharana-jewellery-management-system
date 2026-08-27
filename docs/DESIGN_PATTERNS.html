@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rajabharana — Design Patterns</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; margin: 0; padding: 24px; color: #1e293b; font-size: 13px; line-height: 1.55; }
+        h1 { text-align: center; font-size: 1.35rem; margin-bottom: 4px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 24px; }
+        .page { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; max-width: 980px; margin-left: auto; margin-right: auto; }
+        h2 { font-size: 1rem; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+        h3 { font-size: 0.9rem; margin: 16px 0 8px; color: #334155; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 14px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; font-weight: 600; }
+        .report-text { background: #f8fafc; border-left: 4px solid #b8860b; padding: 14px 16px; font-size: 0.88rem; line-height: 1.7; }
+        .wrap { overflow: auto; }
+        code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+        @media print { body { background: #fff; } .page { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <h1>Design Patterns</h1>
+    <p class="sub">Rajabharana Jewellery Management System · Academic Report</p>
+
+    <div class="page">
+        <h2>1. Patterns Used in the Project</h2>
+        <table>
+            <tr><th>#</th><th>Pattern</th><th>Category</th><th>Where Used</th></tr>
+            <tr><td>1</td><td>Model-View-Controller (MVC)</td><td>Architectural</td><td>Entire application</td></tr>
+            <tr><td>2</td><td>Layered (3-Tier) Architecture</td><td>Architectural</td><td>Client, Application, Data tiers</td></tr>
+            <tr><td>3</td><td>Service Layer</td><td>Architectural</td><td>InvoiceService, PaymentService</td></tr>
+            <tr><td>4</td><td>Active Record</td><td>Data access</td><td>Eloquent models</td></tr>
+            <tr><td>5</td><td>Front Controller</td><td>Architectural</td><td>Laravel routing</td></tr>
+            <tr><td>6</td><td>Dependency Injection</td><td>Structural</td><td>Controllers, services</td></tr>
+            <tr><td>7</td><td>Form Request (Validation Object)</td><td>Behavioral</td><td>StoreOrderRequest, etc.</td></tr>
+            <tr><td>8</td><td>Middleware (Chain of Responsibility)</td><td>Behavioral</td><td>EnsurePermission, EnsureAdmin</td></tr>
+            <tr><td>9</td><td>Strategy (via Enums)</td><td>Behavioral</td><td>OrderStatus, InvoiceStatus</td></tr>
+            <tr><td>10</td><td>Factory Method</td><td>Creational</td><td>generateOrderNumber()</td></tr>
+            <tr><td>11</td><td>Singleton (app-level)</td><td>Creational</td><td>BillingSetting::current()</td></tr>
+            <tr><td>12</td><td>View Component</td><td>Structural</td><td>AdminLayout, AppLayout</td></tr>
+            <tr><td>13</td><td>Observer (Notifications)</td><td>Behavioral</td><td>InvoiceIssuedNotification</td></tr>
+            <tr><td>14</td><td>Role-Based Access Control</td><td>Security</td><td>Rbac, middleware, config</td></tr>
+        </table>
+    </div>
+
+    <div class="page wrap">
+        <h2>2. MVC Pattern</h2>
+        <div class="mermaid">
+flowchart LR
+    Browser["Browser"] --> Controller["Controller"]
+    Controller --> Model["Eloquent Model"]
+    Controller --> View["Blade View"]
+    Model --> DB["MySQL"]
+    View --> Browser
+        </div>
+        <table>
+            <tr><th>Layer</th><th>Examples</th></tr>
+            <tr><td>Model</td><td>User, Order, Invoice, Payment</td></tr>
+            <tr><td>View</td><td>Blade templates in resources/views</td></tr>
+            <tr><td>Controller</td><td>InvoiceController, OrderController</td></tr>
+        </table>
+    </div>
+
+    <div class="page wrap">
+        <h2>3. Service Layer Pattern</h2>
+        <div class="mermaid">
+classDiagram
+    class InvoiceController {
+        -InvoiceService invoiceService
+        +issue()
+    }
+    class InvoiceService {
+        -InvoiceCalculator calculator
+        +createDraftFromOrder()
+        +issue()
+    }
+    class InvoiceCalculator {
+        +calculate()
+    }
+    class Invoice
+    InvoiceController --> InvoiceService
+    InvoiceService --> InvoiceCalculator
+    InvoiceService --> Invoice
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>4. Middleware Chain and RBAC</h2>
+        <div class="mermaid">
+flowchart LR
+    Request["HTTP Request"] --> Auth["auth"]
+    Auth --> Verified["verified"]
+    Verified --> Role["EnsureAdmin"]
+    Role --> Perm["EnsurePermission"]
+    Perm --> Controller["Controller"]
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>5. Observer Pattern — Notifications</h2>
+        <div class="mermaid">
+sequenceDiagram
+    participant Staff as Staff
+    participant Service as InvoiceService
+    participant Invoice as Invoice
+    participant Notif as Notification
+    participant Customer as Customer
+    Staff->>Service: issue invoice
+    Service->>Invoice: status Issued
+    Service->>Notif: notify customer
+    Notif->>Customer: database alert
+        </div>
+    </div>
+
+    <div class="page wrap">
+        <h2>6. Pattern Relationships Overview</h2>
+        <div class="mermaid">
+classDiagram
+    direction TB
+    class Controller {
+        <<MVC>>
+    }
+    class FormRequest {
+        <<Validation Object>>
+    }
+    class Service {
+        <<Service Layer>>
+    }
+    class Model {
+        <<Active Record>>
+    }
+    class Middleware {
+        <<Chain of Responsibility>>
+    }
+    class Notification {
+        <<Observer>>
+    }
+    class Enum {
+        <<Strategy>>
+    }
+    Controller --> FormRequest
+    Controller --> Service
+    Controller --> Model
+    Middleware --> Controller
+    Service --> Model
+    Service --> Notification
+    Model --> Enum
+        </div>
+    </div>
+
+    <div class="page">
+        <h2>7. Report Paragraph (copy-paste)</h2>
+        <div class="report-text">
+            The Rajabharana Jewellery Management System applies several established design patterns to achieve a maintainable and scalable architecture. The overall structure follows the <strong>Model-View-Controller (MVC)</strong> pattern and a <strong>3-tier layered architecture</strong>, separating presentation (Blade views), application logic (controllers and services), and data persistence (Eloquent models and MySQL). Complex business operations such as invoicing and payment processing are handled through a dedicated <strong>Service Layer</strong> (<code>InvoiceService</code>, <code>PaymentService</code>, <code>InvoiceCalculator</code>), keeping controllers thin and logic reusable. <strong>Form Request</strong> classes implement the validation object pattern for secure input handling. <strong>Middleware</strong> classes form a <strong>Chain of Responsibility</strong> for authentication and <strong>Role-Based Access Control (RBAC)</strong>. Domain statuses are modelled using PHP <strong>Enums</strong> with encapsulated behaviour, applying a <strong>Strategy</strong>-like approach. <strong>Factory Method</strong> functions generate unique order and invoice numbers. Customer alerts use Laravel's <strong>Observer-based Notification</strong> system. <strong>Dependency Injection</strong> is used throughout controllers for loose coupling.
+        </div>
+    </div>
+
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });</script>
+</body>
+</html>

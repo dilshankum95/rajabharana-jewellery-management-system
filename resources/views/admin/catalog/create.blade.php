@@ -10,7 +10,7 @@
         <form method="POST" action="{{ route('admin.catalog.store') }}" enctype="multipart/form-data"
             class="jewel-card jewel-card-body space-y-6">
             @csrf
-            @include('admin.catalog._form', compact('categories', 'goldQualities', 'availabilityStatuses'))
+            @include('admin.catalog._form', compact('categories', 'goldQualities', 'availabilityStatuses', 'rawMaterials'))
             <button type="submit" class="jewel-btn">Create Item</button>
         </form>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\OrderStatus;
+use App\Enums\ProductionStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\MetalPrice;
@@ -18,15 +19,16 @@ class DashboardController extends Controller
         $stats = [
             'total_orders' => Order::count(),
             'pending_orders' => Order::where('status', OrderStatus::Pending)->count(),
-            'in_progress' => Order::whereIn('status', [
-                OrderStatus::Confirmed,
-                OrderStatus::InProduction,
-                OrderStatus::QualityCheck,
-            ])->count(),
-            'ready_orders' => Order::where('status', OrderStatus::Ready)->count(),
+            'in_progress' => Order::where('status', OrderStatus::Accepted)
+                ->where(function ($query) {
+                    $query->whereNull('production_status')
+                        ->orWhere('production_status', '!=', ProductionStatus::ReadyToPickup->value);
+                })
+                ->count(),
+            'ready_orders' => Order::where('production_status', ProductionStatus::ReadyToPickup)->count(),
             'total_customers' => User::where('role', UserRole::Customer)->count(),
             'quoted_value' => Order::whereNotNull('estimated_price')
-                ->whereNot('status', OrderStatus::Cancelled)
+                ->where('status', '!=', OrderStatus::Rejected)
                 ->sum('estimated_price'),
             'overdue_deliveries' => Order::deliveryOverdue()->count(),
             'due_soon_deliveries' => Order::deliveryDueSoon()->count(),

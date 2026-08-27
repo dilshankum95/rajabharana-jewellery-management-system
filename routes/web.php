@@ -7,10 +7,12 @@ use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\MetalPriceController;
 use App\Http\Controllers\Admin\CatalogDesignController;
+use App\Http\Controllers\Admin\RawMaterialController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderAssignmentController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\StaffUserController;
 use App\Http\Controllers\Admin\WorkshopController;
 use App\Http\Controllers\Customer\DashboardController;
@@ -75,6 +77,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         ->middleware('permission:'.Permission::OrdersManage->value)
         ->name('orders.update');
 
+    Route::patch('/orders/{order}/production', [AdminOrderController::class, 'updateProduction'])
+        ->name('orders.update-production');
+
     Route::patch('/orders/{order}/assign-technician', [OrderAssignmentController::class, 'update'])
         ->middleware('permission:'.Permission::ProductionAssign->value)
         ->name('orders.assign-technician');
@@ -102,6 +107,19 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::delete('/catalog/{catalog}', [CatalogDesignController::class, 'destroy'])->name('catalog.destroy');
         Route::delete('/catalog/{catalog}/images/{image}', [CatalogDesignController::class, 'destroyImage'])->name('catalog.images.destroy');
         Route::patch('/catalog/{catalog}/images/{image}/primary', [CatalogDesignController::class, 'setPrimaryImage'])->name('catalog.images.primary');
+    });
+
+    Route::middleware('permission:'.Permission::RawMaterialsView->value)->prefix('raw-materials')->name('raw-materials.')->group(function () {
+        Route::get('/', [RawMaterialController::class, 'index'])->name('index');
+    });
+
+    Route::middleware('permission:'.Permission::RawMaterialsManage->value)->prefix('raw-materials')->name('raw-materials.')->group(function () {
+        Route::get('/create', [RawMaterialController::class, 'create'])->name('create');
+        Route::post('/', [RawMaterialController::class, 'store'])->name('store');
+        Route::get('/{rawMaterial}/edit', [RawMaterialController::class, 'edit'])->name('edit');
+        Route::patch('/{rawMaterial}', [RawMaterialController::class, 'update'])->name('update');
+        Route::delete('/{rawMaterial}', [RawMaterialController::class, 'destroy'])->name('destroy');
+        Route::post('/{rawMaterial}/adjust-stock', [RawMaterialController::class, 'adjustStock'])->name('adjust-stock');
     });
 
     Route::middleware('permission:'.Permission::MetalPricesManage->value)->group(function () {
@@ -140,12 +158,22 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/billing/settings', [BillingSettingsController::class, 'edit'])->name('billing.settings');
         Route::patch('/billing/settings', [BillingSettingsController::class, 'update'])->name('billing.settings.update');
     });
+
+    Route::middleware('permission:'.Permission::ReportsView->value)->prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/{type}/print', [ReportController::class, 'print'])->name('print');
+        Route::get('/{type}/export', [ReportController::class, 'exportCsv'])
+            ->middleware('permission:'.Permission::ReportsExport->value)
+            ->name('export');
+        Route::get('/{type}', [ReportController::class, 'show'])->name('show');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'technician'])->prefix('technician')->name('technician.')->group(function () {
     Route::get('/', TechnicianDashboardController::class)->name('dashboard');
     Route::get('/jobs/{order}', [TechnicianJobController::class, 'show'])->name('jobs.show');
-    Route::patch('/jobs/{order}', [TechnicianJobController::class, 'update'])->name('jobs.update');
+    Route::post('/jobs/{order}/task', [TechnicianJobController::class, 'respondToTask'])->name('jobs.task');
+    Route::patch('/jobs/{order}/production', [TechnicianJobController::class, 'updateProduction'])->name('jobs.production');
 });
 
 Route::middleware('auth')->group(function () {

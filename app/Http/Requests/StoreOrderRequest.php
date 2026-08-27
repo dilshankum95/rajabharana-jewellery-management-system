@@ -5,9 +5,11 @@ namespace App\Http\Requests;
 use App\Enums\AvailabilityStatus;
 use App\Enums\DesignType;
 use App\Http\Requests\Concerns\SanitizesInput;
+use App\Models\CatalogDesign;
 use App\Support\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreOrderRequest extends FormRequest
 {
@@ -72,6 +74,41 @@ class StoreOrderRequest extends FormRequest
             'contact_phone' => ValidationRules::phone(required: true),
             'delivery_address' => ValidationRules::address(required: true),
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($this->input('design_type') !== DesignType::Catalog->value || ! $this->filled('catalog_design_id')) {
+                return;
+            }
+
+            $design = CatalogDesign::with('rawMaterials')->find($this->input('catalog_design_id'));
+
+            if (! $design) {
+                return;
+            }
+
+            $quantity = max(1, (int) $this->input('quantity', 1));
+
+            if ((int) $design->stock_quantity < $quantity) {
+                $validator->errors()->add(
+                    'quantity',
+                    "Only {$design->stock_quantity} unit(s) available for this design. Please reduce the quantity."
+                );
+            }
+
+            foreach ($design->rawMaterials as $material) {
+                $required = round((float) $material->pivot->quantity_required * $quantity, 3);
+
+                if ((float) $material->stock_quantity < $required) {
+                    $validator->errors()->add(
+                        'quantity',
+                        "Insufficient workshop stock for {$material->name}. Need {$required} {$material->unit_label}."
+                    );
+                }
+            }
+        });
     }
 
     public function messages(): array

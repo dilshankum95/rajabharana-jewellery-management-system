@@ -10,6 +10,8 @@ enum Permission: string
     case CustomersView = 'customers.view';
     case CatalogView = 'catalog.view';
     case CatalogManage = 'catalog.manage';
+    case RawMaterialsView = 'raw-materials.view';
+    case RawMaterialsManage = 'raw-materials.manage';
     case MetalPricesManage = 'metal-prices.manage';
     case UsersManage = 'users.manage';
     case ProductionView = 'production.view';
@@ -18,6 +20,8 @@ enum Permission: string
     case BillingView = 'billing.view';
     case BillingManage = 'billing.manage';
     case BillingSettings = 'billing.settings';
+    case ReportsView = 'reports.view';
+    case ReportsExport = 'reports.export';
 
     public function label(): string
     {
@@ -28,6 +32,8 @@ enum Permission: string
             self::CustomersView => 'View customers',
             self::CatalogView => 'View catalog',
             self::CatalogManage => 'Manage catalog',
+            self::RawMaterialsView => 'View raw materials',
+            self::RawMaterialsManage => 'Manage raw materials',
             self::MetalPricesManage => 'Manage metal prices',
             self::UsersManage => 'Manage staff accounts',
             self::ProductionView => 'View production queue',
@@ -36,6 +42,8 @@ enum Permission: string
             self::BillingView => 'View invoices',
             self::BillingManage => 'Manage invoices and payments',
             self::BillingSettings => 'Manage billing settings (tax & discounts)',
+            self::ReportsView => 'View reports',
+            self::ReportsExport => 'Export reports (CSV)',
         };
     }
 }

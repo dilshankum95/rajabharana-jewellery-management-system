@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name') }}</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
+        <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=dm-sans:400,500,600,700|playfair-display:400,500,600,700&display=swap" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+            @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-jewel-dark overflow-hidden">
         <div class="absolute inset-0 opacity-30 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23E9B44C\" fill-opacity=\"0.06\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
@@ -25,23 +25,23 @@
                 <a href="{{ route('catalog.index') }}" class="hidden sm:inline text-sm font-semibold text-slate-300 hover:text-white transition">Our Catalog</a>
             </div>
             <div class="flex items-center gap-3">
-                @auth
+                    @auth
                     <a href="{{ url('/dashboard') }}" class="jewel-btn text-xs px-5 py-2">Dashboard</a>
-                @else
+                    @else
                     <a href="{{ route('login') }}" class="text-sm font-semibold text-slate-300 hover:text-white px-4 py-2 transition">Sign In</a>
                     @if(Route::has('register'))
                         <a href="{{ route('register') }}" class="jewel-btn text-xs px-5 py-2">Register</a>
-                    @endif
-                @endauth
+                        @endif
+                    @endauth
             </div>
-        </nav>
+                </nav>
 
         <main class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12 px-6 py-16 sm:px-10 lg:px-16 lg:py-24 max-w-7xl mx-auto">
             <div class="flex-1 text-center lg:text-left animate-slide-up">
                 <span class="inline-block px-4 py-1.5 rounded-full bg-jewel-rose/20 text-jewel-rose-light text-xs font-semibold uppercase tracking-widest mb-6 border border-jewel-rose/30">Fine Jewellery · Custom Orders</span>
                 <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-tight">
                     Crafted with<br>
-                    <span class="text-transparent bg-clip-text bg-gold-shimmer">timeless elegance</span>
+                    <span class="text-transparent bg-clip-text bg-gold-shimmer">Timeless Elegance</span>
                 </h1>
                 <p class="mt-6 text-slate-400 text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed">
                     Order bespoke gold jewellery from our catalog or submit your own design. Track every step from workshop to delivery.
@@ -73,12 +73,12 @@
                         <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-2">{{ $lbl }}</p>
                     </div>
                 @endforeach
-            </div>
-        </main>
+                </div>
+            </main>
 
         <footer class="relative z-10 text-center py-8 text-xs text-slate-500 border-t border-white/5">
             &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
         </footer>
-    </div>
-</body>
+        </div>
+    </body>
 </html>

@@ -37,7 +37,7 @@
                         <tr class="text-left text-slate-400 border-b border-slate-100">
                             <th class="pb-3 pr-4 font-medium">Order</th>
                             <th class="pb-3 pr-4 font-medium">Item</th>
-                            <th class="pb-3 pr-4 font-medium">Status</th>
+                            <th class="pb-3 pr-4 font-medium">Task / Production</th>
                             <th class="pb-3 pr-4 font-medium">Due Date</th>
                             <th class="pb-3 font-medium"></th>
                         </tr>
@@ -47,7 +47,12 @@
                             <tr class="{{ $job->isDeliveryOverdue() ? 'bg-rose-50/50' : ($job->isDeliveryDueSoon() ? 'bg-amber-50/40' : '') }}">
                                 <td class="py-3 pr-4 font-medium">{{ $job->order_number }}</td>
                                 <td class="py-3 pr-4">{{ $job->item_type_label }}@if($job->item_name) · {{ $job->item_name }}@endif</td>
-                                <td class="py-3 pr-4"><x-order-status-badge :status="$job->status" /></td>
+                                <td class="py-3 pr-4">
+                                    <div class="flex flex-wrap gap-1">
+                                        <x-task-status-badge :status="$job->task_status" />
+                                        <x-production-status-badge :status="$job->production_status" />
+                                    </div>
+                                </td>
                                 <td class="py-3 pr-4 {{ $job->isDeliveryOverdue() ? 'text-rose-600 font-medium' : ($job->isDeliveryDueSoon() ? 'text-amber-700 font-medium' : '') }}">
                                     {{ $job->expected_delivery_date->format('M d, Y') }}
                                 </td>
@@ -64,7 +69,7 @@
 
     @if($readyJobs->isNotEmpty())
         <section class="jewel-card jewel-card-body">
-            <h2 class="jewel-section-title mb-4">Recently Completed (Ready)</h2>
+            <h2 class="jewel-section-title mb-4">Recently Completed (Ready to Pickup)</h2>
             <ul class="divide-y divide-slate-50 text-sm">
                 @foreach($readyJobs as $job)
                     <li class="py-3 flex items-center justify-between gap-4">

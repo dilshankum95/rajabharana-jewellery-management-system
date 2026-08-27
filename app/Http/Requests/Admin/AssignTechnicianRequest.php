@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\User;
-use App\Support\Rbac;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -11,7 +9,7 @@ class AssignTechnicianRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Rbac::userHasPermission($this->user(), 'production.assign');
+        return $this->user()?->isAdmin() ?? false;
     }
 
     public function rules(): array

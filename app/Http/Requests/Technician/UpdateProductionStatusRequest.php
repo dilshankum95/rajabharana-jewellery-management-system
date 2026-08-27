@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests\Technician;
 
-use App\Enums\OrderStatus;
+use App\Enums\ProductionStatus;
 use App\Http\Requests\Concerns\SanitizesInput;
 use App\Support\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateProductionJobRequest extends FormRequest
+class UpdateProductionStatusRequest extends FormRequest
 {
     use SanitizesInput;
 
@@ -17,7 +17,7 @@ class UpdateProductionJobRequest extends FormRequest
         $order = $this->route('order');
 
         return $this->user()?->isTechnician()
-            && $order->technicianCanUpdate($this->user());
+            && $order->technicianCanUpdateProduction($this->user());
     }
 
     protected function prepareForValidation(): void
@@ -28,9 +28,9 @@ class UpdateProductionJobRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => [
+            'production_status' => [
                 'required',
-                Rule::enum(OrderStatus::class),
+                Rule::enum(ProductionStatus::class),
             ],
             'note' => ValidationRules::longText(max: 2000, required: false),
         ];
@@ -40,20 +40,20 @@ class UpdateProductionJobRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $order = $this->route('order');
-            $newStatus = OrderStatus::tryFrom($this->input('status'));
+            $newStatus = ProductionStatus::tryFrom($this->input('production_status'));
 
             if (! $newStatus) {
                 return;
             }
 
-            if ($newStatus === $order->status) {
+            if ($newStatus === $order->production_status) {
                 return;
             }
 
-            if (! $order->isValidTechnicianStatusTransition($newStatus)) {
+            if (! $order->isValidProductionTransition($newStatus)) {
                 $validator->errors()->add(
-                    'status',
-                    'This status change is not allowed from the current order state.'
+                    'production_status',
+                    'Production status can only move forward one step at a time.'
                 );
             }
         });

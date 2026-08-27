@@ -16,7 +16,17 @@ Use these diagrams in your project report (Word). Export from [Mermaid Live Edit
 
 **Wireframe diagrams:** [`WIREFRAME.html`](WIREFRAME.html) · [`WIREFRAME.md`](WIREFRAME.md)
 
-**Planned modules included:** Billing (Sprint 9) · Reports (Sprint 10)
+**Technology stack (for report):** [`TECHNOLOGY_STACK.html`](TECHNOLOGY_STACK.html) · [`TECHNOLOGY_STACK.md`](TECHNOLOGY_STACK.md)
+
+**Design patterns (for report):** [`DESIGN_PATTERNS.html`](DESIGN_PATTERNS.html) · [`DESIGN_PATTERNS.md`](DESIGN_PATTERNS.md)
+
+**Implementation (Section 6.3):** [`IMPLEMENTATION.html`](IMPLEMENTATION.html) · [`IMPLEMENTATION.md`](IMPLEMENTATION.md)
+
+**Registration module (detailed):** [`IMPLEMENTATION_REGISTER.html`](IMPLEMENTATION_REGISTER.html) · [`IMPLEMENTATION_REGISTER.md`](IMPLEMENTATION_REGISTER.md)
+
+**Project setup (installation):** [`PROJECT_SETUP.html`](PROJECT_SETUP.html) · [`PROJECT_SETUP.md`](PROJECT_SETUP.md)
+
+**Planned modules included:** Reports (Sprint 10)
 
 ---
 

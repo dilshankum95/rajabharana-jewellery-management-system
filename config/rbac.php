@@ -17,6 +17,10 @@ return [
         UserRole::Manager->value => [
             Permission::CatalogView->value,
             Permission::CatalogManage->value,
+            Permission::RawMaterialsView->value,
+            Permission::RawMaterialsManage->value,
+            Permission::ReportsView->value,
+            Permission::ReportsExport->value,
         ],
 
         UserRole::Staff->value => [
@@ -27,6 +31,8 @@ return [
             Permission::CatalogView->value,
             Permission::BillingView->value,
             Permission::BillingManage->value,
+            Permission::ReportsView->value,
+            Permission::ProductionView->value,
         ],
 
         UserRole::Technician->value => [

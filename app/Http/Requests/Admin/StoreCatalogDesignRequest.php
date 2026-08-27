@@ -3,14 +3,16 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\AvailabilityStatus;
+use App\Http\Requests\Admin\Concerns\ValidatesCatalogMaterials;
 use App\Http\Requests\Concerns\SanitizesInput;
 use App\Support\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreCatalogDesignRequest extends FormRequest
 {
-    use SanitizesInput;
+    use SanitizesInput, ValidatesCatalogMaterials;
 
     public function authorize(): bool
     {
@@ -20,6 +22,7 @@ class StoreCatalogDesignRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->trimStrings(['name', 'description'], ['description']);
+        $this->filterEmptyCatalogMaterialRows();
     }
 
     public function rules(): array
@@ -31,10 +34,17 @@ class StoreCatalogDesignRequest extends FormRequest
             'weight_grams' => ValidationRules::weight(required: true),
             'description' => ValidationRules::orderNotes(max: 2000),
             'selling_price' => ValidationRules::money(),
+            'stock_quantity' => ['required', 'integer', 'min:0', 'max:99999'],
             'availability_status' => ['required', Rule::enum(AvailabilityStatus::class)],
             'images' => ['required', 'array', 'min:1', 'max:10'],
             'images.*' => ValidationRules::imageFile(required: true),
+            ...$this->catalogMaterialRules(),
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $this->validateCatalogMaterialRows($validator);
     }
 
     public function messages(): array
